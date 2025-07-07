@@ -33,8 +33,6 @@ function Parser:ParseSteps(text)
 
     local raw = {}
     local current, lastReward
-    local bossesCount = 0
-    local notesCount = 0
 
     local function splitActions(action)
         local parts = {}
@@ -87,29 +85,44 @@ function Parser:ParseSteps(text)
                 actions = splitActions(self:GetRacialText(action)),
                 rewards = {}
             }
-            lastReward = nil
-            bossesCount = 0
-            notesCount = 0
+            lastReward = nil -- Reset for the new step
             table.insert(raw, current)
         elseif current then
-            local boss, mount = line:match("^(%S.-)%s%s+(%S.-)%s*$")
-            if boss and mount then
-                lastReward = {
-                    boss = boss,
-                    mount = mount,
-                    note = ""
-                }
-                table.insert(current.rewards, lastReward)
-                bossesCount = bossesCount + 1
-            else
-                local txt = line:match("%S.*") or ""
-                if current.rewards and #current.rewards > 0 then
-                    current.rewards[notesCount + 1].note = txt
+            -- Check if the line has actual content or is just whitespace
+            local content = line:match("^%s*(%S.*%S*)%s*$")
+
+            if content then -- Only proceed if the line is not empty
+                local boss, mount = content:match("^(%S.-)%s%s+(%S.-)$")
+                if boss and mount then
+                    -- This line defines a boss and a mount
+                    lastReward = {
+                        boss = boss,
+                        mount = mount,
+                        note = ""
+                    }
+                    table.insert(current.rewards, lastReward)
                 else
-                    current.note = self:GetRacialText(txt)
+                    -- This line is a note. Let's attach it to the right place.
+                    local txt = content
+                    if lastReward then
+                        -- If we just read a boss/mount, this note belongs to it.
+                        if lastReward.note and lastReward.note ~= "" then
+                            lastReward.note = lastReward.note .. "\n" .. txt
+                        else
+                            lastReward.note = txt
+                        end
+                    else
+                        -- If no reward is listed yet for this step, it's a general note.
+                        if not current.note then current.note = "" end
+                        if current.note ~= "" then
+                            current.note = current.note .. "\n" .. self:GetRacialText(txt)
+                        else
+                            current.note = self:GetRacialText(txt)
+                        end
+                    end
                 end
-                notesCount = notesCount + 1
             end
+            -- Lines that are empty or only contain whitespace will now be correctly ignored.
         end
     end
 
