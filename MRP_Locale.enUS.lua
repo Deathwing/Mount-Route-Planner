@@ -98,7 +98,10 @@ MRP.L = {
     ["Cannot set waypoint on map: '%s', please report it."] = "Cannot set waypoint on map: '%s', please report it.",
 
     ["Mount not found: '%s', please report it."] = "Mount not found: '%s', please report it.",
-    ["Item not found: '%s', please report it."] = "Item not found: '%s', please report it."
+    ["Item not found: '%s', please report it."] = "Item not found: '%s', please report it.",
+
+    ["Wrong Difficulty"] = "Wrong Difficulty",
+    ["Please switch to '%s'"] = "Please switch to '%s'"
 }
 
 setmetatable(MRP.L, {

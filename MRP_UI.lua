@@ -640,3 +640,38 @@ f:SetScript("OnEvent", function()
     toggle:SetChecked(MRP_DB.autoSkip)
     autoAdvanceToggle:SetChecked(MRP_DB.autoAdvance)
 end)
+
+local warningFrame = CreateFrame("Frame", "MRPDifficultyWarningFrame", UIParent, "BackdropTemplate")
+warningFrame:SetSize(500, 100)
+warningFrame:SetPoint("TOP", UIParent, "TOP", 0, -150)
+warningFrame:SetFrameStrata("HIGH")
+warningFrame:SetBackdrop({
+    bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
+    edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+    tile = true, tileSize = 32, edgeSize = 32,
+    insets = { left = 11, right = 12, top = 12, bottom = 11 }
+})
+warningFrame:SetBackdropColor(0.8, 0, 0, 0.9)
+warningFrame:Hide()
+
+-- Main text of the warning
+warningFrame.title = warningFrame:CreateFontString(nil, "OVERLAY", "GameFont_Gigantic")
+warningFrame.title:SetPoint("TOP", warningFrame, "TOP", 0, -25)
+warningFrame.title:SetTextColor(1, 0.82, 0)
+warningFrame.title:SetText(L["Wrong Difficulty"])
+
+-- Subtitle with the instruction
+warningFrame.subText = warningFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+warningFrame.subText:SetPoint("TOP", warningFrame.title, "BOTTOM", 0, -8)
+warningFrame.subText:SetTextColor(1, 1, 1)
+warningFrame.subText:SetText(L["Please switch to '%s'"])
+
+-- Functions for displaying and hiding the window
+function UI:ShowDifficultyWarning(requiredDifficultyText)
+    warningFrame.subText:SetText(string.format(L["Please switch to '%s'"], requiredDifficultyText))
+    warningFrame:Show()
+end
+
+function UI:HideDifficultyWarning()
+    warningFrame:Hide()
+end
