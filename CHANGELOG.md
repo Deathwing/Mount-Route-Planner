@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v0.3.2](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v0.3.2) (2025-07-16)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v0.3.2) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Bug Fixes
+- Added missing Zandalar Teleporter for Horde characters
+
 ## [v0.3.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v0.3.1) (2025-07-16)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v0.3.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

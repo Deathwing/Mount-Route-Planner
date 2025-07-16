@@ -318,6 +318,7 @@ Data.blimps = {
 Data.teleports = {
     ["Zereth Mortis"] = { x = 49.51, y = 25.07, mapName = "Oribos:1671", mapID = 1671 },
     ["Kul'Tiras"] = { x = 48.74, y = 95.20, mapName = "Stormwind City", mapId = 84 },
+    ["Zandalar"] = { x = 58.57, y = 91.34, mapName = "Orgrimmar", mapId = 85 },
 }
 
 Data.flightmasters = {
