@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v0.3.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v0.3.1) (2025-07-16)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v0.3.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Bug Fixes
+- Fixed issues related to importing the new content format
+
 ## [v0.3.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v0.3.0) (2025-07-07)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v0.3.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

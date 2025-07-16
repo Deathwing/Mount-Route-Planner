@@ -87,13 +87,18 @@ function Parser:ParseSteps(text)
     for _, line in ipairs(lines) do
         -- if the line is like '482 / 1095 (45%)' then skip it
         if not line:find("^%d+%s*/%s*%d+%s*%(%d+%%%)$") then
+            line = line:gsub("^%s*[-—]*%s*", "")
             local num, action = line:match("^(%d+)%s+(.+)$")
             if num and not action:find("^Man,") then
+                local part1, part2 = action:match("^(.-)%s%s%s%s%s%s%s%s(.*)$")
                 current = {
-                    actions = splitActions(self:GetRacialText(action)),
+                    actions = splitActions(self:GetRacialText(part1 or action)),
                     rewards = {},
                     rawRewardNotes = {},
                 }
+                if part2 and part2 ~= "" then
+                    current.note = self:GetRacialText(part2)
+                end
                 lastReward = nil
                 bossesCount = 0
                 notesCount = 0
@@ -203,13 +208,26 @@ function Parser:Parse(text)
             end
         elseif lower:find("portal to ") then
             step.portal = step.action:match("Portal to (.+)")
+            if i == 1 then
+                prevLabel = UnitFactionGroup("player") == "Horde" and "Orgrimmar" or "Stormwind"
+            end
+
             step.location = MRP.Data.genericPortals[step.portal or ""] or (MRP.Data.portals[prevLabel or ""] and MRP.Data.portals[prevLabel or ""][step.portal or ""])
             if not step.location then
                 print("|cffffcc00[MRP]|r " .. format(L["Portal location not found for: '%s' in '%s', please report it."], step.portal or "", prevLabel or ""))
             end
-        elseif lower:find("hearthstone to") then
-            step.hearthstone = step.action:match("Hearthstone to (.+)")
-            step.location = { x = 0.5, y = 0.5, mapName = step.hearthstone, getFromNextStep = true }
+        elseif lower:find("hearthstone to") or lower:find("heartstone to ") then
+            step.hearthstone = step.action:match("Hearthstone to (.+)") or step.action:match("Heartstone to (.+)")
+            if step.hearthstone == "Dalaran" then
+                step.hearthstone = nil
+                step.item = "Dalaran Hearthstone"
+                step.location = MRP.Data.items[step.item or ""]
+                if not step.location then
+                    print("|cffffcc00[MRP]|r " .. format(L["Item location not found for: '%s', please report it."], step.item or ""))
+                end
+            else
+                step.location = { x = 0.5, y = 0.5, mapName = step.hearthstone, getFromNextStep = true }
+            end
         elseif lower:find("teleport to ") then
             step.teleport = step.action:match("Teleport to (.+)")
             step.location = MRP.Data.teleports[step.teleport or ""]

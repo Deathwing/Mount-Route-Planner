@@ -246,7 +246,7 @@ function MRP_IsBossDead(boss, instance)
                 local numEncounters = select(9, GetSavedInstanceInfo(i))
                 for j = 1, numEncounters do
                     local encounterName, _, isKilled = GetSavedInstanceEncounterInfo(i, j)
-                    if encounterName and (encounterName == bossName or encounterName:lower() == bossName) then
+                    if encounterName and (encounterName == bossName or encounterName:lower() == bossName or encounterName:find(bossName)) then
                         return isKilled
                     end
                 end
@@ -256,7 +256,7 @@ function MRP_IsBossDead(boss, instance)
 
     for i = 1, GetNumSavedWorldBosses() do
         local worldBossName = GetSavedWorldBossInfo(i)
-        if worldBossName and (worldBossName == bossName or worldBossName:lower() == bossName) then
+        if worldBossName and (worldBossName == bossName or worldBossName:lower() == bossName or worldBossName:find(bossName)) then
             return true
         end
     end
@@ -293,7 +293,6 @@ function MRP_MatchesDifficulty(neededDiffString, diffID)
         -- Especially for WotLK mounts like Invincible.
         -- ID 6 = 25-Player Heroic
         return diffID == 6
-
     elseif neededDiffString:find("Heroic only") then
         -- Covers ALL types of “Heroic”.
         -- ID 2 = Dungeon Heroic
@@ -301,7 +300,6 @@ function MRP_MatchesDifficulty(neededDiffString, diffID)
         -- ID 6 = 25-player Raid Heroic (WotLK/Cata)
         -- ID 15 = Heroic Raid (Flex, from MoP)
         return diffID == 2 or diffID == 5 or diffID == 6 or diffID == 15
-
     elseif neededDiffString:find("Mythic only") then
         -- Covers ALL types of “Mythic”.
         -- ID 16 = Mythic Raid
@@ -384,7 +382,7 @@ local StepWatcher = CreateFrame("Frame")
 -- We are now listening for ALL relevant zone events to be sure.
 StepWatcher:RegisterEvent("ZONE_CHANGED")
 StepWatcher:RegisterEvent("ZONE_CHANGED_INDOORS")
-StepWatcher:RegisterEvent("ZONE_CHANGED_NEW_AREA") 
+StepWatcher:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 StepWatcher:RegisterEvent("BAG_UPDATE_COOLDOWN")
 StepWatcher:RegisterEvent("PLAYER_REGEN_ENABLED")
 StepWatcher:RegisterEvent("NEW_MOUNT_ADDED")
@@ -411,7 +409,7 @@ function MRP_CheckDifficultyWarning(event)
         for _, reward in ipairs(step.rewards or {}) do
             if not MRP_GetMountCollectedByName(reward.mount) and reward.note and reward.note ~= "" then
                 local neededDiffString = nil
-                
+
                 if reward.note:find("Mythic only") then
                     neededDiffString = "Mythic only"
                 elseif reward.note:find("Heroic 25 only") then
@@ -447,7 +445,7 @@ function MRP_CheckDifficultyWarning(event)
 end
 
 StepWatcher:SetScript("OnEvent", function(_, event)
-    MRP_CheckDifficultyWarning(event)
+    -- MRP_CheckDifficultyWarning(event)
     MRP_CheckCurrentStepComplete(false)
 end)
 
