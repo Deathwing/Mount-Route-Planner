@@ -1,0 +1,2 @@
+-- MRP.d.lua
+MRP = {}

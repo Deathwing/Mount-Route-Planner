@@ -1,331 +1,377 @@
 -- MRP_Data.lua
-local _, MRP = ...
+-- local _, MRP = ...
 
-local Data = {}
-MRP.Data = Data
+---@class Dungeon
+---@field x number the x coordinate of the dungeon entrance
+---@field y number the y coordinate of the dungeon entrance
+---@field mapName string the name of the map where the dungeon is located
+---@field mapID number the uiMapID of the dungeon entrance
+---@field instanceId number the instanceID (mapID)
+---@field availableDifficultyIds number[] the available difficultyIDs for the dungeon
+---@field expansionLevel number the expansionLevel of the dungeon
 
-Data.mapNamesToIds = {
-    ["Darkmoon Island"] = 407,
-    ["Dornogal"] = 2339,
-    ["Isle of Dorn"] = 2248,
-    ["The Ringing Deeps"] = 2214,
-    ["Hallowfall"] = 2215,
-    ["Azj-Kahet"] = 2255,
-    ["City of Threads Umbral Bazaar"] = 2213,
-    ["The Proscenium"] = 2328,
-    ["Ara-Kara City of Echoes"] = 2216,
-    ["Ara-Kara City of Threads"] = 2255,
-    ["Siren Isle"] = 2369,
-    ["Tazavesh"] = 1550,
-    ["Undermine"] = 2346,
-    ["Waking Shore"] = 2022,
-    ["Ohn'ahran Plains"] = 2023,
-    ["The Azure Span"] = 2024,
-    ["Thaldraszus"] = 2025,
-    ["Valdrakken"] = 2112,
-    ["Forbidden Reach"] = 2151,
-    ["Zarelek Cavern"] = 2133,
-    ["Emerald Dream"] = 2200,
-    ["Bel'ameth"] = 2239,
-    ["Overall Shadownlands Map"] = 1550,
-    ["Ardenweald"] = 1565,
-    ["Bastian"] = 1533,
-    ["Maldraxxus"] = 1536,
-    ["Revendreth"] = 1525,
-    ["Oribos"] = 1670,
-    ["Oribos main quest floor"] = 1670,
-    ["Oribos FP & Portals level"] = 1671,
-    ["Korthia"] = 1961,
-    ["The Maw"] = 1543,
-    ["Zereth Mortis"] = 1970,
-    ["Boralus"] = 1161,
-    ["Kul'Tiras"] = 1161,
-    ["Zandalar"] = 1165,
-    ["Drustvar"] = 896,
-    ["Stormsong Valley"] = 942,
-    ["Tiragarde Sound"] = 895,
-    ["Dazaralor"] = 1165,
-    ["Dazaralor The Great Seal"] = 1163,
-    ["Nazmir"] = 863,
-    ["Vol'dun"] = 864,
-    ["Zuldazar"] = 862,
-    ["Mechagon"] = 1462,
-    ["Nazjatar"] = 1355,
-    ["Darkshore"] = 62,
-    ["Isle of Giants"] = 507,
-    ["Tirisfal Glades"] = 18,
-    ["Uldum"] = 249,
-    ["Vale of Eternal Blossoms"] = 1530,
-    ["Vale of the Eternal Blossoms"] = 1530,
-    ["Argus: Antoran Wastes"] = 885,
-    ["Argus: Eredath"] = 882,
-    ["Argus: Krokuun"] = 830,
-    ["Argus: The Vindicaar"] = 831,
-    ["Azsuna"] = 630,
-    ["Dalaran"] = 627,
-    ["Dalaran Underbelly"] = 628,
-    ["Eye of Azshara"] = 790,
-    ["Helheim"] = 649,
-    ["Highmountain"] = 650,
-    ["Stormheim"] = 634,
-    ["Suramar"] = 680,
-    ["Broken Shore"] = 646,
-    ["The Broken Shore"] = 646,
-    ["Thundertotem"] = 652,
-    ["Val'sharah"] = 641,
-    ["Val'sharah Dreamgrove"] = 747,
-    ["Val'sharah Emerald Dreamway"] = 715,
-    ["Ashran"] = 588,
-    ["Frostfire Ridge"] = 525,
-    ["Gorgrond"] = 543,
-    ["Nagrand"] = 550,
-    ["Shadowmoon Valley"] = 539,
-    ["Spires of Arak"] = 542,
-    ["Talador"] = 535,
-    ["Tanaan Jungle"] = 534,
-    ["Warspear"] = 624,
-    ["Stormshield"] = 622,
-    ["Garrison - Horde"] = 590,
-    ["Garrison - Alliance"] = 582,
-    ["Dread Wastes"] = 422,
-    ["Krasarang Wilds"] = 418,
-    ["Kun-Lai Summit"] = 379,
-    ["Shrine of the Seven Stars"] = 390,
-    ["Shrine of Two Moons"] = 392,
-    ["The Jade Forest"] = 371,
-    ["The Veiled Stair"] = 433,
-    ["Timeless Isle"] = 554,
-    ["Townlong Steppes"] = 388,
-    ["Valley of the Four Winds"] = 376,
-    ["Deepholm"] = 207,
-    ["Mount Hyjal"] = 198,
-    ["Tol Barad"] = 245,
-    ["Twilight Highlands"] = 241,
-    ["Vashj'ir: Kelp'thar Forest"] = 201,
-    ["Vashj'ir: Shimmering Expanse"] = 205,
-    ["Vashj'ir: Abyssal Depths"] = 204,
-    ["Coldarra"] = 114,
-    ["Borean Tundra"] = 114,
-    ["Crystalsong Forest"] = 127,
-    ["Northrend Dalaran"] = 125,
-    ["Dalaran (WotLK)"] = 125,
-    ["Dalaran Underbelly (WotLK)"] = 126,
-    ["Wyrmrest Temple"] = 115,
-    ["Dragonblight"] = 115,
-    ["Grizzly Hills"] = 116,
-    ["Howling Fjord"] = 117,
-    ["Icecrown"] = 118,
-    ["Sholazar Basin"] = 119,
-    ["Storm Peaks"] = 120,
-    ["The Storm Peaks"] = 120,
-    ["Wintergrasp"] = 123,
-    ["Zul' Drak"] = 121,
-    ["Outland (Twisting Nether)"] = 101,
-    ["Blades Edge Mountains"] = 105,
-    ["Hellfire Penninsula"] = 100,
-    ["Nagrand (BC)"] = 107,
-    ["Netherstorm"] = 109,
-    ["Shadowmoon Valley (BC)"] = 104,
-    ["Auchindoun"] = 108,
-    ["Terokkar Forest"] = 108,
-    ["Zangermarsh"] = 102,
-    ["Shattrath"] = 111,
-    ["Silvermoon"] = 110,
-    ["Eversong Woods"] = 94,
-    ["Ghostlands"] = 95,
-    ["Isle of Quel'Danas"] = 122,
-    ["The Exodar"] = 103,
-    ["Azuremyst Isle"] = 97,
-    ["Bloodmyst Isle"] = 106,
-    ["Kalimdor"] = 12,
-    ["Ashenvale"] = 63,
-    ["Azshara"] = 76,
-    ["Darnassus"] = 89,
-    ["Desolace"] = 66,
-    ["Durotar"] = 1,
-    ["Dustwallow Marsh"] = 70,
-    ["Echo Isles"] = 463,
-    ["Felwood"] = 77,
-    ["Feralas"] = 69,
-    ["Moonglade"] = 80,
-    ["Mulgore"] = 7,
-    ["Northern Barrens"] = 10,
-    ["Orgrimmar"] = 85,
-    ["Orgrimmar Cleft of Shadow"] = 86,
-    ["Silithus"] = 81,
-    ["Southern Barrens"] = 199,
-    ["Stonetalon Mountains"] = 65,
-    ["Tanaris"] = 71,
-    ["Teldrassil"] = 57,
-    ["Thunder Bluff"] = 88,
-    ["Thousand Needles"] = 64,
-    ["Un'Goro Crater"] = 78,
-    ["Winterspring"] = 83,
-    ["Eastern Kingdoms"] = 13,
-    ["Arathi Highlands"] = 14,
-    ["Badlands"] = 15,
-    ["Blackrock Mountain"] = 33,
-    ["Blasted Lands"] = 17,
-    ["Burning Steppes"] = 36,
-    ["Cape of Strangethorn"] = 210,
-    ["Deadwind Pass"] = 42,
-    ["Deeprun Tram"] = 499,
-    ["Dun Morogh"] = 29,
-    ["Duskwood"] = 47,
-    ["Eastern Plaguelands"] = 23,
-    ["Elwynn Forest"] = 37,
-    ["Hillsbrad Foothills"] = 25,
-    ["Ironforge"] = 87,
-    ["Loch Modan"] = 48,
-    ["Northern Stranglethorn"] = 50,
-    ["Stranglethorn Vale"] = 224,
-    ["Redridge Mountains"] = 49,
-    ["Ruins of Gilneas"] = 217,
-    ["Searing Gorge"] = 32,
-    ["Shimmering Expanse"] = 205,
-    ["Silvermoon City"] = 110,
-    ["Silverpine Forest"] = 21,
-    ["Stormwind"] = 84,
-    ["Stormwind City"] = 84,
-    ["Swamp of Sorrows"] = 51,
-    ["The Hinterlands"] = 26,
-    ["Undercity"] = 90,
-    ["Western Plaguelands"] = 22,
-    ["Westfall"] = 52,
-    ["Wetlands"] = 56,
+---@type { [string]: Dungeon }
+local dungeons = {
+    ["Stratholme"] = { x = 43.44, y = 18.32, mapName = "Eastern Plaguelands", mapID = 23, instanceId = 329, availableDifficultyIds = { 1, 24 }, expansionLevel = 0 },
+
+    ["Sethekk Halls"] = { x = 44.47, y = 65.33, mapName = "Terokkar Forest", mapID = 108, instanceId = 556, availableDifficultyIds = { 1, 2 }, expansionLevel = 1 },
+    ["Magisters' Terrace"] = { x = 61.03, y = 30.94, mapName = "Isle of Quel'Danas", mapID = 122, instanceId = 585, availableDifficultyIds = { 1, 2, 24 }, expansionLevel = 1 },
+
+    ["Utgarde Pinnacle"] = { x = 57.22, y = 46.70, mapName = "Howling Fjord", mapID = 117, instanceId = 575, availableDifficultyIds = { 1, 2 }, expansionLevel = 2 },
+    ["The Culling of Stratholme"] = { x = 60.16, y = 83.02, mapName = "Caverns of Time:75", mapID = 75, instanceId = 595, availableDifficultyIds = { 1, 2 }, expansionLevel = 2 },
+
+    ["Zul'Aman"] = { x = 81.80, y = 64.79, mapName = "Ghostlands", mapID = 95, instanceId = 568, availableDifficultyIds = { 2 }, expansionLevel = 3 },
+    ["The Vortex Pinnacle"] = { x = 76.75, y = 84.44, mapName = "Uldum:Kalimdor", mapID = 249, instanceId = 657, availableDifficultyIds = { 1, 2, 24 }, expansionLevel = 3 },
+    ["The Stonecore"] = { x = 47.23, y = 52.26, mapName = "Deepholm", mapID = 207, instanceId = 725, availableDifficultyIds = { 1, 2, 24 }, expansionLevel = 3 },
+    ["Zul'Gurub"] = { x = 71.96, y = 32.99, mapName = "Northern Stranglethorn", mapID = 50, instanceId = 859, availableDifficultyIds = { 2 }, expansionLevel = 3 },
+
+    ["Return to Karazhan"] = { x = 46.71, y = 70.22, mapName = "Deadwind Pass", mapID = 42, instanceId = 1651, availableDifficultyIds = { 2, 23 }, expansionLevel = 6 },
+
+    ["Freehold"] = { x = 84.32, y = 78.91, mapName = "Tiragarde Sound", mapID = 895, instanceId = 1754, availableDifficultyIds = { 1, 2, 23, 24 }, expansionLevel = 7 },
+    ["King's Rest"] = { x = 37.51, y = 39.12, mapName = "Zuldazar", mapID = 862, instanceId = 1762, availableDifficultyIds = { 2, 23, 24 }, expansionLevel = 7 },
+    ["The Underrot"] = { x = 51.43, y = 64.97, mapName = "Nazimir", mapID = 863, instanceId = 1841, availableDifficultyIds = { 1, 2, 23 }, expansionLevel = 7 },
+
+    ["The Necrotic Wake"] = { x = 39.79, y = 54.89, mapName = "Bastion", mapID = 1533, instanceId = 2286, availableDifficultyIds = { 1, 2, 23 }, expansionLevel = 8 },
+    ["Tazavesh, the Veiled Market"] = { x = 31.15, y = 76.31, mapName = "The Shadowlands", mapID = 1550, instanceId = 2441, availableDifficultyIds = { 2, 23 }, expansionLevel = 8 },
+
+    ["Dawn of the Infinite"] = { x = 61.15, y = 84.67, mapName = "Thaldraszus", mapID = 2025, instanceId = 2579, availableDifficultyIds = { 2, 23 }, expansionLevel = 9 },
+
+    ["Darkflame Cleft"] = { x = 55.15, y = 21.83, mapName = "The Ringing Deeps", mapID = 2214, instanceId = 2651, availableDifficultyIds = { 1, 2, 23, 8 }, expansionLevel = 10 },
 }
 
-Data.instances = {
-    ["Vortex Pinnacle"] = { x = 76.75, y = 84.44, mapName = "Uldum:Kalimdor", mapID = 249 },
-    ["Throne of the Four Winds"] = { x = 38.42, y = 80.58, mapName = "Uldum:Kalimdor", mapID = 249 },
-    ["Ahn'Quiraj"] = { x = 24.30, y = 87.12, mapName = "Silithus:Kalimdor", mapID = 81 },
-    ["Onyxia"] = { x = 52.15, y = 75.95, mapName = "Dustwallow Marsh", mapID = 70 },
-    ["Icecrown Citadel"] = { x = 53.59, y = 87.12, mapName = "Icecrown", mapID = 118 },
-    ["Vault of Archavon"] = { x = 49.87, y = 10.96, mapName = "Wintergrasp", mapID = 123 },
-    ["Eye of Eternity"] = { x = 27.55, y = 26.65, mapName = "Borean Tundra", mapID = 114 },
-    ["Obsidian Sanctum"] = { x = 59.95, y = 56.87, mapName = "Dragonblight", mapID = 115 },
-    ["Utgarde Pinnacle"] = { x = 57.22, y = 46.70, mapName = "Howling Fjord", mapID = 117 },
-    ["Ulduar"] = { x = 41.59, y = 17.44, mapName = "The Storm Peaks", mapID = 120 },
-    ["Firelands"] = { x = 46.75, y = 78.65, mapName = "Mount Hijal", mapID = 198 },
-    ["Firelands on both Normal and Heroic"] = { x = 46.75, y = 78.65, mapName = "Mount Hijal", mapID = 198 },
-    ["Sethekk Halls"] = { x = 44.47, y = 65.33, mapName = "Terokkar Forest", mapID = 108 },
-    ["Tempest Keep"] = { x = 73.40, y = 63.89, mapName = "Netherstorm", mapID = 109 },
-    ["Magister's Terrace"] = { x = 61.03, y = 30.94, mapName = "Isle of Quel'Danas", mapID = 122 },
-    ["Zul'Aman"] = { x = 81.80, y = 64.79, mapName = "Ghostlands", mapID = 95 },
-    ["Stratholme"] = { x = 27.18, y = 10.96, mapName = "Eastern Plaguelands", mapID = 23 },
-    ["Karazhan"] = { x = 46.99, y = 75.05, mapName = "Deadwind Pass", mapID = 42 },
-    ["Return to Karazhan"] = { x = 46.71, y = 70.22, mapName = "Deadwind Pass", mapID = 42 },
-    ["Zul'Gurub"] = { x = 71.96, y = 32.99, mapName = "Northern Stranglethorn", mapID = 50 },
-    ["Mogu'shan Vaults"] = { x = 59.59, y = 38.94, mapName = "Kun-Lai Summit", mapID = 379 },
-    ["Throne of Thunder"] = { x = 63.67, y = 31.91, mapName = "Isle of Thunder", mapID = 504 },
-    ["Siege of Orgrimmar"] = { x = 73.64, y = 42.54, mapName = "Vale of Eternal Blossoms:Pandaria", mapID = 390 },
-    ["Hellfire Citadel"] = { x = 46.87, y = 52.91, mapName = "Tanaan Jungle", mapID = 534 },
-    ["Blackrock Foundry"] = { x = 51.67, y = 26.80, mapName = "Gorgrond", mapID = 543 },
-    ["The Nighthold"] = { x = 43.31, y = 62.28, mapName = "Suramar", mapID = 680 },
-    ["Tomb of Sargeras"] = { x = 64.03, y = 21.29, mapName = "Broken Shore", mapID = 646 },
-    ["Antorus, the Burning Throne"] = { x = 54.55, y = 0.62, mapName = "Antoran Waste", mapID = 885 },
-    ["Battle of Dazar'alor"] = { x = 70.16, y = 35.44, mapName = "Boralus", mapID = 1161 },
-    ["Freehold"] = { x = 84.32, y = 78.91, mapName = "Tiragarde Sound", mapID = 895 },
-    ["King's Rest"] = { x = 37.51, y = 39.12, mapName = "Zuldazar", mapID = 862 },
-    ["The Underrot"] = { x = 51.43, y = 64.97, mapName = "Nazimir", mapID = 863 },
-    ["Ny'alotha the Waking City"] = { x = 55.15, y = 43.55, mapName = "Uldum:1527", mapID = 1527 },
-    ["Necrotic Wake"] = { x = 39.79, y = 54.89, mapName = "Bastion", mapID = 1533 },
-    ["Tazavesh the Veiled Market"] = { x = 31.15, y = 76.31, mapName = "The Shadowlands", mapID = 1550 },
-    ["Sanctum of Domination"] = { x = 69.31, y = 30.94, mapName = "The Maw:The Shadowlands", mapID = 1543 },
-    ["Sepulcher of the First Ones"] = { x = 80.36, y = 53.63, mapName = "Zereth Mortis", mapID = 1970 },
-    ["Dawn of the Infinites"] = { x = 61.15, y = 84.67, mapName = "Thaldraszus", mapID = 2025 },
-    ["Amirdrassil, the Dream's Hope"] = { x = 26.94, y = 31.55, mapName = "Emerald Dream", mapID = 2200 },
-    ["Darkflame Cleft"] = { x = 55.15, y = 21.83, mapName = "The Ringing Deeps", mapID = 2214 },
-    ["Nerub-ar Palace"] = { x = 43.51, y = 90.18, mapName = "Nerub-ar Palace", mapID = 2255 },
-    ["Liberation of Undermine"] = { x = 40.87, y = 48.77, mapName = "Undermine", mapID = 2346 },
-    ["Culling of Stratholme"] = { x = 57.13, y = 28.22, mapName = "Caverns of Time:75", mapID = 75 },
-    ["Dragon Soul"] = { x = 60.67, y = 20.39, mapName = "Caverns of Time:75", mapID = 75 },
-    ["Stonecore"] = { x = 47.23, y = 52.26, mapName = "Deepholm", mapID = 207 },
-    ["Nighthold"] = { x = 43.31, y = 62.28, mapName = "Suramar", mapID = 680 },
+if WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+    for _, dungeon in pairs(dungeons) do
+        for i = #dungeon.availableDifficultyIds, 1, -1 do
+            if dungeon.availableDifficultyIds[i] == 23 or dungeon.availableDifficultyIds[i] == 24 then
+                table.remove(dungeon.availableDifficultyIds, i)
+            end
+        end
+    end
+end
+
+---@class Raid
+---@field x number the x coordinate of raid entrance
+---@field y number the y coordinate of raid entrance
+---@field mapName string the name of the map where the raid is located
+---@field mapID number the uiMapID of the raid entrance
+---@field instanceId number the instanceID (mapID)
+---@field availableDifficultyIds number[] the available difficultyIDs for the raid
+---@field expansionLevel number the expansionLevel of the raid
+---@field areaId number? the areaID of the raid
+
+---@type { [string]: Raid }
+local raids = {
+    ["Temple of Ahn'Qiraj"] = { x = 24.30, y = 87.12, mapName = "Silithus:Kalimdor", mapID = 81, instanceId = 531, availableDifficultyIds = { 9 }, expansionLevel = 0, areaId = 3429 },
+
+    ["Karazhan"] = { x = 46.99, y = 75.05, mapName = "Deadwind Pass", mapID = 42, instanceId = 532, availableDifficultyIds = { 3 }, expansionLevel = 1, areaId = 3457 },
+    ["The Eye"] = { x = 73.40, y = 63.89, mapName = "Netherstorm", mapID = 109, instanceId = 550, availableDifficultyIds = { 4 }, expansionLevel = 1, areaId = 3845 },
+
+    ["Onyxia's Lair"] = { x = 52.15, y = 75.95, mapName = "Dustwallow Marsh", mapID = 70, instanceId = 249, availableDifficultyIds = { 3, 4 }, expansionLevel = 2, areaId = 2159 },
+    ["Ulduar"] = { x = 41.59, y = 17.44, mapName = "The Storm Peaks", mapID = 120, instanceId = 603, availableDifficultyIds = { 14, 33 }, expansionLevel = 2, areaId = 4273 },
+    ["The Obsidian Sanctum"] = { x = 59.95, y = 56.87, mapName = "Dragonblight", mapID = 115, instanceId = 615, availableDifficultyIds = { 3, 4 }, expansionLevel = 2, areaId = 4493 },
+    ["The Eye of Eternity"] = { x = 27.55, y = 26.65, mapName = "Borean Tundra", mapID = 114, instanceId = 616, availableDifficultyIds = { 3, 4 }, expansionLevel = 2, areaId = 4500 },
+    ["Vault of Archavon"] = { x = 49.87, y = 10.96, mapName = "Wintergrasp", mapID = 123, instanceId = 624, availableDifficultyIds = { 3, 4 }, expansionLevel = 2, areaId = 4603 },
+    ["Icecrown Citadel"] = { x = 53.59, y = 87.12, mapName = "Icecrown", mapID = 118, instanceId = 631, availableDifficultyIds = { 3, 4, 5, 6 }, expansionLevel = 2, areaId = 4812 },
+
+    ["Firelands"] = { x = 46.75, y = 78.65, mapName = "Mount Hijal", mapID = 198, instanceId = 720, availableDifficultyIds = { 14, 15, 33 }, expansionLevel = 3 },
+    ["Throne of the Four Winds"] = { x = 38.42, y = 80.58, mapName = "Uldum:Kalimdor", mapID = 249, instanceId = 754, availableDifficultyIds = { 3, 4, 5, 6 }, expansionLevel = 3 },
+    ["Dragon Soul"] = { x = 60.67, y = 20.39, mapName = "Caverns of Time:75", mapID = 75, instanceId = 967, availableDifficultyIds = { 3, 4, 5, 6, 7 }, expansionLevel = 3 },
+
+    ["Mogu'shan Vaults"] = { x = 59.59, y = 38.94, mapName = "Kun-Lai Summit", mapID = 379, instanceId = 1008, availableDifficultyIds = { 3, 4, 5, 6, 7 }, expansionLevel = 4 },
+    ["Throne of Thunder"] = { x = 63.67, y = 31.91, mapName = "Isle of Thunder", mapID = 504, instanceId = 1098, availableDifficultyIds = { 3, 4, 5, 6, 7 }, expansionLevel = 4 },
+    ["Siege of Orgrimmar"] = { x = 73.64, y = 42.54, mapName = "Vale of Eternal Blossoms:Pandaria", mapID = 390, instanceId = 1136, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 4 },
+
+    ["Blackrock Foundry"] = { x = 51.67, y = 26.80, mapName = "Gorgrond", mapID = 543, instanceId = 1205, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 5 },
+    ["Hellfire Citadel"] = { x = 46.87, y = 52.91, mapName = "Tanaan Jungle", mapID = 534, instanceId = 1448, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 5 },
+
+    ["The Nighthold"] = { x = 43.31, y = 62.28, mapName = "Suramar", mapID = 680, instanceId = 1530, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 6 },
+    ["Tomb of Sargeras"] = { x = 64.03, y = 21.29, mapName = "Broken Shore", mapID = 646, instanceId = 1676, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 6 },
+    ["Antorus, the Burning Throne"] = { x = 55.91, y = 63.77, mapName = "Antoran Waste", mapID = 885, instanceId = 1712, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 6 },
+
+    ["Battle of Dazar'alor"] = { x = 70.16, y = 35.44, mapName = "Boralus", mapID = 1161, instanceId = 2070, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
+    ["Battle of Dazar'alor (H)"] = { x = 54.11, y = 30.60, mapName = "Zuldazar", mapID = 862, instanceId = 2070, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
+    ["Ny'alotha the Waking City"] = { x = 55.15, y = 43.55, mapName = "Uldum:1527", mapID = 1527, instanceId = 2217, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
+
+    ["Sanctum of Domination"] = { x = 69.31, y = 30.94, mapName = "The Maw:The Shadowlands", mapID = 1543, instanceId = 2450, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 8 },
+    ["Sepulcher of the First Ones"] = { x = 80.36, y = 53.63, mapName = "Zereth Mortis", mapID = 1970, instanceId = 2481, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 8 },
+
+    ["Amirdrassil, the Dream's Hope"] = { x = 26.94, y = 31.55, mapName = "Emerald Dream", mapID = 2200, instanceId = 2549, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 9 },
+
+    ["Nerub-ar Palace"] = { x = 43.51, y = 90.18, mapName = "Nerub-ar Palace", mapID = 2255, instanceId = 2657, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 10 },
+    ["Liberation of Undermine"] = { x = 40.87, y = 48.77, mapName = "Undermine", mapID = 2346, instanceId = 2769, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 10 },
 }
 
-Data.npcs = {
-    ["Galleon"] = { x = 71.36, y = 64.14, mapName = "Valley of the Four Winds", mapID = 376 },
-    ["Sha of Anger"] = { x = 54.55, y = 63.35, mapName = "Kun-Lai Summit", mapID = 379 },
-    ["Oondasta"] = { x = 49.87, y = 54.42, mapName = "Isle of Giants", mapID = 507 },
-    ["Nalak"] = { x = 60.31, y = 37.68, mapName = "Isle of Thunder", mapID = 504 },
-    ["Rukhmar"] = { x = 46.87, y = 78.47, mapName = "Spires of Arak", mapNameID = 542 },
+if WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+    for _, raid in pairs(raids) do
+        for i = #raid.availableDifficultyIds, 1, -1 do
+            if raid.availableDifficultyIds[i] == 33 then
+                table.remove(raid.availableDifficultyIds, i)
+            end
+        end
+
+        for i = #raid.availableDifficultyIds, 1, -1 do
+            if raid.availableDifficultyIds[i] == 14 then
+                table.remove(raid.availableDifficultyIds, i)
+                table.insert(raid.availableDifficultyIds, 3)
+                table.insert(raid.availableDifficultyIds, 4)
+            elseif raid.availableDifficultyIds[i] == 15 then
+                table.remove(raid.availableDifficultyIds, i)
+                table.insert(raid.availableDifficultyIds, 5)
+                table.insert(raid.availableDifficultyIds, 6)
+            end
+        end
+
+        table.sort(raid.availableDifficultyIds, function(a, b)
+            return a < b
+        end)
+    end
+end
+
+---@class WorldBoss
+---@field x number the x coordinate of the world boss
+---@field y number the y coordinate of the world boss
+---@field mapName string the name of the map where the world boss is located
+---@field mapID number the uiMapID of the world boss
+---@field questID number the questID for the world boss completion tracking
+---@field expansionLevel number the expansionLevel of the world boss
+
+---@type { [string]: WorldBoss }
+local worldBosses = {
+    ["Salyis's Warband"] = { x = 71.36, y = 64.14, mapName = "Valley of the Four Winds", mapID = 376, questID = 32098, expansionLevel = 4 },
+    ["Sha of Anger"] = { x = 54.55, y = 63.35, mapName = "Kun-Lai Summit", mapID = 379, questID = 32099, expansionLevel = 4 },
+    ["Nalak, The Storm Lord"] = { x = 60.31, y = 37.68, mapName = "Isle of Thunder", mapID = 504, questID = 32518, expansionLevel = 4 },
+    ["Oondasta"] = { x = 49.87, y = 54.42, mapName = "Isle of Giants", mapID = 507, questID = 32519, expansionLevel = 4 },
+
+    ["Rukhmar"] = { x = 46.87, y = 78.47, mapName = "Spires of Arak", mapID = 542, questID = 37464, expansionLevel = 5 },
 }
 
-Data.items = {
-    ["Garrison Hearthstone"] = { x = 43.63, y = 52.44, mapName = "Lunarfall", mapID = 582 },
-    ["Dalaran Hearthstone"] = { x = 72.68, y = 45.24, mapName = "Dalaran:627", mapID = 627 },
+MRP.Data = {
+    dungeons = dungeons,
+    raids = raids,
+    worldBosses = worldBosses,
+    helpfulItems = {}
 }
 
-Data.flyTos = {}
+---@param id number
+---@param from WaypointLocation
+---@param to WaypointLocation
+---@param bidirectional boolean
+---@param cost number
+local function addEntry(id, from, to, bidirectional, cost)
+    local entry = { id = id, from = from, to = to, bidirectional = bidirectional, cost = cost } ---@type Waypoint
+    table.insert(MRP.Waypoints, entry)
+end
 
-Data.genericPortals = {
-    ["the Emerald Dream"] = { x = 62.64, y = 57.29, mapName = "Valdrakken", mapId = 2112 },
-    ["the Emerald Dream in the Emerald Enclave"] = { x = 62.64, y = 57.29, mapName = "Valdrakken", mapId = 2112 },
-}
+local flightpathCount = 0
 
-Data.portals = {
-    ["Stormwind"] = {
-        ["Uldum"] = { x = 75.25, y = 20.52, mapName = "Stormwind City", mapId = 84 },
-        ["Northrend Dalaran"] = { x = 44.35, y = 88.74, mapName = "Stormwind City", mapId = 84 },
-        ["Hyjal"] = { x = 76.20, y = 18.71, mapName = "Stormwind City", mapId = 84 },
-        ["Caverns of Time"] = { x = 43.72, y = 85.33, mapName = "Stormwind City", mapId = 84 },
-        ["Deepholm"] = { x = 73.18, y = 19.65, mapName = "Stormwind City", mapId = 84 },
-        ["Shattrath"] = { x = 44.93, y = 85.71, mapName = "Stormwind City", mapId = 84 },
-        ["Jade Forest"] = { x = 45.74, y = 87.11, mapName = "Stormwind City", mapId = 84 },
-        ["Oribos"] = { x = 47.56, y = 94.95, mapName = "Stormwind City", mapId = 84 },
-        ["Valdrakken"] = { x = 48.91, y = 93.39, mapName = "Stormwind City", mapId = 84 },
-        ["Dornogal"] = { x = 40.84, y = 92.74, mapName = "Stormwind City", mapId = 84 },
-    },
-    ["Orgrimmar"] = {
-        ["Uldum"] = { x = 48.84, y = 38.57, mapName = "Orgrimmar", mapId = 85 },
-        ["Northrend Dalaran"] = { x = 56.21, y = 91.75, mapName = "Orgrimmar", mapId = 85 },
-        ["Hyjal"] = { x = 51.15, y = 38.31, mapName = "Orgrimmar", mapId = 85 },
-        ["Caverns of Time"] = { x = 56.40, y = 92.57, mapName = "Orgrimmar", mapId = 85 },
-        ["Deepholm"] = { x = 50.83, y = 36.34, mapName = "Orgrimmar", mapId = 85 },
-        ["Shattrath"] = { x = 57.50, y = 91.65, mapName = "Orgrimmar", mapId = 85 },
-        ["Jade Forest"] = { x = 57.44, y = 92.28, mapName = "Orgrimmar", mapId = 85 },
-        ["Oribos"] = { x = 58.31, y = 87.91, mapName = "Orgrimmar", mapId = 85 },
-        ["Valdrakken"] = { x = 57.12, y = 87.30, mapName = "Orgrimmar", mapId = 85 },
-        ["Dornogal"] = { x = 57.87, y = 89.84, mapName = "Orgrimmar", mapId = 85 },
-    },
-    ["Shattrath"] = {
-        ["Isle of Quel'Danas"] = { x = 48.61, y = 42.02, mapName = "Shattrath City", mapID = 111 },
-    },
-    ["Jade Forest"] = {
-        ["Isle of Thunder"] = { x = 49.75, y = 68.67, mapName = "Townlong Steppes", mapID = 388 },
-    },
-    ["Dalaran Hearthstone"] = {
-        ["Argus"] = { x = 74.24, y = 49.20, mapName = "Dalaran:627", mapID = 627 },
-    },
-    ["Argus"] = {
-        ["Antoran Wastes"] = { x = 42.43, y = 21.83, mapName = "The Vindicaar:Krokuun", mapID = 831 },
-    },
-    ["Oribos"] = {
-        ["The Maw"] = { x = 49.51, y = 51.54, mapName = "Oribos:1671", mapID = 1671 },
-    },
-    ["Dornogal"] = {
-        ["Undermine"] = { x = 52.39, y = 50.93, mapName = "Dornogal", mapID = 2339 },
-    }
-}
+local function addFlightpath(fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.FlightpathTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) } end } ---@type WaypointLocation
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.FlightpathTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) } end } ---@type WaypointLocation
+    addEntry(MRP.SpecialLocaId.FlightpathTo + flightpathCount, from, to, true, cost)
+    flightpathCount = flightpathCount + 1
+end
 
-Data.hearthstones = {}
+-- Shadowlands
+if GetExpansionLevel() >= 8 then
+    -- Both
+    addFlightpath(2222, { x = -1902.4399414062, y = 1214.7600097656, z = 5450.8701171875 }, false, 10565, 2222, { x = -3387.6999511719, y = 5461.4599609375, z = 4275.7202148438 }, false, 10982, 10) -- Oribos to Pridefall Hamlet, Revendreth
+    addFlightpath(2222, { x = -1902.4399414062, y = 1214.7600097656, z = 5450.8701171875 }, false, 10565, 2222, { x = -6143.7797851562, y = -207.12800598145, z = 5581.919921875 }, false, 11515, 10) -- Oribos to Tirna Vaal, Ardenweald
+    addFlightpath(2222, { x = -1902.4399414062, y = 1214.7600097656, z = 5450.8701171875 }, false, 10565, 2222, { x = -4160.75, y = -4629.7700195312, z = 6534.1499023438 }, false, 11473, 10)        -- Oribos to Aspirant's Rest, Bastion
+    addFlightpath(2222, { x = -1902.4399414062, y = 1214.7600097656, z = 5450.8701171875 }, false, 10565, 2222, { x = 2580.4699707031, y = -2520.7600097656, z = 3307.5200195312 }, false, 11465, 10) -- Oribos to Theater of Pain, Maldraxxus
+    addFlightpath(2222, { x = -1902.4399414062, y = 1214.7600097656, z = 5450.8701171875 }, false, 10565, 2222, { x = -5895.6401367188, y = 4810.740234375, z = 4789.990234375 }, false, 13672, 10)   -- Oribos to Tazavesh, the Veiled Market
+end
 
-Data.blimps = {
-    ["Stranglethorn Vale"] = { x = 52.63, y = 53.45, mapName = "Orgrimmar", mapID = 85 },
-}
+local boatCount = 0
 
-Data.teleports = {
-    ["Zereth Mortis"] = { x = 49.51, y = 25.07, mapName = "Oribos:1671", mapID = 1671 },
-    ["Kul'Tiras"] = { x = 48.74, y = 95.20, mapName = "Stormwind City", mapId = 84 },
-    ["Zandalar"] = { x = 58.57, y = 91.34, mapName = "Orgrimmar", mapId = 85 },
-}
+local function addBoat(fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.BoatTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId), C_Map.GetAreaInfo(toAreaId) } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.BoatTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId), C_Map.GetAreaInfo(fromAreaId) } end }
+    addEntry(MRP.SpecialLocaId.BoatTo + boatCount, from, to, true, cost)
+    boatCount = boatCount + 1
+end
 
-Data.flightmasters = {
-    ["Oribos"] = { x = 60.55, y = 67.67, mapName = "Oribos:1671", mapID = 1671 },
-    ["Valdrakken"] = { x = 44.59, y = 67.67, mapName = "Valdrakken", mapID = 2112 },
-    ["Dornogal"] = { x = 44.59, y = 51.83, mapName = "Dornogal", mapID = 2339 },
-    ["Darkflame Cleft"] = { x = 42.81, y = 33.48, mapName = "The Ringing Deeps", mapID = 2214 },
-}
+-- Cataclysm (Classic Only)
+if GetExpansionLevel() >= 3 and WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addBoat(0, { x = -8645.5400390625, y = 1308.25, z = 5.23483991623 }, false, 1519, 1, { x = 8177.5600585938, y = 1002.6599731445, z = 6.66929006577 }, false, 702, 600) -- Stormwind to Rut'theran Village
+    end
+end
 
-Data.walkTos = {}
+local zeppelinCount = 0
+
+local function addZeppelin(fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.ZeppelinTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId), C_Map.GetAreaInfo(toAreaId) } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.ZeppelinTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId), C_Map.GetAreaInfo(fromAreaId) } end }
+    addEntry(MRP.SpecialLocaId.ZeppelinTo + zeppelinCount, from, to, true, cost)
+    zeppelinCount = zeppelinCount + 1
+end
+
+-- Cataclysm (Classic Only)
+if GetExpansionLevel() >= 3 and WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addZeppelin(0, { x = 2070.5122070312, y = 289.15798950195, z = 97.03157806396 }, false, 1497, 1, { x = 1842.1899414062, y = -4389.0400390625, z = 135.23300170898 }, false, 1637, 600)   --  Undercity to Orgrimmar
+        addZeppelin(0, { x = 2059.9340820312, y = 235.90972900391, z = 99.76524353027 }, false, 1497, 0, { x = -12396.400390625, y = 217.47999572754, z = 1.69035005569 }, false, 117, 600)      --  Undercity to Grom'gol Base Camp
+        addZeppelin(0, { x = 2063.2448730469, y = 364.23959350586, z = 82.50442504883 }, false, 1497, 571, { x = 1950.8000488281, y = -6174.2299804688, z = 24.30380058289 }, false, 495, 600)   --  Undercity to Howling Fjord
+    end
+end
+
+local portalCount = 0
+
+local function addPortal(bidirectional, fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.PortalTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = bidirectional and condition or nil, type = 1, important = true, locaId = MRP.SpecialLocaId.PortalTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) } end }
+    addEntry(MRP.SpecialLocaId.PortalTo + portalCount, from, to, bidirectional, cost)
+    portalCount = portalCount + 1
+end
+
+-- Wrath of the Lich King
+if GetExpansionLevel() >= 2 then
+    -- Both
+    addPortal(true, 119, { x = 0.4035, y = 0.8309, z = 0 }, true, 4300, 78, { x = 0.5055, y = 0.0773, z = 0 }, true, 4381, 10, function() return C_QuestLog.IsQuestFlaggedCompleted(12546) end) -- Sholazar Basin to Un'Goro Crater
+end
+
+-- Pandaria (Retail Only)
+if GetExpansionLevel() >= 4 and WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addPortal(true, 388, { x = 0.4975, y = 0.6866, z = 0 }, true, 5842, 504, { x = 0.6470, y = 0.7348, z = 0 }, true, 6507, 10) -- Townlong Steppes to Isle of Thunder
+    end
+
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addPortal(true, 388, { x = 0.5065, y = 0.7340, z = 0 }, true, 5842, 504, { x = 0.3315, y = 0.3285, z = 0 }, true, 6507, 10) -- Townlong Steppes to Isle of Thunder
+    end
+end
+
+-- Pandaria (Classic Only)
+if GetExpansionLevel() >= 4 and WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
+    -- Both
+    addPortal(false, 125, { x = 0.2543, y = 0.5155, z = 661 }, true, 4613, 74, { x = 0.5460, y = 0.2830, z = 0 }, true, 2300, 10) -- Dalaran to Caverns of Time
+
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addPortal(false, 103, { x = 0.4757, y = 0.6216, z = -138 }, true, 3557, 89, { x = 0.4347, y = 0.7868, z = 0 }, true, 1657, 10)                                                                  -- Exodar to Darnassus
+        addPortal(false, 103, { x = 0.4815, y = 0.6302, z = -138 }, true, 3557, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                    -- Exodar to Blasted Lands
+
+        addPortal(false, 84, { x = 0.4897, y = 0.8736, z = 100 }, true, 1519, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                      -- Stormwind to Blasted Lands
+        addPortal(false, 84, { x = 0.6871, y = 0.1717, z = 117 }, true, 1519, 371, { x = 0.4624, y = 0.8517, z = 63 }, true, 6516, 10, function() return C_QuestLog.IsQuestFlaggedCompleted(29548) end) -- Stormwind to Paw'don Village
+
+        addPortal(false, 87, { x = 0.2726, y = 0.0708, z = 501 }, true, 1537, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                      -- Ironforge to Blasted Lands
+
+        addPortal(false, 89, { x = 0.4399, y = 0.7814, z = 0 }, true, 1657, 103, { x = 0.2627, y = 0.4559, z = -138 }, true, 3557, 10)                                                                  -- Darnassus to Exodar
+        addPortal(false, 89, { x = 0.4422, y = 0.7870, z = 0 }, true, 1657, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                        -- Darnassus to Blasted Lands
+
+        addPortal(false, 394, { x = 0.7086, y = 0.3040, z = 0 }, true, 6142, 103, { x = 0.2627, y = 0.4559, z = -138 }, true, 3557, 10)                                                                 -- Shrine of Seven Stars to Exodar
+        addPortal(false, 394, { x = 0.7168, y = 0.3598, z = 0 }, true, 6142, 84, { x = 0.4867, y = 0.8815, z = 149 }, true, 1519, 10)                                                                   -- Shrine of Seven Stars to Stormwind
+        addPortal(false, 394, { x = 0.7403, y = 0.4098, z = 0 }, true, 6142, 87, { x = 0.2551, y = 0.843, z = 501 }, true, 1537, 10)                                                                    -- Shrine of Seven Stars to Ironforge
+        addPortal(false, 394, { x = 0.7724, y = 0.4350, z = 0 }, true, 6142, 89, { x = 0.4347, y = 0.7868, z = 0 }, true, 1657, 10)                                                                     -- Shrine of Seven Stars to Darnassus
+        addPortal(false, 394, { x = 0.6848, y = 0.5298, z = 0 }, true, 6142, 111, { x = 0.5497, y = 0.4023, z = -12 }, true, 3703, 10)                                                                  -- Shrine of Seven Stars to Shattrath
+        addPortal(false, 394, { x = 0.6165, y = 0.3960, z = 0 }, true, 6142, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 10)                                                                  -- Shrine of Seven Stars to Dalaran
+    end
+
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addPortal(false, 110, { x = 0.5870, y = 0.2052, z = 48 }, true, 3487, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                      -- Silvermoon to Blasted Lands
+
+        addPortal(false, 86, { x = 0.4648, y = 0.6689, z = 0 }, true, 1637, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                        -- Orgrimmar to Blasted Lands
+        addPortal(false, 85, { x = 0.6883, y = 0.4057, z = 40 }, true, 1637, 371, { x = 0.2851, y = 0.1402, z = 248 }, true, 6521, 10, function() return C_QuestLog.IsQuestFlaggedCompleted(29690) end) -- Orgrimmar to Honeydew Village
+
+        addPortal(false, 88, { x = 0.2297, y = 0.1360, z = 111 }, true, 1638, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                      -- Thunder Bluff to Blasted Lands
+
+        addPortal(false, 998, { x = 0.8527, y = 0.1727, z = 0 }, true, 1497, 17, { x = 0.5390, y = 0.4608, z = 0 }, true, 4, 10, function() return UnitLevel("player") >= 56 end)                       -- Undercity to Blasted Lands
+
+        addPortal(false, 392, { x = 0.7625, y = 0.5261, z = 0 }, true, 6141, 110, { x = 0.5635, y = 0.2183, z = 48 }, true, 3487, 10)                                                                   -- Shrine of Two Moons to Silvermoon
+        addPortal(false, 392, { x = 0.7332, y = 0.4270, z = 0 }, true, 6141, 86, { x = 0.4891, y = 0.5435, z = 0 }, true, 1637, 10)                                                                     -- Shrine of Two Moons to Orgrimmar
+        addPortal(false, 392, { x = 0.7382, y = 0.3656, z = 0 }, true, 6141, 88, { x = 0.2238, y = 0.1877, z = 111 }, true, 1638, 10)                                                                   -- Shrine of Two Moons to Thunder Bluff
+        addPortal(false, 392, { x = 0.7429, y = 0.4786, z = 0 }, true, 6141, 998, { x = 0.8409, y = 0.1718, z = 0 }, true, 1497, 10)                                                                    -- Shrine of Two Moons to Undercity
+        addPortal(false, 392, { x = 0.6336, y = 0.5747, z = 0 }, true, 6141, 111, { x = 0.5497, y = 0.4023, z = -12 }, true, 3703, 10)                                                                  -- Shrine of Two Moons to Shattrath
+        addPortal(false, 392, { x = 0.6154, y = 0.3651, z = 0 }, true, 6141, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 10)                                                                  -- Shrine of Two Moons to Dalaran
+    end
+end
+
+if GetExpansionLevel() >= 6 then
+    -- Both
+    addPortal(false, 627, { x = 0.7427, y = 0.4930, z = 739 }, true, 7505, 1669, { x = 500.28100585938, y = 1469.6800537109, z = 742.44201660156 }, true, 8714, 10) -- Dalaran to Argus
+end
+
+local itemCount = 0
+local helpfulItems = {}
+
+local function addItem(itemId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
+    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), C_Map.GetAreaInfo(toAreaId) } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), C_Map.GetAreaInfo(toAreaId) } end }
+    addEntry(MRP.SpecialLocaId.ItemTo + itemCount, from, to, false, cost)
+    itemCount = itemCount + 1
+    if not helpfulItems[itemId] then
+        helpfulItems[itemId] = true
+        table.insert(MRP.Data.helpfulItems, itemId)
+    end
+end
+
+local function addDynamicItem(itemId, dynLoc, dynLocaId, cost, condition)
+    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), dynLocaId() } end }
+    local to = { unknown1 = 0, flags = 0, dynLoc = dynLoc, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), dynLocaId() } end }
+    addEntry(MRP.SpecialLocaId.ItemTo + itemCount, from, to, false, cost)
+    itemCount = itemCount + 1
+    if not helpfulItems[itemId] then
+        helpfulItems[itemId] = true
+        table.insert(MRP.Data.helpfulItems, itemId)
+    end
+end
+
+-- Vanilla
+-- Both
+addDynamicItem(6948, MRP.Util.GetBindingLocation, GetBindLocation, (select(3, UnitRace("player")) == 1 and GetExpansionLevel() >= 10) and 12.5 or 30, function() return MRP.AreaL[GetBindLocation()] end) -- Hearthstone
+addItem(18984, 83, { x = 0.5985, y = 0.4976, z = 0 }, true, 2255, 60)                                                                                                                                     -- Dimensional Ripper - Everlook
+addItem(18966, 71, { x = 0.5151, y = 0.3025, z = 0 }, true, 976, 60)                                                                                                                                      -- Ultrasafe Transporter: Gadgetzan
+addItem(22631, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 5)                                                                                                                                      -- Atiesh, Greatstaff of the Guardian
+
+-- The Burning Crusade
+if GetExpansionLevel() >= 1 then
+    -- Both
+    addItem(30542, 109, { x = 0.3355, y = 0.6767, z = 0 }, true, 3712, 60) -- Dimensional Ripper - Area 52
+    addItem(30544, 105, { x = 0.6091, y = 0.7008, z = 0 }, true, 3918, 60) -- Ultrasafe Transporter: Toshley's Station
+    addItem(32757, 104, { x = 0.6621, y = 0.4398, z = 0 }, true, 3840, 15) -- Blessed Medallion of Karabor
+end
+
+-- Wrath of the Lich King
+if GetExpansionLevel() >= 2 then
+    -- Both
+    addItem(46874, 118, { x = 0.6938, y = 0.2264, z = 0 }, true, 4658, 30)   -- Argent Crusader's Tabard
+    addItem(52251, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Jaina's Locket
+    addItem(50287, 224, { x = 0.3692, y = 0.7599, z = 9 }, true, 35, 30)     -- Boots of the Bay
+end
+
+-- Cataclysm
+if GetExpansionLevel() >= 3 then
+    -- Both
+    addItem(58487, 207, { x = 0.4873, y = 0.5356, z = -48 }, true, 5042, 10) -- Potion of Deepholm
+end
+
+-- Mists of Pandaria
+if GetExpansionLevel() >= 4 then
+    -- Both
+    addItem(103678, 554, { x = 0.3451, y = 0.5550, z = 0 }, true, 6757, 10) -- Time-Lost Artifact
+end
+
+-- Warlords of Draenor
+if GetExpansionLevel() >= 5 then
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addItem(110560, 582, { x = 0.2992, y = 0.3392, z = 0 }, true, 6790, 30, function() return C_QuestLog.IsQuestFlaggedCompleted(34586) end) -- Garrison Hearthstone
+    end
+
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addItem(110560, 590, { x = 0.5, y = 0.5, z = 0 }, true, 7004, 30, function() return C_QuestLog.IsQuestFlaggedCompleted(34378) end) -- Garrison Hearthstone
+    end
+end
+
+-- Legion
+if GetExpansionLevel() >= 6 then
+    -- Both
+    addItem(140192, 627, { x = 0.6092, y = 0.4472, z = 739 }, true, 7502, 30, function() return C_QuestLog.IsQuestFlaggedCompleted(44184) or C_QuestLog.IsQuestFlaggedCompleted(44663) end) -- Dalaran Hearthstone
+    addItem(142469, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 30)                                                                                                                  -- Violet Seal of the Grand Magus
+end

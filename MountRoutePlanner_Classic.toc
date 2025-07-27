@@ -1,0 +1,78 @@
+## Interface: 50500
+## Title: Mount Route Planner (MRP)
+## Author: Deathwing
+## Version: v1.1.0
+## LoadOnDemand: 0
+## License: All Rights Reserved
+## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
+## Notes: Plan and track your mount farming route with automatic collection scans, smart skipping, filters, waypoints, and travel-based routing.
+## SavedVariables: MRP_Settings
+## SavedVariablesPerCharacter: MRP_CharacterSettings
+
+## Category-enUS: Collections
+## Category-enGB: Collections
+## Category-deDE: Kriegsmeutesammlungen
+## Category-frFR: Collections du bataillon
+## Category-esES: Colecciones de banda guerrera
+## Category-esMX: Colecciones de tropa
+## Category-itIT: Collezioni della Brigata
+## Category-ptBR: Coleções do Bando de Guerra
+## Category-ruRU: Коллекции отряда
+## Category-koKR: 전투부대 수집품
+## Category-zhCN: 战团藏品
+## Category-zhTW: 戰隊收藏
+
+## X-Localizations: enUS, enGB, deDE, ruRU
+## X-CompatibleLocales: enUS, enGB, deDE, frFR, esES, esMX, itIT, ptBR, ruRU, koKR, zhCN, zhTW
+
+# MRP_REMOVE_NEXT_LINE
+MRP.d.lua
+
+Locale\MRP_Locale.enUS.lua
+Locale\MRP_Locale.deDE.lua
+Locale\MRP_Locale.ruRU.lua
+
+MRP_Enums.lua
+MRP_CharacterSettings.lua
+MRP_Settings.lua
+
+MRP_Util.lua
+
+Data_Classic\MRP_Areas.lua
+Data_Classic\MRP_Areas_enUS.lua
+Data_Classic\MRP_Areas_deDE.lua
+Data_Classic\MRP_Areas_frFR.lua
+Data_Classic\MRP_Areas_esES.lua
+Data_Classic\MRP_Areas_esMX.lua
+Data_Classic\MRP_Areas_itIT.lua
+Data_Classic\MRP_Areas_ptBR.lua
+Data_Classic\MRP_Areas_ruRU.lua
+Data_Classic\MRP_Areas_koKR.lua
+Data_Classic\MRP_Areas_zhCN.lua
+Data_Classic\MRP_Areas_zhTW.lua
+Data_Classic\MRP_Waypoints.lua
+Data_Classic\MRP_Waypoints_enUS.lua
+Data_Classic\MRP_Waypoints_deDE.lua
+Data_Classic\MRP_Waypoints_frFR.lua
+Data_Classic\MRP_Waypoints_esES.lua
+Data_Classic\MRP_Waypoints_esMX.lua
+Data_Classic\MRP_Waypoints_itIT.lua
+Data_Classic\MRP_Waypoints_ptBR.lua
+Data_Classic\MRP_Waypoints_ruRU.lua
+Data_Classic\MRP_Waypoints_koKR.lua
+Data_Classic\MRP_Waypoints_zhCN.lua
+Data_Classic\MRP_Waypoints_zhTW.lua
+Data_Classic\MRP_Steps.lua
+
+MRP_Data.lua
+
+# MRP_UNCOMMENT_NEXT_LINE
+# Navigation\embed.xml
+
+MRP_Filter.lua
+
+MRP_Options.lua
+MRP_UI.lua
+MRP_Minimap.lua
+
+MRP_Core.lua

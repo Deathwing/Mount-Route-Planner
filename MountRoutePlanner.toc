@@ -1,12 +1,13 @@
 ## Interface: 110107
 ## Title: Mount Route Planner (MRP)
 ## Author: Deathwing
-## Version: v0.3.1
+## Version: v1.1.0
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
-## IconTexture: Interface\AddOns\MountRoutePlanner\MRP.tga
-## Notes: Plan your mount farming route using SimpleArmory data with waypoint integration and smart step skipping.
-## SavedVariables: MRP_DB
+## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
+## Notes: Plan and track your mount farming route with automatic collection scans, smart skipping, filters, waypoints, and travel-based routing.
+## SavedVariables: MRP_Settings
+## SavedVariablesPerCharacter: MRP_CharacterSettings
 
 ## Category-enUS: Collections
 ## Category-enGB: Collections
@@ -24,15 +25,54 @@
 ## X-Localizations: enUS, enGB, deDE, ruRU
 ## X-CompatibleLocales: enUS, enGB, deDE, frFR, esES, esMX, itIT, ptBR, ruRU, koKR, zhCN, zhTW
 
-MRP_Locale.enUS.lua
-MRP_Locale.deDE.lua
-MRP_Locale.ruRU.lua
+# MRP_REMOVE_NEXT_LINE
+MRP.d.lua
 
-MRP_DB.lua
+Locale\MRP_Locale.enUS.lua
+Locale\MRP_Locale.deDE.lua
+Locale\MRP_Locale.ruRU.lua
+
+MRP_Enums.lua
+MRP_CharacterSettings.lua
+MRP_Settings.lua
+
+MRP_Util.lua
+
+Data_Retail\MRP_Areas.lua
+Data_Retail\MRP_Areas_enUS.lua
+Data_Retail\MRP_Areas_deDE.lua
+Data_Retail\MRP_Areas_frFR.lua
+Data_Retail\MRP_Areas_esES.lua
+Data_Retail\MRP_Areas_esMX.lua
+Data_Retail\MRP_Areas_itIT.lua
+Data_Retail\MRP_Areas_ptBR.lua
+Data_Retail\MRP_Areas_ruRU.lua
+Data_Retail\MRP_Areas_koKR.lua
+Data_Retail\MRP_Areas_zhCN.lua
+Data_Retail\MRP_Areas_zhTW.lua
+Data_Retail\MRP_Waypoints.lua
+Data_Retail\MRP_Waypoints_enUS.lua
+Data_Retail\MRP_Waypoints_deDE.lua
+Data_Retail\MRP_Waypoints_frFR.lua
+Data_Retail\MRP_Waypoints_esES.lua
+Data_Retail\MRP_Waypoints_esMX.lua
+Data_Retail\MRP_Waypoints_itIT.lua
+Data_Retail\MRP_Waypoints_ptBR.lua
+Data_Retail\MRP_Waypoints_ruRU.lua
+Data_Retail\MRP_Waypoints_koKR.lua
+Data_Retail\MRP_Waypoints_zhCN.lua
+Data_Retail\MRP_Waypoints_zhTW.lua
+Data_Retail\MRP_Steps.lua
+
 MRP_Data.lua
-MRP_Parser.lua
-MRP_Prefills.lua
+
+# MRP_UNCOMMENT_NEXT_LINE
+# Navigation\embed.xml
+
+MRP_Filter.lua
+
+MRP_Options.lua
 MRP_UI.lua
 MRP_Minimap.lua
 
-MRP.lua
+MRP_Core.lua
