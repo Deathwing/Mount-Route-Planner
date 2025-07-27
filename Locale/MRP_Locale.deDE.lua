@@ -103,6 +103,7 @@ MRP.L = {
   ["This will create waypoints for each step in your route."] = "Dies erstellt Wegpunkte für jeden Schritt in Ihrer Route.",
   ["Trash"] = "Trash", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Unknown Boss"] = "Unbekannter Boss",
+  ["Unknown Location"] = "Unbekannter Ort",
   ["Unknown Step"] = "Unbekannter Schritt",
   ["Use item: %s"] = "Benutze Gegenstand: %s",
   ["Use spell: %s"] = "Zauber wirken: %s",

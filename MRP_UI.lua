@@ -47,7 +47,7 @@ local function CreateToggleWithLabelAndTooltip(parent, text, description)
     return toggle
 end
 
-local frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
+local frame = CreateFrame("Frame", "MRPFrame", UIParent, "BackdropTemplate")
 frame:SetSize(400, 260)
 frame:SetPoint("CENTER")
 frame:SetBackdrop({
@@ -245,6 +245,10 @@ actionBtn:SetPushedTexture("Interface\\Icons\\INV_Misc_QuestionMark")
 actionBtn:GetPushedTexture():SetVertexColor(0.6, 0.6, 0.6, 1)
 actionBtn:SetHighlightTexture("Interface\\Icons\\INV_Misc_QuestionMark")
 actionBtn:SetAttribute("type", "macro")
+actionBtn:RegisterForClicks("AnyUp", "AnyDown")
+if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
+    actionBtn:RegisterForClicks("AnyUp")
+end
 actionBtn:Hide()
 
 function UI:AddPossibleInCombatWarning()
@@ -278,8 +282,10 @@ function UI:ShowActionUseSpell(spellId)
 end
 
 function UI:ShowActionUseItem(itemId)
-    local name, _, _, _, _, _, _, _, _, icon = C_Item.GetItemInfo(itemId)
+    local item = MRP.Util.GetItem(itemId)
+    local name = item:GetItemName()
     if name then
+        local icon = item:GetItemIcon()
         if icon then
             actionBtn:SetNormalTexture(icon)
             actionBtn:SetHighlightTexture(icon)
@@ -488,9 +494,10 @@ function UI:ShowPathfindingWarnings()
             if #missingItems > 0 then
                 GameTooltip:AddLine(L["Missing helpful items from your inventory:"], 1, 1, 1)
                 for _, itemId in ipairs(missingItems) do
-                    local name, _, quality, _, _, _, _, _, _, icon = C_Item.GetItemInfo(itemId)
+                    local item = MRP.Util.GetItem(itemId)
+                    local name = item:GetItemName()
                     if name then
-                        GameTooltip:AddLine(format("|T%s:16:16:0:0|t %s", icon or "Interface\\Icons\\INV_Misc_QuestionMark", name), C_Item.GetItemQualityColor(quality))
+                        GameTooltip:AddLine(format("|T%s:16:16:0:0|t %s", item:GetItemIcon() or "Interface\\Icons\\INV_Misc_QuestionMark", name), C_Item.GetItemQualityColor(item:GetItemQuality()))
                     end
                 end
                 GameTooltip:AddLine(" ")

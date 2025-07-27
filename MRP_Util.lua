@@ -1,6 +1,8 @@
 -- MRP.lua
 -- local _, MRP = ...
 
+local L = MRP.L
+
 local Util = {}
 MRP.Util = Util
 
@@ -51,4 +53,23 @@ end
 function Util.GetBindingLocation()
     local loc = MRP.Areas[MRP.AreaL[GetBindLocation()]]
     return { mapId = loc.mapId, pos = { x = loc.pos.x, y = loc.pos.y, z = loc.pos.z }, isUI = false }
+end
+
+---@type table<number, ItemMixin>
+local itemCache = {}
+
+---@param itemId number
+---@return ItemMixin
+function Util.GetItem(itemId)
+    if not itemCache[itemId] then
+        itemCache[itemId] = Item:CreateFromItemID(itemId)
+    end
+
+    return itemCache[itemId]
+end
+
+---@param itemId number
+---@return string itemName
+function Util.GetItemNameSafe(itemId)
+    return Util.GetItem(itemId):GetItemName() or L["Item_" .. itemId]
 end

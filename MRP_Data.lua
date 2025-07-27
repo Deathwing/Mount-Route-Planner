@@ -1,6 +1,8 @@
 -- MRP_Data.lua
 -- local _, MRP = ...
 
+local L = MRP.L
+
 ---@class Dungeon
 ---@field x number the x coordinate of the dungeon entrance
 ---@field y number the y coordinate of the dungeon entrance
@@ -165,8 +167,8 @@ end
 local flightpathCount = 0
 
 local function addFlightpath(fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
-    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.FlightpathTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) } end } ---@type WaypointLocation
-    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.FlightpathTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) } end } ---@type WaypointLocation
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.FlightpathTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId] } end } ---@type WaypointLocation
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.FlightpathTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) or L["Area_" .. fromAreaId] } end } ---@type WaypointLocation
     addEntry(MRP.SpecialLocaId.FlightpathTo + flightpathCount, from, to, true, cost)
     flightpathCount = flightpathCount + 1
 end
@@ -184,8 +186,8 @@ end
 local boatCount = 0
 
 local function addBoat(fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
-    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.BoatTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId), C_Map.GetAreaInfo(toAreaId) } end }
-    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.BoatTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId), C_Map.GetAreaInfo(fromAreaId) } end }
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.BoatTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) or L["Area_" .. fromAreaId], C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId] } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.BoatTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId], C_Map.GetAreaInfo(fromAreaId) or L["Area_" .. fromAreaId] } end }
     addEntry(MRP.SpecialLocaId.BoatTo + boatCount, from, to, true, cost)
     boatCount = boatCount + 1
 end
@@ -201,8 +203,8 @@ end
 local zeppelinCount = 0
 
 local function addZeppelin(fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
-    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.ZeppelinTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId), C_Map.GetAreaInfo(toAreaId) } end }
-    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.ZeppelinTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId), C_Map.GetAreaInfo(fromAreaId) } end }
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.ZeppelinTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) or L["Area_" .. fromAreaId], C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId] } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.ZeppelinTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId], C_Map.GetAreaInfo(fromAreaId) or L["Area_" .. fromAreaId] } end }
     addEntry(MRP.SpecialLocaId.ZeppelinTo + zeppelinCount, from, to, true, cost)
     zeppelinCount = zeppelinCount + 1
 end
@@ -211,17 +213,17 @@ end
 if GetExpansionLevel() >= 3 and WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
     -- Horde
     if UnitFactionGroup("player") == "Horde" then
-        addZeppelin(0, { x = 2070.5122070312, y = 289.15798950195, z = 97.03157806396 }, false, 1497, 1, { x = 1842.1899414062, y = -4389.0400390625, z = 135.23300170898 }, false, 1637, 600)   --  Undercity to Orgrimmar
-        addZeppelin(0, { x = 2059.9340820312, y = 235.90972900391, z = 99.76524353027 }, false, 1497, 0, { x = -12396.400390625, y = 217.47999572754, z = 1.69035005569 }, false, 117, 600)      --  Undercity to Grom'gol Base Camp
-        addZeppelin(0, { x = 2063.2448730469, y = 364.23959350586, z = 82.50442504883 }, false, 1497, 571, { x = 1950.8000488281, y = -6174.2299804688, z = 24.30380058289 }, false, 495, 600)   --  Undercity to Howling Fjord
+        addZeppelin(0, { x = 2070.5122070312, y = 289.15798950195, z = 97.03157806396 }, false, 1497, 1, { x = 1842.1899414062, y = -4389.0400390625, z = 135.23300170898 }, false, 1637, 600) --  Undercity to Orgrimmar
+        addZeppelin(0, { x = 2059.9340820312, y = 235.90972900391, z = 99.76524353027 }, false, 1497, 0, { x = -12396.400390625, y = 217.47999572754, z = 1.69035005569 }, false, 117, 600)    --  Undercity to Grom'gol Base Camp
+        addZeppelin(0, { x = 2063.2448730469, y = 364.23959350586, z = 82.50442504883 }, false, 1497, 571, { x = 1950.8000488281, y = -6174.2299804688, z = 24.30380058289 }, false, 495, 600) --  Undercity to Howling Fjord
     end
 end
 
 local portalCount = 0
 
 local function addPortal(bidirectional, fromMapId, fromPos, fromIsUI, fromAreaId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
-    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.PortalTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) } end }
-    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = bidirectional and condition or nil, type = 1, important = true, locaId = MRP.SpecialLocaId.PortalTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) } end }
+    local from = { unknown1 = 0, flags = 0, loc = { mapId = fromMapId, pos = fromPos, isUI = fromIsUI }, condition = condition, type = 1, important = true, locaId = MRP.SpecialLocaId.PortalTo, locaArgs = function() return { C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId] } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, condition = bidirectional and condition or nil, type = 1, important = true, locaId = MRP.SpecialLocaId.PortalTo, locaArgs = function() return { C_Map.GetAreaInfo(fromAreaId) or L["Area_" .. fromAreaId] } end }
     addEntry(MRP.SpecialLocaId.PortalTo + portalCount, from, to, bidirectional, cost)
     portalCount = portalCount + 1
 end
@@ -293,15 +295,15 @@ end
 
 if GetExpansionLevel() >= 6 then
     -- Both
-    addPortal(false, 627, { x = 0.7427, y = 0.4930, z = 739 }, true, 7505, 1669, { x = 500.28100585938, y = 1469.6800537109, z = 742.44201660156 }, true, 8714, 10) -- Dalaran to Argus
+    addPortal(false, 627, { x = 0.7427, y = 0.4930, z = 739 }, true, 7505, 1669, { x = 500.28100585938, y = 1469.6800537109, z = 742.44201660156 }, false, 8714, 10) -- Dalaran to Argus
 end
 
 local itemCount = 0
 local helpfulItems = {}
 
 local function addItem(itemId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
-    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), C_Map.GetAreaInfo(toAreaId) } end }
-    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), C_Map.GetAreaInfo(toAreaId) } end }
+    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemId), C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId] } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemId), C_Map.GetAreaInfo(toAreaId) } end }
     addEntry(MRP.SpecialLocaId.ItemTo + itemCount, from, to, false, cost)
     itemCount = itemCount + 1
     if not helpfulItems[itemId] then
@@ -311,8 +313,8 @@ local function addItem(itemId, toMapId, toPos, toIsUI, toAreaId, cost, condition
 end
 
 local function addDynamicItem(itemId, dynLoc, dynLocaId, cost, condition)
-    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), dynLocaId() } end }
-    local to = { unknown1 = 0, flags = 0, dynLoc = dynLoc, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { C_Item.GetItemInfo(itemId), dynLocaId() } end }
+    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemId), dynLocaId() or L["Unknown Location"] } end }
+    local to = { unknown1 = 0, flags = 0, dynLoc = dynLoc, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemId), dynLocaId() or L["Unknown Location"] } end }
     addEntry(MRP.SpecialLocaId.ItemTo + itemCount, from, to, false, cost)
     itemCount = itemCount + 1
     if not helpfulItems[itemId] then

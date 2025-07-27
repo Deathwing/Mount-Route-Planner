@@ -99,6 +99,7 @@ MRP.L = {
   ["This will create waypoints for each step in your route."] = "This will create waypoints for each step in your route.",
   ["Trash"] = "Trash",
   ["Unknown Boss"] = "Unknown Boss",
+  ["Unknown Location"] = "Unknown Location",
   ["Unknown Step"] = "Unknown Step",
   ["Use item: %s"] = "Use item: %s",
   ["Use spell: %s"] = "Use spell: %s",

@@ -1,5 +1,16 @@
 # Mount Route Planner
 
+## [v1.1.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.1) (2025-07-27)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added more hearthstone locations for main cities
+
+### Bug Fixes
+- Fixed an issue with the minimap button and main frame to reset with each UI reload
+- Fixed an issue with minimap button not being shown in some cases
+- Fixed an issue with item names and buttons
+
 ## [v1.1.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.0) (2025-07-27)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

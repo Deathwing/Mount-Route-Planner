@@ -103,6 +103,7 @@ MRP.L = {
   ["This will create waypoints for each step in your route."] = "Это создаст путевые точки для каждого шага вашего маршрута.",
   ["Trash"] = "Trash", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Unknown Boss"] = "Неизвестный босс",
+  ["Unknown Location"] = "Неизвестное местоположение",
   ["Unknown Step"] = "Неизвестный шаг",
   ["Use item: %s"] = "Use item: %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Use spell: %s"] = "Use spell: %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
