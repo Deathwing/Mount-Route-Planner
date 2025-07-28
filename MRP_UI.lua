@@ -269,7 +269,7 @@ function UI:ShowActionUseSpell(spellId)
         actionBtn:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:AddLine(format(L["Use spell: %s"], spellInfo.name), 1, 1, 1)
-            GameTooltip:AddLine(format(L["Click to cast %s."], spellInfo.name), 0.6, 0.6, 0.6, true)
+            GameTooltip:AddLine(format(L["Click to cast %s."], spellInfo.name), 0.6, 0.6, 0.6)
             UI:AddPossibleInCombatWarning()
             GameTooltip:Show()
         end)
@@ -305,7 +305,7 @@ function UI:ShowActionUseItem(itemId)
         actionBtn:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
             GameTooltip:AddLine(format(L["Use item: %s"], name), 1, 1, 1)
-            GameTooltip:AddLine(format(L["Click to use %s."], name), 0.6, 0.6, 0.6, true)
+            GameTooltip:AddLine(format(L["Click to use %s."], name), 0.6, 0.6, 0.6)
             UI:AddPossibleInCombatWarning()
             GameTooltip:Show()
         end)
@@ -315,6 +315,53 @@ function UI:ShowActionUseItem(itemId)
         actionBtn:Show()
         ActionButton_ShowOverlayGlow(actionBtn)
     end
+end
+
+function UI:ShowActionTrashIt()
+    local itemsToSell = MRP.Core:GatherTrashItData()
+    if #itemsToSell == 0 then
+        return
+    end
+
+    local itemsWithCount = {}
+    for _, info in ipairs(itemsToSell) do
+        local item = info.item
+        local name = item:GetItemName()
+        if name then
+            if not itemsWithCount[name] then
+                itemsWithCount[name] = { count = 0, item = item }
+            end
+            itemsWithCount[name].count = itemsWithCount[name].count + item:GetStackCount()
+        end
+    end
+
+    actionBtn:SetNormalTexture("Interface\\Icons\\Ability_Repair")
+    actionBtn:SetHighlightTexture("Interface\\Icons\\Ability_Repair")
+    actionBtn:SetPushedTexture("Interface\\Icons\\Ability_Repair")
+
+    local macro = "/mrp trashit"
+
+    actionBtn:SetAttribute("macrotext", macro)
+    actionBtn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(L["Trash It!"], 1, 1, 1)
+        for _, info in pairs(itemsWithCount) do
+            local item = info.item
+            local name = item:GetItemName()
+            if name then
+                local r, g, b = C_Item.GetItemQualityColor(item:GetItemQuality())
+                GameTooltip:AddLine(format("|T%s:16:16:0:0|t %s (%dx)", item:GetItemIcon() or "Interface\\Icons\\INV_Misc_QuestionMark", name, info.count), r, g, b)
+            end
+        end
+        GameTooltip:AddLine(" ")
+        GameTooltip:AddLine(L["Click to trash all items listed above."], 0.6, 0.6, 0.6)
+        GameTooltip:Show()
+    end)
+    actionBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    actionBtn:Show()
+    ActionButton_ShowOverlayGlow(actionBtn)
 end
 
 local difficultyConfig = {
@@ -364,7 +411,7 @@ function UI:ShowActionSwitchDifficulty(difficultyId)
     actionBtn:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:AddLine(format(L["Switch to '%s' difficulty"], GetDifficultyInfo(difficultyId)), 1, 1, 1)
-        GameTooltip:AddLine(format(L["Click to switch the %s difficulty."], config.name), 0.6, 0.6, 0.6, true)
+        GameTooltip:AddLine(format(L["Click to switch the %s difficulty."], config.name), 0.6, 0.6, 0.6)
         UI:AddPossibleInCombatWarning()
         GameTooltip:Show()
     end)
@@ -497,7 +544,8 @@ function UI:ShowPathfindingWarnings()
                     local item = MRP.Util.GetItem(itemId)
                     local name = item:GetItemName()
                     if name then
-                        GameTooltip:AddLine(format("|T%s:16:16:0:0|t %s", item:GetItemIcon() or "Interface\\Icons\\INV_Misc_QuestionMark", name), C_Item.GetItemQualityColor(item:GetItemQuality()))
+                        local r, g, b = C_Item.GetItemQualityColor(item:GetItemQuality())
+                        GameTooltip:AddLine(format("|T%s:16:16:0:0|t %s", item:GetItemIcon() or "Interface\\Icons\\INV_Misc_QuestionMark", name), r, g, b)
                     end
                 end
                 GameTooltip:AddLine(" ")
@@ -663,7 +711,6 @@ function UI:UpdateDisplay()
             end
             mountBtn:SetScript("OnClick", function(self, button)
                 if InCombatLockdown() then
-                    -- call our slashcmd
                     UIErrorsFrame:OnEvent("UI_ERROR_MESSAGE", 525, ERR_NOT_IN_COMBAT)
                     return
                 end
@@ -759,6 +806,10 @@ function UI:UpdateDisplay()
             end
         end
         self:ClearCurrentPathfindingData()
+    end
+
+    if (MRP.Core:CanPossiblyTrashIt()) then
+        self:ShowActionTrashIt()
     end
 
     frame.progress:SetText(L["Step %d of %d"]:format(idx, #steps))

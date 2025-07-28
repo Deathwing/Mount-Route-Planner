@@ -302,6 +302,91 @@ function Core:CheckCurrentStepComplete(force)
     end
 end
 
+---@class TrashItItem
+---@field bag number
+---@field slot number
+---@field item ItemMixin
+
+---@return TrashItItem[] itemsToSell
+function Core:GatherTrashItData()
+    local expansionLevel = GetExpansionLevel()
+    local itemsToSell = {}
+
+    for bag = 0, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
+        for slot = 1, C_Container.GetContainerNumSlots(bag) do
+            local itemId = C_Container.GetContainerItemID(bag, slot)
+            if itemId then
+                local item = Item:CreateFromBagAndSlot(bag, slot)
+                if item then
+                    local inventoryType = item:GetInventoryType()
+                    if inventoryType >= Enum.InventoryType.IndexHeadType and inventoryType <= Enum.InventoryType.Index2HweaponType then
+                        local itemQuality = item:GetItemQuality()
+                        if itemQuality >= Enum.ItemQuality.Rare and itemQuality <= Enum.ItemQuality.Epic then
+                            local expansionID = select(15, C_Item.GetItemInfo(itemId))
+                            if expansionID and expansionID < expansionLevel then
+                                table.insert(itemsToSell, { bag = bag, slot = slot, item = item })
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return itemsToSell
+end
+
+function Core:CanPossiblyTrashIt()
+    if not MerchantFrame or not MerchantFrame:IsShown() then
+        return false
+    end
+
+    if GetMerchantNumItems() == 0 then
+        return false
+    end
+
+    return true
+end
+
+function Core:TrashItFromData(itemsToSell)
+    if not self:CanPossiblyTrashIt() then
+        print(L["|cffffd200[MRP]|r Trashing items is not possible at the moment."])
+        return
+    end
+
+    if #itemsToSell == 0 then
+        print(L["|cffffd200[MRP]|r No items to trash"])
+        return
+    end
+
+    local function SellNext(index)
+        if index > #itemsToSell then
+            print(L["|cffffd200[MRP]|r All items trashed."])
+            C_Timer.After(0, function() MRP.UI:UpdateDisplay() end)
+            return
+        end
+
+        if not MerchantFrame or not MerchantFrame:IsShown() then
+            print(L["|cffffd200[MRP]|r Merchant frame is not open. Please open it to trash items."])
+            C_Timer.After(0, function() MRP.UI:UpdateDisplay() end)
+            return
+        end
+
+        local data = itemsToSell[index]
+        if data then
+            C_Container.UseContainerItem(data.bag, data.slot)
+            print(L["|cffffd200[MRP]|r Trashed item: %s"], data.item:GetItemName())
+            C_Timer.After(0, function() SellNext(index + 1) end)
+        end
+    end
+
+    SellNext(1)
+end
+
+function Core:TrashIt()
+    self:TrashItFromData(self:GatherTrashItData())
+end
+
 ---@param event string
 function Core:CheckRaidInfo(event)
     if not (event == "ENCOUNTER_END") then
@@ -322,11 +407,20 @@ end
 
 ---@param event string
 function Core:CheckForDisplayUpdate(event)
-    if not (event == "NEW_MOUNT_ADDED" or event == "UPDATE_INSTANCE_INFO" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "ZONE_CHANGED_NEW_AREA") then
+    if not (event == "MERCHANT_CLOSED" or event == "NEW_MOUNT_ADDED" or event == "UPDATE_INSTANCE_INFO" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "ZONE_CHANGED_NEW_AREA") then
         return
     end
 
     MRP.UI:UpdateDisplay()
+end
+
+---@param event string
+function Core:CheckForTrashItInfo(event)
+    if not (event == "MERCHANT_SHOW") then
+        return
+    end
+
+    MRP.UI:ShowActionTrashIt()
 end
 
 ---@param event string
@@ -499,6 +593,8 @@ local watcher = CreateFrame("Frame")
 watcher:RegisterEvent("BAG_UPDATE_DELAYED")
 watcher:RegisterEvent("ENCOUNTER_END")
 watcher:RegisterEvent("HEARTHSTONE_BOUND")
+watcher:RegisterEvent("MERCHANT_CLOSED")
+watcher:RegisterEvent("MERCHANT_SHOW")
 watcher:RegisterEvent("NEW_MOUNT_ADDED")
 watcher:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
 watcher:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -508,9 +604,10 @@ watcher:RegisterEvent("ZONE_CHANGED")
 watcher:RegisterEvent("ZONE_CHANGED_INDOORS")
 watcher:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 watcher:SetScript("OnEvent", function(_, event)
-    Core:CheckRaidInfo(event)
     Core:CheckForPathfindingWarnings(event)
+    Core:CheckRaidInfo(event)
     Core:CheckForDisplayUpdate(event)
+    Core:CheckForTrashItInfo(event)
     Core:CheckDifficultyWarning(event)
     Core:CheckCurrentStepComplete(false)
 end)
@@ -548,6 +645,8 @@ function Core:HandleSlashCommand(msg)
     elseif cmd == "tomtom" and (arg1 == "on" or arg1 == "off") then
         MRP_Settings.useTomTom = (arg1 == "on")
         print(string.format(L["|cff00ff00[MRP]|r TomTom usage is now: %s"], (MRP_Settings.useTomTom and L["|cff00ff00ENABLED|r"] or L["|cffff0000DISABLED|r"])))
+    elseif cmd == "trashit" then
+        Core:TrashIt()
     elseif cmd == "updatedisplaydelayed" then
         C_Timer.After(tonumber(arg1) or 0.25, function() MRP.UI:UpdateDisplay() end)
     else
