@@ -342,6 +342,10 @@ end
 if GetExpansionLevel() >= 2 then
     -- Both
     addItem(46874, 118, { x = 0.6938, y = 0.2264, z = 0 }, true, 4658, 30)   -- Argent Crusader's Tabard
+    addItem(40586, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Band of the Kirin Tor
+    addItem(45688, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Inscribed Band of the Kirin Tor
+    addItem(48954, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Etched Band of the Kirin Tor
+    addItem(51560, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Runed Band of the Kirin Tor
     addItem(52251, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Jaina's Locket
     addItem(50287, 224, { x = 0.3692, y = 0.7599, z = 9 }, true, 35, 30)     -- Boots of the Bay
 end
