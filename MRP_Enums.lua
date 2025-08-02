@@ -149,6 +149,7 @@ MRP.SpecialLocaId = {
 ---@field mapId number the mapID of the source
 ---@field uiMapIds number[] the uiMapIDs of the source
 ---@field allowedDifficultyIds number[] the allowed difficulty IDs for the source
+---@field relevantDifficultyIds number[]? the relevant difficulty IDs for the source
 ---@field note string? an optional note for the source
 ---@field bonusRoll boolean? whether the source can be bonus rolled
 ---@field factionMask number? the faction mask for the source

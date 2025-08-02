@@ -93,6 +93,7 @@ local raids = {
     ["Battle of Dazar'alor"] = { x = 70.16, y = 35.44, mapName = "Boralus", mapID = 1161, instanceId = 2070, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
     ["Battle of Dazar'alor (H)"] = { x = 54.11, y = 30.60, mapName = "Zuldazar", mapID = 862, instanceId = 2070, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
     ["Ny'alotha the Waking City"] = { x = 55.15, y = 43.55, mapName = "Uldum:1527", mapID = 1527, instanceId = 2217, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
+    ["Ny'alotha the Waking City (VoEB)"] = { x = 40.18, y = 45.39, mapName = "Vale of Eternal Blossoms:1530", mapID = 1530, instanceId = 2217, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 7 },
 
     ["Sanctum of Domination"] = { x = 69.31, y = 30.94, mapName = "The Maw:The Shadowlands", mapID = 1543, instanceId = 2450, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 8 },
     ["Sepulcher of the First Ones"] = { x = 80.36, y = 53.63, mapName = "Zereth Mortis", mapID = 1970, instanceId = 2481, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 8 },
@@ -144,7 +145,7 @@ local worldBosses = {
     ["Nalak, The Storm Lord"] = { x = 60.31, y = 37.68, mapName = "Isle of Thunder", mapID = 504, questID = 32518, expansionLevel = 4 },
     ["Oondasta"] = { x = 49.87, y = 54.42, mapName = "Isle of Giants", mapID = 507, questID = 32519, expansionLevel = 4 },
 
-    ["Rukhmar"] = { x = 46.87, y = 78.47, mapName = "Spires of Arak", mapID = 542, questID = 37464, expansionLevel = 5 },
+    ["Rukhmar"] = { x = 34.4, y = 39.0, mapName = "Spires of Arak", mapID = 542, questID = 37464, expansionLevel = 5 },
 }
 
 MRP.Data = {
@@ -312,23 +313,56 @@ local function addItem(itemId, toMapId, toPos, toIsUI, toAreaId, cost, condition
     end
 end
 
-local function addDynamicItem(itemId, dynLoc, dynLocaId, cost, condition)
-    local from = { actionOptions = { { type = "item", data = itemId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseItem(itemId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemId), dynLocaId() or L["Unknown Location"] } end }
-    local to = { unknown1 = 0, flags = 0, dynLoc = dynLoc, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemId), dynLocaId() or L["Unknown Location"] } end }
+local function addDynamicItemWithMultipleIds(itemIds, dynLoc, dynLocaId, cost, condition)
+    local finalActionOptions = {}
+    for _, itemId in ipairs(itemIds) do
+        table.insert(finalActionOptions, { type = "item", data = itemId, allowAny = true })
+    end
+
+    local finalCondition = function()
+        if condition and not condition() then
+            return false
+        end
+
+        for _, itemId in ipairs(itemIds) do
+            if MRP.UI:CanUseItem(itemId) then
+                return true
+            end
+        end
+
+        return false
+    end
+
+    local from = { actionOptions = finalActionOptions, condition = finalCondition, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemIds[1]), dynLocaId() or L["Unknown Location"] } end }
+    local to = { unknown1 = 0, flags = 0, dynLoc = dynLoc, type = 2, locaId = MRP.SpecialLocaId.ItemTo, locaArgs = function() return { MRP.Util.GetItemNameSafe(itemIds[1]), dynLocaId() or L["Unknown Location"] } end }
     addEntry(MRP.SpecialLocaId.ItemTo + itemCount, from, to, false, cost)
     itemCount = itemCount + 1
-    if not helpfulItems[itemId] then
-        helpfulItems[itemId] = true
-        table.insert(MRP.Data.helpfulItems, itemId)
+
+    for _, itemId in ipairs(itemIds) do
+        if not helpfulItems[itemId] then
+            helpfulItems[itemId] = true
+            table.insert(MRP.Data.helpfulItems, itemId)
+        end
     end
+end
+
+local hearthstones = {}
+
+local function addHearthstone(itemId)
+    table.insert(hearthstones, itemId)
 end
 
 -- Vanilla
 -- Both
-addDynamicItem(6948, MRP.Util.GetBindingLocation, GetBindLocation, (select(3, UnitRace("player")) == 1 and GetExpansionLevel() >= 10) and 12.5 or 30, function() return MRP.AreaL[GetBindLocation()] end) -- Hearthstone
-addItem(18984, 83, { x = 0.5985, y = 0.4976, z = 0 }, true, 2255, 60)                                                                                                                                     -- Dimensional Ripper - Everlook
-addItem(18966, 71, { x = 0.5151, y = 0.3025, z = 0 }, true, 976, 60)                                                                                                                                      -- Ultrasafe Transporter: Gadgetzan
-addItem(22631, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 5)                                                                                                                                      -- Atiesh, Greatstaff of the Guardian
+addHearthstone(6948)                                                  -- Hearthstone
+addItem(18984, 83, { x = 0.5985, y = 0.4976, z = 0 }, true, 2255, 60) -- Dimensional Ripper - Everlook
+addItem(18966, 71, { x = 0.5151, y = 0.3025, z = 0 }, true, 976, 60)  -- Ultrasafe Transporter: Gadgetzan
+addItem(22631, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 5)  -- Atiesh, Greatstaff of the Guardian
+addHearthstone(172179)                                                -- Eternal Traveler's Hearthstone
+addHearthstone(193588)                                                -- Timewalker's Hearthstone
+addHearthstone(200630)                                                -- Ohn'ir Windsage's Hearthstone
+addHearthstone(208704)                                                -- Deepdweller's Earthen Hearthstone
+addHearthstone(209035)                                                -- Hearthstone of the Flame
 
 -- The Burning Crusade
 if GetExpansionLevel() >= 1 then
@@ -359,6 +393,7 @@ end
 -- Mists of Pandaria
 if GetExpansionLevel() >= 4 then
     -- Both
+    addHearthstone(93672)                                                   -- Dark Portal
     addItem(103678, 554, { x = 0.3451, y = 0.5550, z = 0 }, true, 6757, 10) -- Time-Lost Artifact
 end
 
@@ -381,3 +416,31 @@ if GetExpansionLevel() >= 6 then
     addItem(140192, 627, { x = 0.6092, y = 0.4472, z = 739 }, true, 7502, 30, function() return C_QuestLog.IsQuestFlaggedCompleted(44184) or C_QuestLog.IsQuestFlaggedCompleted(44663) end) -- Dalaran Hearthstone
     addItem(142469, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 30)                                                                                                                  -- Violet Seal of the Grand Magus
 end
+
+-- Battle for Azeroth
+if GetExpansionLevel() >= 7 then
+    -- Both
+    addHearthstone(168907) -- Holographic Digitalization Hearthstone
+end
+
+-- Shadowlands
+if GetExpansionLevel() >= 8 then
+    -- Both
+    addHearthstone(188952) -- Dominated Hearthstone
+    addHearthstone(190196) -- Enlightened Hearthstone
+end
+
+-- The War Within
+if GetExpansionLevel() >= 10 then
+    -- Both
+    addHearthstone(162973) -- Greatfather Winter's Hearthstone
+    addHearthstone(163045) -- Headless Horseman's Hearthstone
+    addHearthstone(165669) -- Lunar Elder's Hearthstone
+    addHearthstone(165670) -- Peddlefeet's Lovely Hearthstone
+    addHearthstone(165802) -- Noble Gardener's Hearthstone
+    addHearthstone(166746) -- Fire Eater's Hearthstone
+    addHearthstone(166747) -- Brewfest Reveler's Hearthstone
+    addHearthstone(236687) -- Explosive Hearthstone
+end
+
+addDynamicItemWithMultipleIds(hearthstones, MRP.Util.GetBindingLocation, GetBindLocation, (select(3, UnitRace("player")) == 1 and GetExpansionLevel() >= 10) and 12.5 or 30, function() return MRP.AreaL[GetBindLocation()] end) -- Hearthstones

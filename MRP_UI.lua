@@ -227,14 +227,14 @@ local autoAdvanceToggle = CreateToggleWithLabelAndTooltip(frame, L["Auto-Advance
 autoAdvanceToggle:SetPoint("BOTTOMLEFT", prevBtn, "TOPLEFT", 0, 0)
 
 autoAdvanceToggle:SetScript("OnClick", function(self)
-    MRP_Settings.autoAdvance = self:GetChecked()
+    MRP_CharacterSettings.autoAdvance = self:GetChecked()
 end)
 
 local autoSkipToggle = CreateToggleWithLabelAndTooltip(frame, L["Auto-Skip Steps"], L["Automatically skips steps that are already completed."])
 autoSkipToggle:SetPoint("BOTTOMLEFT", autoAdvanceToggle, "TOPLEFT", 0, 0)
 
 autoSkipToggle:SetScript("OnClick", function(self)
-    MRP_Settings.autoSkip = self:GetChecked()
+    MRP_CharacterSettings.autoSkip = self:GetChecked()
 end)
 
 local actionBtn = CreateFrame("Button", nil, frame, "InsecureActionButtonTemplate")
@@ -355,6 +355,7 @@ function UI:ShowActionTrashIt()
         end
         GameTooltip:AddLine(" ")
         GameTooltip:AddLine(L["Click to trash all items listed above."], 0.6, 0.6, 0.6)
+        UI:AddPossibleInCombatWarning()
         GameTooltip:Show()
     end)
     actionBtn:SetScript("OnLeave", function()
@@ -386,6 +387,10 @@ local difficultyConfig = {
 }
 
 function UI:ShowActionSwitchDifficulty(difficultyId)
+    if MRP.Core:IsLFRDifficulty(difficultyId) then
+        return
+    end
+
     local config = nil
     for _, c in ipairs(difficultyConfig) do
         if c.check(difficultyId) then
@@ -502,8 +507,8 @@ function UI:Toogle()
         if not C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal") then
             UIParentLoadAddOn("Blizzard_EncounterJournal")
         end
-        autoSkipToggle:SetChecked(MRP_Settings.autoSkip)
-        autoAdvanceToggle:SetChecked(MRP_Settings.autoAdvance)
+        autoSkipToggle:SetChecked(MRP_CharacterSettings.autoSkip)
+        autoAdvanceToggle:SetChecked(MRP_CharacterSettings.autoAdvance)
 
         frame:Show()
         self:ShowPathfindingWarnings()
@@ -524,7 +529,8 @@ function UI:ShowPathfindingWarnings()
 
     local missingItems = {}
     for _, itemId in ipairs(MRP.Data.helpfulItems) do
-        if not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
+        local isToy = PlayerHasToy and PlayerHasToy(itemId)
+        if not isToy and not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
             if C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
                 table.insert(missingItems, itemId)
             end
@@ -613,7 +619,8 @@ function UI:UpdateDisplay()
 
     local totalIconsForStep = 0
     for _, mount in ipairs(step.mounts) do
-        if not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde) then
+        local relevantDifficultyIds = MRP.Core:GetRelevantDifficultyIds(mount)
+        if #relevantDifficultyIds > 0 and (not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde)) then
             totalIconsForStep = totalIconsForStep + 1
         end
     end
@@ -622,12 +629,13 @@ function UI:UpdateDisplay()
 
     local index = 1
     for _, mount in ipairs(step.mounts) do
-        if not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde) then
+        local relevantDifficultyIds = MRP.Core:GetRelevantDifficultyIds(mount)
+        if #relevantDifficultyIds > 0 and (not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde)) then
             local isCollected = select(11, C_MountJournal.GetMountInfoByID(mount.id))
 
             local defeatedMap = {}
             local allAreDefeated = true
-            for _, difficultyId in ipairs(mount.source.allowedDifficultyIds) do
+            for _, difficultyId in ipairs(relevantDifficultyIds) do
                 local defeated, onLegacyRaidDifficulty = MRP.Core:IsEncounterDefeatedWithLegacyRaidCheck(mount, step.source, difficultyId)
                 defeatedMap[difficultyId] = { defeated = defeated, onLegacyRaidDifficulty = onLegacyRaidDifficulty }
                 if not defeated then
@@ -663,7 +671,7 @@ function UI:UpdateDisplay()
                 if isCollected then
                     GameTooltip:AddLine(L["You have collected this mount"], 1, 1, 0.6)
                 end
-                for _, difficultyId in ipairs(mount.source.allowedDifficultyIds) do
+                for _, difficultyId in ipairs(relevantDifficultyIds) do
                     local state = defeatedMap[difficultyId]
                     if difficultyId == -1 then
                         if state.defeated then
@@ -717,7 +725,7 @@ function UI:UpdateDisplay()
 
                 if button == "LeftButton" then
                     if mount.source.journalEncounter then
-                        EncounterJournal_OpenJournal(mount.source.allowedDifficultyIds[1], mount.source.journalEncounter.instanceId, mount.source.journalEncounter.id, nil, nil, mount.itemId)
+                        EncounterJournal_OpenJournal(relevantDifficultyIds[1], mount.source.journalEncounter.instanceId, mount.source.journalEncounter.id, nil, nil, mount.itemId)
                     else
                         local uiMapId = mount.source.uiMapIds[1]
                         if uiMapId == 319 then
@@ -726,7 +734,7 @@ function UI:UpdateDisplay()
                             uiMapId = 812
                         end
 
-                        EncounterJournal_OpenJournal(mount.source.allowedDifficultyIds[1], EJ_GetInstanceForMap(uiMapId), nil, nil, nil, mount.itemId)
+                        EncounterJournal_OpenJournal(relevantDifficultyIds[1], EJ_GetInstanceForMap(uiMapId), nil, nil, nil, mount.itemId)
                     end
                 elseif button == "RightButton" then
                     SetCollectionsJournalShown(true, COLLECTIONS_JOURNAL_TAB_INDEX_MOUNTS)
@@ -743,23 +751,28 @@ function UI:UpdateDisplay()
         end
     end
 
+    local isInPvP = MRP.Core:IsInPvp()
     local warningText = nil
     local instance = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.raids[step.source.name] or nil
     local alreadyInInstance = false
     local isInstanceRelevant = false
     local isRepeatable = false
     if instance then
-        local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIdsWithLegacyRaidCheck(step)
+        local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIds(step)
         isInstanceRelevant = #bestDifficulties > 0
         isRepeatable = #bestDifficulties > 0 and tContains(bestDifficulties, 1)
         if #bestDifficulties > 0 and not tContains(bestDifficulties, GetDungeonDifficultyID()) and not tContains(bestDifficulties, WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and GetLegacyRaidDifficultyID() or GetRaidDifficultyID()) and not tContains(bestDifficulties, GetRaidDifficultyID()) then
             if #bestDifficulties == #instance.availableDifficultyIds then
             elseif #bestDifficulties > 1 then
                 warningText = format(L["Run the instance on any of the following difficulties to collect all mounts:\n%s"], table.concat(MRP.Util.Map(bestDifficulties, GetDifficultyInfo), ", "))
-                self:ShowActionSwitchDifficulty(bestDifficulties[#bestDifficulties])
+                if not isInPvP then
+                    self:ShowActionSwitchDifficulty(bestDifficulties[#bestDifficulties])
+                end
             else
                 warningText = format(L["Run the instance on '%s' to collect all mounts."], GetDifficultyInfo(bestDifficulties[1]))
-                self:ShowActionSwitchDifficulty(bestDifficulties[1])
+                if not isInPvP then
+                    self:ShowActionSwitchDifficulty(bestDifficulties[1])
+                end
             end
         end
 
@@ -790,9 +803,14 @@ function UI:UpdateDisplay()
     end
     frame.stepPathfindingText:SetText("")
 
-    if entry and not alreadyInInstance then
+    if isInPvP then
+        frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
+        frame.stepPathfindingText:SetText(L["Pathfinding not available in PvP instances."])
+    elseif entry and not alreadyInInstance then
         if entry.instanceId and entry.instanceId == 2070 and isHorde then
             self:UpdateCurrentPathfinding(MRP.Data.raids["Battle of Dazar'alor (H)"])
+        elseif entry.instanceId and entry.instanceId == 2217 and MRP.Core:IsEntranceOnMap(MRP.Data.raids["Ny'alotha the Waking City (VoEB)"].mapID, entry.instanceId) then
+            self:UpdateCurrentPathfinding(MRP.Data.raids["Ny'alotha the Waking City (VoEB)"])
         else
             self:UpdateCurrentPathfinding(entry)
         end
@@ -808,9 +826,9 @@ function UI:UpdateDisplay()
         self:ClearCurrentPathfindingData()
     end
 
-    if (MRP.Core:CanPossiblyTrashIt()) then
-        self:ShowActionTrashIt()
-    end
+    if (MRP.Core:CanPossiblyTrashIt()) then -- MRP_REMOVE_LINE
+        self:ShowActionTrashIt()            -- MRP_REMOVE_LINE
+    end                                     -- MRP_REMOVE_LINE
 
     frame.progress:SetText(L["Step %d of %d"]:format(idx, #steps))
     frame.progressBar:SetWidth(frame.progressBarBG:GetWidth() * (idx / #steps))
@@ -856,7 +874,7 @@ function UI:UpdateCurrentPathfinding(entry)
         ClearLogs()   -- MRP_REMOVE_LINE
     end               -- MRP_REMOVE_LINE
     ---@diagnostic disable-next-line: undefined-global
-    local optimizedPath, nodes, edges = NavigateTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
+    local optimizedPath = NavigateTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
 
     local newPathKey = nil
     if optimizedPath then
@@ -878,7 +896,7 @@ function UI:UpdateCurrentPathfinding(entry)
         DevTool:AddData({ pathKey = pathKey, path = path, pathPos = pathPos, pathStep = pathStep }, "MRP_Path") -- MRP_REMOVE_LINE
     end
 
-    if #optimizedPath > 0 then
+    if pathStep then
         self:ShowCurrentPathfindingStep()
     else
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
@@ -1034,16 +1052,15 @@ function UI:AddUserWaypoint(loc, loca, key)
 end
 
 ---@param spellId number
----@param isItemSpell? boolean
 ---@return boolean
-function UI:CanUseSpell(spellId, isItemSpell)
+function UI:CanUseSpell(spellId)
     if not spellId then return false end
-    if not isItemSpell and not IsSpellKnown(spellId) then return false end
+    if not IsSpellKnown(spellId) then return false end
 
     local chargeInfo = C_Spell.GetSpellCharges(spellId)
     if chargeInfo and chargeInfo.currentCharges > 0 then return true end
 
-    return not isItemSpell or C_Spell.GetSpellCooldown(spellId).duration <= 0
+    return C_Spell.GetSpellCooldown(spellId).duration <= 0
 end
 
 ---@param itemId number
@@ -1052,9 +1069,16 @@ function UI:CanUseItem(itemId)
     if not itemId then return false end
     if not ((PlayerHasToy and PlayerHasToy(itemId)) or (C_Item.GetItemCount(itemId) > 0 and C_Item.IsUsableItem(itemId))) then return false end
 
-    if C_Item.GetItemCooldown and select(2, C_Item.GetItemCooldown(itemId)) <= 0 then return true end
+    if C_Item.GetItemCooldown then
+        if select(2, C_Item.GetItemCooldown(itemId)) <= 0 then return true end
+    elseif C_Container then
+        if select(2, C_Container.GetItemCooldown(itemId)) <= 0 then return true end
+    end
 
-    return self:CanUseSpell(select(2, C_Item.GetItemSpell(itemId)), true)
+    local chargeInfo = C_Spell.GetSpellCharges(C_Item.GetItemSpell(itemId))
+    if chargeInfo and chargeInfo.currentCharges > 0 then return true end
+
+    return false
 end
 
 function UI:ShowCurrentPathfindingStep()
@@ -1084,16 +1108,31 @@ function UI:ShowCurrentPathfindingStep()
         end
     end
 
-    local gotAction = false
+    local validActionOptions = {}
     for _, actionOption in ipairs(actionOptions) do
         if actionOption.type == "spell" and self:CanUseSpell(actionOption.data) then
-            self:ShowActionUseSpell(actionOption.data)
-            gotAction = true
+            table.insert(validActionOptions, actionOption)
+            if not actionOption.allowAny then
+                break
+            end
         elseif actionOption.type == "item" and self:CanUseItem(actionOption.data) then
-            self:ShowActionUseItem(actionOption.data)
+            table.insert(validActionOptions, actionOption)
+            if not actionOption.allowAny then
+                break
+            end
+        end
+    end
+
+    local gotAction = false
+    if #validActionOptions > 0 then
+        local randomActionOption = validActionOptions[math.random(#validActionOptions)]
+        if randomActionOption.type == "spell" then
+            self:ShowActionUseSpell(randomActionOption.data)
+            gotAction = true
+        elseif randomActionOption.type == "item" then
+            self:ShowActionUseItem(randomActionOption.data)
             gotAction = true
         end
-        break
     end
 
     if IsInInstance() and not gotAction then

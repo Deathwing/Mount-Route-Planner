@@ -1,5 +1,19 @@
 # Mount Route Planner
 
+## [v1.1.2](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.2) (2025-08-02)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.2) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- AutoSkip and AutoAdvance are now saved per character
+- Added option to filter out all LFR content
+
+### Bug Fixes
+- Fixed an issue while being inside pvp content (#8)
+- Fixed issues with cooldowns of items
+- Fixed an issue with the hearthstone
+- Fixed location marker for Rukhmar
+- Fixed entrance detection for Ny'alotha
+
 ## [v1.1.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.1) (2025-07-27)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

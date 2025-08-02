@@ -56,12 +56,38 @@ showDifficultyWarningToggle:SetScript("OnClick", function(self)
     MRP.UI:UpdateDisplay()
 end)
 
+local ignoreLFRDifficultyToggle = CreateFrame("CheckButton", nil, optionsFrame, "InterfaceOptionsCheckButtonTemplate")
+ignoreLFRDifficultyToggle:SetPoint("TOPLEFT", showDifficultyWarningToggle, "BOTTOMLEFT", 0, -12)
+ignoreLFRDifficultyToggle.Text:SetText(L["Ignore LFR Difficulty"])
+
+ignoreLFRDifficultyToggle:SetScript("OnEnter", function(self)
+    GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    GameTooltip:SetText(L["Ignore LFR Difficulty"])
+    GameTooltip:AddLine(L["Enable this to ignore LFR difficulty on all steps."], 1, 1, 1)
+    GameTooltip:Show()
+end)
+
+ignoreLFRDifficultyToggle:SetScript("OnLeave", function()
+    GameTooltip:Hide()
+end)
+
+ignoreLFRDifficultyToggle:SetScript("OnClick", function(self)
+    MRP_Settings.ignoreLFRDifficulty = self:GetChecked()
+    for _, step in ipairs(MRP.Steps) do
+        for _, mount in ipairs(step.mounts) do
+            mount.source.relevantDifficultyIds = nil
+        end
+    end
+    MRP.UI:UpdateDisplay()
+end)
+
 local settingsCategory = Settings.RegisterCanvasLayoutCategory(optionsFrame, "Mount Route Planner")
 Settings.RegisterAddOnCategory(settingsCategory)
 
 function Options:Show()
     tomtomToggle:SetChecked(MRP_Settings.useTomTom)
     showDifficultyWarningToggle:SetChecked(MRP_Settings.showDifficultyWarning)
+    ignoreLFRDifficultyToggle:SetChecked(MRP_Settings.ignoreLFRDifficulty)
 
     Settings.OpenToCategory(settingsCategory:GetID())
 end

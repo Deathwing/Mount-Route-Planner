@@ -36,7 +36,7 @@ function Core:NextStep()
     repeat
         MRP_CharacterSettings.currentStep = MRP_CharacterSettings.currentStep + 1
         local step = MRP.Filter:GetCurrentStep()
-    until not (MRP_Settings.autoSkip and step and self:ShouldSkipStep(step))
+    until not (MRP_CharacterSettings.autoSkip and step and self:ShouldSkipStep(step))
 
     MRP.UI:UpdateDisplay()
 end
@@ -59,17 +59,24 @@ function Core:IsRaidDifficulty(difficultyId)
     return difficultyId == 7 or difficultyId == 14 or difficultyId == 15 or difficultyId == 16 or difficultyId == 17 or difficultyId == 18 or difficultyId == 33 or difficultyId == 151 or difficultyId == 220
 end
 
-function IsCurrentEncouterDefeated()
-    local step = MRP.Filter:GetCurrentStep()
-    if not step then
-        return {}
-    end
+---@param difficultyId number
+---@return boolean isLFRDifficulty
+function Core:IsLFRDifficulty(difficultyId)
+    return difficultyId == 7 or difficultyId == 17 or difficultyId == 151
+end
 
-    local results = {}
-    for _, mount in ipairs(step.mounts) do
-        results[mount.id] = Core:IsEncounterDefeated(mount, step.source)
+function Core:IsInPvp()
+    local inInstance, instanceType = IsInInstance()
+    return inInstance and (instanceType == "pvp" or instanceType == "arena")
+end
+
+function Core:IsEntranceOnMap(mapId, instanceId)
+    for _, data in pairs(C_EncounterJournal.GetDungeonEntrancesForMap(mapId)) do
+        if data.journalInstanceID == instanceId then
+            return true
+        end
     end
-    return results
+    return false
 end
 
 ---@param mount Mount
@@ -192,8 +199,9 @@ function Core:GetMostSuitableDifficultyIds(step)
 
     for _, mount in ipairs(step.mounts) do
         if not select(11, C_MountJournal.GetMountInfoByID(mount.id)) then
-            for _, difficultyId in ipairs(mount.source.allowedDifficultyIds) do
-                if not self:IsEncounterDefeated(mount, step.source, difficultyId) then
+            for _, difficultyId in ipairs(MRP.Core:GetRelevantDifficultyIds(mount)) do
+                local usedDifficultyId = self:IsLegacyRaidDifficulty(difficultyId) and -1 or difficultyId
+                if not self:IsEncounterDefeated(mount, step.source, usedDifficultyId >= 0 and usedDifficultyId or nil) then
                     if not mountsPerDifficultyId[difficultyId] then
                         mountsPerDifficultyId[difficultyId] = 0
                     end
@@ -219,70 +227,13 @@ function Core:GetMostSuitableDifficultyIds(step)
 end
 
 ---@param step Step
----@return number[] difficultyIds
----@return { [number]: number }? mountsPerDifficulty
-function Core:GetMostSuitableDifficultyIdsForLegacyRaids(step)
-    if not step then
-        return {}, nil
-    end
-
-    ---@type { [number]: number }
-    local mountsPerDifficultyId = {}
-
-    for _, mount in ipairs(step.mounts) do
-        if not select(11, C_MountJournal.GetMountInfoByID(mount.id)) and not self:IsEncounterDefeated(mount, step.source, nil) then
-            for _, difficultyId in ipairs(mount.source.allowedDifficultyIds) do
-                if not mountsPerDifficultyId[difficultyId] then
-                    mountsPerDifficultyId[difficultyId] = 0
-                end
-                mountsPerDifficultyId[difficultyId] = mountsPerDifficultyId[difficultyId] + 1
-            end
-        end
-    end
-
-    local bestDifficultyIds = {}
-    local maxMounts = 0
-
-    for difficultyId, mountCount in pairs(mountsPerDifficultyId) do
-        if mountCount > maxMounts then
-            maxMounts = mountCount
-            bestDifficultyIds = { difficultyId }
-        elseif mountCount == maxMounts then
-            table.insert(bestDifficultyIds, difficultyId)
-        end
-    end
-
-    return bestDifficultyIds, mountsPerDifficultyId
-end
-
----@param step Step
----@return number[] difficultyIds
----@return { [number]: number }? mountsPerDifficulty
-function Core:GetMostSuitableDifficultyIdsWithLegacyRaidCheck(step)
-    if not step then
-        return {}, nil
-    end
-
-    local instance = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.raids[step.source.name] or nil
-    if instance then
-        for _, difficultyId in ipairs(instance.availableDifficultyIds) do
-            if self:IsLegacyRaidDifficulty(difficultyId) then
-                return self:GetMostSuitableDifficultyIdsForLegacyRaids(step)
-            end
-        end
-    end
-
-    return self:GetMostSuitableDifficultyIds(step)
-end
-
----@param step Step
 ---@return boolean shouldSkip
 function Core:ShouldSkipStep(step)
     if not step then
         return false
     end
 
-    local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIdsWithLegacyRaidCheck(step)
+    local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIds(step)
     if #bestDifficulties > 0 then
         return false
     end
@@ -297,9 +248,26 @@ function Core:CheckCurrentStepComplete(force)
     end
 
     local step = MRP.Filter:GetCurrentStep()
-    if step and (force or (MRP_Settings.autoAdvance and self:ShouldSkipStep(step))) then
+    if step and (force or (MRP_CharacterSettings.autoAdvance and self:ShouldSkipStep(step))) then
         self:NextStep()
     end
+end
+
+---@param mount Mount
+function Core:GetRelevantDifficultyIds(mount)
+    if mount.source.relevantDifficultyIds then
+        return mount.source.relevantDifficultyIds
+    end
+
+    local relevantDifficultyIds = {}
+    for _, difficultyId in ipairs(mount.source.allowedDifficultyIds) do
+        if not MRP_Settings.ignoreLFRDifficulty or not self:IsLFRDifficulty(difficultyId) then
+            table.insert(relevantDifficultyIds, difficultyId)
+        end
+    end
+    mount.source.relevantDifficultyIds = relevantDifficultyIds
+
+    return relevantDifficultyIds
 end
 
 ---@class TrashItItem
@@ -351,32 +319,34 @@ end
 function Core:TrashItFromData(itemsToSell)
     if not self:CanPossiblyTrashIt() then
         print(L["|cffffd200[MRP]|r Trashing items is not possible at the moment."])
+        C_Timer.After(0.5, function() MRP.UI:UpdateDisplay() end)
         return
     end
 
     if #itemsToSell == 0 then
         print(L["|cffffd200[MRP]|r No items to trash"])
+        C_Timer.After(0.5, function() MRP.UI:UpdateDisplay() end)
         return
     end
 
     local function SellNext(index)
         if index > #itemsToSell then
             print(L["|cffffd200[MRP]|r All items trashed."])
-            C_Timer.After(0, function() MRP.UI:UpdateDisplay() end)
+            C_Timer.After(0.5, function() MRP.UI:UpdateDisplay() end)
             return
         end
 
         if not MerchantFrame or not MerchantFrame:IsShown() then
             print(L["|cffffd200[MRP]|r Merchant frame is not open. Please open it to trash items."])
-            C_Timer.After(0, function() MRP.UI:UpdateDisplay() end)
+            C_Timer.After(0.5, function() MRP.UI:UpdateDisplay() end)
             return
         end
 
         local data = itemsToSell[index]
         if data then
             C_Container.UseContainerItem(data.bag, data.slot)
-            print(L["|cffffd200[MRP]|r Trashed item: %s"], data.item:GetItemName())
-            C_Timer.After(0, function() SellNext(index + 1) end)
+            print(format(L["|cffffd200[MRP]|r Trashed item: %s"], data.item:GetItemName()))
+            C_Timer.After(0.1, function() SellNext(index + 1) end)
         end
     end
 
@@ -454,7 +424,7 @@ function Core:CheckDifficultyWarning(event)
         return
     end
 
-    local mostSuitableDifficultyIds = self:GetMostSuitableDifficultyIdsForLegacyRaids(step)
+    local mostSuitableDifficultyIds = self:GetMostSuitableDifficultyIds(step)
     if #mostSuitableDifficultyIds > 0 and not tContains(mostSuitableDifficultyIds, difficultyId) then
         MRP.UI:ShowDifficultyWarning(mostSuitableDifficultyIds)
     else
@@ -534,14 +504,6 @@ function Core:InitializeSettings()
         MRP_Settings = {}
     end
 
-    if MRP_Settings.autoSkip == nil then
-        MRP_Settings.autoSkip = true
-    end
-
-    if MRP_Settings.autoAdvance == nil then
-        MRP_Settings.autoAdvance = true
-    end
-
     if MRP_Settings.useTomTom == nil then
         MRP_Settings.useTomTom = true
     end
@@ -550,8 +512,20 @@ function Core:InitializeSettings()
         MRP_Settings.showDifficultyWarning = true
     end
 
+    if MRP_Settings.ignoreLFRDifficulty == nil then
+        MRP_Settings.ignoreLFRDifficulty = false
+    end
+
     if not MRP_CharacterSettings then
         MRP_CharacterSettings = {}
+    end
+
+    if MRP_CharacterSettings.autoSkip == nil then
+        MRP_CharacterSettings.autoSkip = true
+    end
+
+    if MRP_CharacterSettings.autoAdvance == nil then
+        MRP_CharacterSettings.autoAdvance = true
     end
 
     if MRP_CharacterSettings.currentStep == nil then
@@ -607,7 +581,7 @@ watcher:SetScript("OnEvent", function(_, event)
     Core:CheckForPathfindingWarnings(event)
     Core:CheckRaidInfo(event)
     Core:CheckForDisplayUpdate(event)
-    Core:CheckForTrashItInfo(event)
+    Core:CheckForTrashItInfo(event) -- MRP_REMOVE_LINE
     Core:CheckDifficultyWarning(event)
     Core:CheckCurrentStepComplete(false)
 end)
@@ -645,8 +619,8 @@ function Core:HandleSlashCommand(msg)
     elseif cmd == "tomtom" and (arg1 == "on" or arg1 == "off") then
         MRP_Settings.useTomTom = (arg1 == "on")
         print(string.format(L["|cff00ff00[MRP]|r TomTom usage is now: %s"], (MRP_Settings.useTomTom and L["|cff00ff00ENABLED|r"] or L["|cffff0000DISABLED|r"])))
-    elseif cmd == "trashit" then
-        Core:TrashIt()
+    elseif cmd == "trashit" then -- MRP_REMOVE_LINE
+        Core:TrashIt()           -- MRP_REMOVE_LINE
     elseif cmd == "updatedisplaydelayed" then
         C_Timer.After(tonumber(arg1) or 0.25, function() MRP.UI:UpdateDisplay() end)
     else

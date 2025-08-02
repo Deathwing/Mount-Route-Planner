@@ -1,7 +1,7 @@
 ## Interface: 110107
 ## Title: Mount Route Planner (MRP)
 ## Author: Deathwing
-## Version: v1.1.0
+## Version: v1.1.2
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
 ## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
