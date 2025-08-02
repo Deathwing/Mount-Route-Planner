@@ -6,6 +6,7 @@
 ### Added
 - AutoSkip and AutoAdvance are now saved per character
 - Added option to filter out all LFR content
+- Added Kirin Tor teleport items (#7, thanks to @Kebabpizza)
 
 ### Bug Fixes
 - Fixed an issue while being inside pvp content (#8)
