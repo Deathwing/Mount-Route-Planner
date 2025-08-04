@@ -561,6 +561,10 @@ function Core:InitializeSettings()
             MRP_CharacterSettings.filter.collectedStates[collectedState] = not collectedState
         end
     end
+
+    if MRP_CharacterSettings.ignoredHelpfulItems == nil then
+        MRP_CharacterSettings.ignoredHelpfulItems = {}
+    end
 end
 
 local watcher = CreateFrame("Frame")
@@ -593,6 +597,7 @@ f:SetScript("OnEvent", function()
     Core:FilterTimewalkingSteps()
     MRP.Filter:Apply(true)
     Core:CheckCurrentStepComplete(false)
+    MRP.Options:InitializeIgnoredHelpfulItems()
 
     if DevTool then                                                     -- MRP_REMOVE_LINE
         DevTool:AddData(MRP, "MRP")                                     -- MRP_REMOVE_LINE

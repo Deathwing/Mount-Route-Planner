@@ -2934,6 +2934,72 @@ local steps = {
       name = "Liberation of Undermine"
     },
     expansion = 10
+  },
+  {
+    id = 50,
+    mounts = {
+      {
+        id = 2606,
+        name = "Royal Voidwing",
+        icon = "interface/icons/inv_voiddragonmount2ethereal_king.blp",
+        itemId = 246445,
+        spellId = 1242272,
+        source = {
+          mapId = 2810,
+          uiMapIds = {
+            2467
+          },
+          allowedDifficultyIds = {
+            15,
+            16
+          },
+          note = "This mount is only obtainable from \124cffa335ee\124Hitem:246446::::::::80:::::\124h[Mark of the Twilight Oath]\124h\124r, which starts the quest 'A Twilight Oath's End'. This quest is only available until the release of Midnight.",
+          journalEncounter = {
+            id = 2691,
+            name = "Dimensius, the All-Devouring",
+            instanceId = 1302,
+            uiMapId = 2467
+          },
+          dungeonEncounter = {
+            id = 3135,
+            name = "Dimensius, the All-Devouring",
+            mapId = 2810
+          }
+        }
+      },
+      {
+        id = 2569,
+        name = "Unbound Star-Eater",
+        icon = "interface/icons/inv_cosmicdragonmount.blp",
+        itemId = 243061,
+        spellId = 1234573,
+        source = {
+          mapId = 2810,
+          uiMapIds = {
+            2467
+          },
+          allowedDifficultyIds = {
+            16
+          },
+          journalEncounter = {
+            id = 2691,
+            name = "Dimensius, the All-Devouring",
+            instanceId = 1302,
+            uiMapId = 2467
+          },
+          dungeonEncounter = {
+            id = 3135,
+            name = "Dimensius, the All-Devouring",
+            mapId = 2810
+          }
+        }
+      }
+    },
+    source = {
+      type = "Raid",
+      name = "Manaforge Omega"
+    },
+    expansion = 10
   }
 }
 

@@ -9785,6 +9785,76 @@ local waypoints = {
     cost = 30
   },
   {
+    id = 309,
+    from = {
+      locaId = 469,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = -1657.8199462891,
+          y = -501.57998657227,
+          z = 549.74700927734
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 470,
+      flags = 0,
+      loc = {
+        mapId = 2552,
+        pos = {
+          x = 2969.6298828125,
+          y = -2384.7600097656,
+          z = 265.98699951172
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 310,
+    from = {
+      locaId = 471,
+      flags = 0,
+      loc = {
+        mapId = 2552,
+        pos = {
+          x = 2981.7299804688,
+          y = -2379.7600097656,
+          z = 266.10998535156
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 472,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = -1640.2299804688,
+          y = -494.23001098633,
+          z = 549.64001464844
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
     id = 311,
     from = {
       locaId = 473,
@@ -9845,6 +9915,253 @@ local waypoints = {
           x = 2589.3898925781,
           y = -2631.8999023438,
           z = 182.33999633789
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 313,
+    from = {
+      locaId = 482,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = 1348.9399414062,
+          y = -1040.9799804688,
+          z = -97.10050201416
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 483,
+      flags = 0,
+      loc = {
+        mapId = 530,
+        pos = {
+          x = -1427.2299804688,
+          y = 6345.8100585938,
+          z = 39.15129852295
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 314,
+    from = {
+      locaId = 484,
+      flags = 0,
+      loc = {
+        mapId = 530,
+        pos = {
+          x = -1462.6899414062,
+          y = 6339.08984375,
+          z = 37.24039840698
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 485,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = -188.22999572754,
+          y = 1253.5699462891,
+          z = 259.7200012207
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30,
+    condition = function() return (C_QuestLog.IsOnQuest(88661)) end
+  },
+  {
+    id = 315,
+    from = {
+      locaId = 486,
+      flags = 0,
+      loc = {
+        mapId = 530,
+        pos = {
+          x = -1462.6899414062,
+          y = 6339.08984375,
+          z = 37.24039840698
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 487,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = 1301.5899658203,
+          y = -1053.0500488281,
+          z = -100.98000335693
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30,
+    condition = function() return (C_QuestLog.IsOnQuest(88659)) end
+  },
+  {
+    id = 316,
+    from = {
+      locaId = 479,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = 1331.5799560547,
+          y = -1045.7099609375,
+          z = -97.10389709473
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 488,
+      flags = 0,
+      loc = {
+        mapId = 1643,
+        pos = {
+          x = 2522.2700195312,
+          y = -761.94000244141,
+          z = 38.38000106812
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 317,
+    from = {
+      locaId = 481,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = 1321.75,
+          y = -1017.3099975586,
+          z = -97.22010040283
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 489,
+      flags = 0,
+      loc = {
+        mapId = 2444,
+        pos = {
+          x = -3850.7399902344,
+          y = 3433.669921875,
+          z = 170.32000732422
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 318,
+    from = {
+      locaId = 477,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = 1339.0100097656,
+          y = -1011.7899780273,
+          z = -97.21959686279
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 490,
+      flags = 0,
+      loc = {
+        mapId = 2601,
+        pos = {
+          x = -1407.7099609375,
+          y = -2821.4099121094,
+          z = -1180.3199462891
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 319,
+    from = {
+      locaId = 480,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = 1352.3900146484,
+          y = -1023.4600219727,
+          z = -97.16069793701
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 491,
+      flags = 0,
+      loc = {
+        mapId = 2222,
+        pos = {
+          x = 2767.2800292969,
+          y = -3742.5700683594,
+          z = 3293.4799804688
         }
       },
       type = 2,

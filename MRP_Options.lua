@@ -81,6 +81,103 @@ ignoreLFRDifficultyToggle:SetScript("OnClick", function(self)
     MRP.UI:UpdateDisplay()
 end)
 
+local ignoredHelpfulItemsInitialized = false
+local ignoredHelpfulItemToggles = {}
+
+function Options:InitializeIgnoredHelpfulItems()
+    if ignoredHelpfulItemsInitialized then
+        return
+    end
+
+    local ignoredHelpfulItemsTitle = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    ignoredHelpfulItemsTitle:SetPoint("TOPLEFT", ignoreLFRDifficultyToggle, "BOTTOMLEFT", 0, -12)
+    ignoredHelpfulItemsTitle:SetText(L["Ignored Helpful Items (Owned items only)"])
+
+    local scrollFrame = CreateFrame("ScrollFrame", nil, optionsFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", ignoredHelpfulItemsTitle, "BOTTOMLEFT", 4, -4)
+    scrollFrame:SetSize(340, 220)
+    scrollFrame.scrollBarHideable = true
+    scrollFrame.ScrollBar:Hide();
+
+    local content = CreateFrame("Frame", nil, scrollFrame)
+    content:SetSize(320, 1)
+
+    scrollFrame:SetScrollChild(content)
+
+    local itemCount = 1
+    local lastFrame
+
+    local CHECKBOX_WIDTH = 24
+    local ICON_SIZE = 28
+    local ITEM_HEIGHT = 32
+
+    for _, itemId in ipairs(MRP.Data.helpfulItems) do
+        if not C_ToyBox.GetToyInfo(itemId) and C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
+            local item = MRP.Util.GetItem(itemId)
+            local itemName = item:GetItemName()
+            local itemIcon = item:GetItemIcon()
+
+            local itemFrame = CreateFrame("Frame", nil, content)
+            itemFrame:SetSize(300, ITEM_HEIGHT)
+            if itemCount == 1 then
+                itemFrame:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -8)
+            else
+                itemFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -4)
+            end
+
+            local ignoreToggle = CreateFrame("CheckButton", nil, itemFrame, "InterfaceOptionsCheckButtonTemplate")
+            ignoreToggle:SetSize(CHECKBOX_WIDTH, CHECKBOX_WIDTH)
+            ignoreToggle:SetPoint("RIGHT", itemFrame, "RIGHT", -4, 0)
+            ignoreToggle.Text:SetText(L["Ignore"])
+            ignoreToggle.Text:ClearAllPoints()
+            ignoreToggle.Text:SetPoint("LEFT", ignoreToggle, "RIGHT", 2, 0)
+            ignoreToggle:SetChecked(MRP_CharacterSettings.ignoredHelpfulItems[itemId])
+            ignoredHelpfulItemToggles[itemId] = ignoreToggle
+
+            ignoreToggle:SetScript("OnClick", function(self)
+                MRP_CharacterSettings.ignoredHelpfulItems[itemId] = self:GetChecked()
+                MRP.UI:ShowPathfindingWarnings()
+            end)
+
+            local icon = itemFrame:CreateTexture(nil, "ARTWORK")
+            icon:SetSize(ICON_SIZE, ICON_SIZE)
+            icon:SetPoint("LEFT", itemFrame, "LEFT", 0, 0)
+            icon:SetTexture(itemIcon or "Interface\\Icons\\INV_Misc_QuestionMark")
+
+            local name = itemFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            name:SetPoint("LEFT", icon, "RIGHT", 8, 0)
+            name:SetPoint("RIGHT", ignoreToggle, "LEFT", -8, 0)
+            name:SetText(itemName or ("Item " .. itemId))
+            name:SetJustifyH("LEFT")
+
+            item:ContinueOnItemLoad(function()
+                icon:SetTexture(item:GetItemIcon())
+                name:SetText(item:GetItemName())
+            end)
+
+            itemFrame:SetScript("OnEnter", function(self)
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                GameTooltip:SetItemByID(itemId)
+                GameTooltip:Show()
+            end)
+            itemFrame:SetScript("OnLeave", function()
+                GameTooltip:Hide()
+            end)
+
+            lastFrame = itemFrame
+            itemCount = itemCount + 1
+        end
+    end
+
+    if lastFrame then
+        content:SetHeight((itemCount - 1) * (ITEM_HEIGHT + 4) + 16)
+    else
+        content:SetHeight(ITEM_HEIGHT)
+    end
+
+    ignoredHelpfulItemsInitialized = true
+end
+
 local settingsCategory = Settings.RegisterCanvasLayoutCategory(optionsFrame, "Mount Route Planner")
 Settings.RegisterAddOnCategory(settingsCategory)
 
@@ -88,6 +185,9 @@ function Options:Show()
     tomtomToggle:SetChecked(MRP_Settings.useTomTom)
     showDifficultyWarningToggle:SetChecked(MRP_Settings.showDifficultyWarning)
     ignoreLFRDifficultyToggle:SetChecked(MRP_Settings.ignoreLFRDifficulty)
+    for itemId, toggle in pairs(ignoredHelpfulItemToggles) do
+        toggle:SetChecked(MRP_CharacterSettings.ignoredHelpfulItems[itemId])
+    end
 
     Settings.OpenToCategory(settingsCategory:GetID())
 end

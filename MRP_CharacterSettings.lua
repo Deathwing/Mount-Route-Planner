@@ -6,6 +6,7 @@
 ---@field autoAdvance boolean Whether to automatically advance to the next step after completing the current one.
 ---@field currentStep number The current step in the route being followed.
 ---@field filter FilterSettings The filter settings for the character.
+---@field ignoredHelpfulItems { number: boolean } A list of helpful items to ignore for this character.
 MRP_CharacterSettings = {
     autoSkip = true,
     autoAdvance = true,
@@ -33,5 +34,6 @@ MRP_CharacterSettings = {
             [MRP.FilterCollectedState.Collected] = false,
             [MRP.FilterCollectedState.NotCollected] = true
         },
-    }
+    },
+    ignoredHelpfulItems = {}
 }

@@ -268,8 +268,7 @@ function UI:ShowActionUseSpell(spellId)
         actionBtn:SetAttribute("macrotext", "/cast " .. spellInfo.name)
         actionBtn:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:AddLine(format(L["Use spell: %s"], spellInfo.name), 1, 1, 1)
-            GameTooltip:AddLine(format(L["Click to cast %s."], spellInfo.name), 0.6, 0.6, 0.6)
+            GameTooltip:SetSpellByID(spellId)
             UI:AddPossibleInCombatWarning()
             GameTooltip:Show()
         end)
@@ -304,8 +303,11 @@ function UI:ShowActionUseItem(itemId)
         actionBtn:SetAttribute("macrotext", macro)
         actionBtn:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-            GameTooltip:AddLine(format(L["Use item: %s"], name), 1, 1, 1)
-            GameTooltip:AddLine(format(L["Click to use %s."], name), 0.6, 0.6, 0.6)
+            if C_ToyBox.GetToyInfo(itemId) then
+                GameTooltip:SetToyByItemID(itemId)
+            else
+                GameTooltip:SetItemByID(itemId)
+            end
             UI:AddPossibleInCombatWarning()
             GameTooltip:Show()
         end)
@@ -444,6 +446,7 @@ frame.titleButton:SetNormalTexture("Interface\\common\\help-i")
 frame.titleButton:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 frame.titleButton:SetPushedTexture("Interface\\common\\help-i")
 frame.titleButton:Hide()
+frame.titleButton:SetScript("OnClick", nil)
 frame.titleButton:SetScript("OnLeave", function()
     GameTooltip:Hide()
 end)
@@ -459,6 +462,7 @@ frame.stepInfoButton:SetNormalTexture("Interface\\common\\help-i")
 frame.stepInfoButton:SetHighlightTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight")
 frame.stepInfoButton:SetPushedTexture("Interface\\common\\help-i")
 frame.stepInfoButton:Hide()
+frame.stepInfoButton:SetScript("OnClick", nil)
 frame.stepInfoButton:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
     GameTooltip:AddLine(L["This step is repeatable*"], 1, 1, 1)
@@ -529,8 +533,7 @@ function UI:ShowPathfindingWarnings()
 
     local missingItems = {}
     for _, itemId in ipairs(MRP.Data.helpfulItems) do
-        local isToy = PlayerHasToy and PlayerHasToy(itemId)
-        if not isToy and not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
+        if not C_ToyBox.GetToyInfo(itemId) and not MRP_CharacterSettings.ignoredHelpfulItems[itemId] and not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
             if C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
                 table.insert(missingItems, itemId)
             end
@@ -555,6 +558,7 @@ function UI:ShowPathfindingWarnings()
                     end
                 end
                 GameTooltip:AddLine(" ")
+                GameTooltip:AddLine(L["You can ignore these items in the settings."], 0.5, 1, 0.5)
                 GameTooltip:AddLine(L["Pathfinding will not use these items until you have them in your inventory."], 0.6, 0.6, 1)
             end
 
@@ -631,7 +635,7 @@ function UI:UpdateDisplay()
     for _, mount in ipairs(step.mounts) do
         local relevantDifficultyIds = MRP.Core:GetRelevantDifficultyIds(mount)
         if #relevantDifficultyIds > 0 and (not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde)) then
-            local isCollected = select(11, C_MountJournal.GetMountInfoByID(mount.id))
+            local name, _, icon, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(mount.id)
 
             local defeatedMap = {}
             local allAreDefeated = true
@@ -653,9 +657,16 @@ function UI:UpdateDisplay()
                 local startX = (frameWidth - (iconsInRow * 36)) / 2
                 mountBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", startX + col * 36, -84 - row * 36)
             end
-            mountBtn:SetNormalTexture(mount.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
-            mountBtn:SetHighlightTexture(mount.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+            mountBtn:SetNormalTexture(icon or "Interface\\Icons\\INV_Misc_QuestionMark")
+            mountBtn:SetHighlightTexture(icon or "Interface\\Icons\\INV_Misc_QuestionMark")
             mountBtn:GetNormalTexture():SetDesaturated(allAreDefeated or isCollected)
+
+            if mount.source.note then
+                local noteIcon = mountBtn:CreateTexture(nil, "OVERLAY")
+                noteIcon:SetSize(16, 16)
+                noteIcon:SetPoint("TOPRIGHT", mountBtn, "TOPRIGHT", 4, 4)
+                noteIcon:SetTexture("Interface\\common\\help-i")
+            end
 
             local allowLeftClick = (mount.source.journalEncounter and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)) ~= nil or (mount.source.uiMapIds[1] and EJ_GetInstanceForMap(mount.source.uiMapIds[1])) > 0
 
@@ -663,11 +674,7 @@ function UI:UpdateDisplay()
                 ---@diagnostic disable-next-line: param-type-mismatch
                 GameTooltip:SetOwner(mountBtn, "ANCHOR_RIGHT")
                 GameTooltip:AddLine(self:GetLocalizedBossName(mount), 1, 1, 1)
-                local sourceNote = self:GetLocalizedSourceNote(mount)
-                if sourceNote then
-                    GameTooltip:AddLine(sourceNote, nil, nil, nil, true)
-                end
-                GameTooltip:AddLine(format(L["Mount: %s"], C_MountJournal.GetMountInfoByID(mount.id)) or mount.name, 0.6, 1, 0.6)
+                GameTooltip:AddLine(format(L["Mount: %s"], name or mount.name, 0.6, 1, 0.6))
                 if isCollected then
                     GameTooltip:AddLine(L["You have collected this mount"], 1, 1, 0.6)
                 end
@@ -704,6 +711,14 @@ function UI:UpdateDisplay()
                 end
                 GameTooltip:AddLine(L["Right-click to view in Mount Journal"], 1, 1, 1)
                 GameTooltip:AddLine(L["Middle-click to view on Map"], 1, 1, 1)
+
+                local sourceNote = self:GetLocalizedSourceNote(mount)
+                if sourceNote then
+                    GameTooltip:AddLine(" ")
+                    GameTooltip:AddLine(L["Note:"], 1, 1, 1)
+                    GameTooltip:AddLine(sourceNote, nil, nil, nil, true)
+                end
+
                 UI:AddPossibleInCombatWarning()
 
                 GameTooltip:Show()
@@ -874,6 +889,12 @@ function UI:UpdateCurrentPathfinding(entry)
         ClearLogs()   -- MRP_REMOVE_LINE
     end               -- MRP_REMOVE_LINE
     ---@diagnostic disable-next-line: undefined-global
+    if not NavigateTo then
+        frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
+        frame.stepPathfindingText:SetText(L["Pathfinding not available"])
+        return
+    end
+    ---@diagnostic disable-next-line: undefined-global
     local optimizedPath = NavigateTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
 
     local newPathKey = nil
@@ -893,7 +914,9 @@ function UI:UpdateCurrentPathfinding(entry)
         pathPos = 1
         pathStep = path and pathPos <= #path and path[pathPos] or nil
 
-        DevTool:AddData({ pathKey = pathKey, path = path, pathPos = pathPos, pathStep = pathStep }, "MRP_Path") -- MRP_REMOVE_LINE
+        if DevTool then                                                                                             -- MRP_REMOVE_LINE
+            DevTool:AddData({ pathKey = pathKey, path = path, pathPos = pathPos, pathStep = pathStep }, "MRP_Path") -- MRP_REMOVE_LINE
+        end                                                                                                         -- MRP_REMOVE_LINE
     end
 
     if pathStep then
@@ -1067,7 +1090,7 @@ end
 ---@return boolean
 function UI:CanUseItem(itemId)
     if not itemId then return false end
-    if not ((PlayerHasToy and PlayerHasToy(itemId)) or (C_Item.GetItemCount(itemId) > 0 and C_Item.IsUsableItem(itemId))) then return false end
+    if not (PlayerHasToy(itemId) or (C_Item.GetItemCount(itemId) > 0 and C_Item.IsUsableItem(itemId))) then return false end
 
     if C_Item.GetItemCooldown then
         if select(2, C_Item.GetItemCooldown(itemId)) <= 0 then return true end

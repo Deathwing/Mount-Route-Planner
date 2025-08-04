@@ -1,5 +1,22 @@
 # Mount Route Planner
 
+## [v1.1.3](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.3) (2025-08-04)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.3) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added support for patch 11.2.0
+- Added option to ignore specific helpful items
+- Action options are now using ingame tooltips for spells and items
+
+### Bug Fixes
+- Fixed an edge case when pathfinding was not available
+- Fixed an issue when the mount icon was not available
+- Fixed an issue with 'Ultrasafe Transporter: Gadgetzan'
+- Clicking info icons will no longer close the main frame
+
+### Changes
+- Mount notes are now having a clear indicator and display at the bottom of the tooltip
+
 ## [v1.1.2](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.2) (2025-08-02)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.2) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

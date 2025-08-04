@@ -102,6 +102,7 @@ local raids = {
 
     ["Nerub-ar Palace"] = { x = 43.51, y = 90.18, mapName = "Nerub-ar Palace", mapID = 2255, instanceId = 2657, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 10 },
     ["Liberation of Undermine"] = { x = 40.87, y = 48.77, mapName = "Undermine", mapID = 2346, instanceId = 2769, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 10 },
+    ["Manaforge Omega"] = { x = 41.89, y = 21.57, mapName = "K'aresh", mapID = 2371, instanceId = 2810, availableDifficultyIds = { 14, 15, 16, 17 }, expansionLevel = 10 },
 }
 
 if WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC then
@@ -356,7 +357,7 @@ end
 -- Both
 addHearthstone(6948)                                                  -- Hearthstone
 addItem(18984, 83, { x = 0.5985, y = 0.4976, z = 0 }, true, 2255, 60) -- Dimensional Ripper - Everlook
-addItem(18966, 71, { x = 0.5151, y = 0.3025, z = 0 }, true, 976, 60)  -- Ultrasafe Transporter: Gadgetzan
+addItem(18986, 71, { x = 0.5151, y = 0.3025, z = 0 }, true, 976, 60)  -- Ultrasafe Transporter: Gadgetzan
 addItem(22631, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 5)  -- Atiesh, Greatstaff of the Guardian
 addHearthstone(172179)                                                -- Eternal Traveler's Hearthstone
 addHearthstone(193588)                                                -- Timewalker's Hearthstone
@@ -444,3 +445,5 @@ if GetExpansionLevel() >= 10 then
 end
 
 addDynamicItemWithMultipleIds(hearthstones, MRP.Util.GetBindingLocation, GetBindLocation, (select(3, UnitRace("player")) == 1 and GetExpansionLevel() >= 10) and 12.5 or 30, function() return MRP.AreaL[GetBindLocation()] end) -- Hearthstones
+
+table.sort(MRP.Data.helpfulItems, function(a, b) return a < b end)
