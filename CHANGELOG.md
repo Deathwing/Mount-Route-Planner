@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v1.1.4](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.4) (2025-08-05)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.4) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Bug Fixes
+- Fixed an issue when TomTom is enabled, rendering the pathfinding unusable
+
 ## [v1.1.3](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.3) (2025-08-04)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.3) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 
