@@ -347,6 +347,15 @@ local function addDynamicItemWithMultipleIds(itemIds, dynLoc, dynLocaId, cost, c
     end
 end
 
+local spellCount = 0
+
+local function addSpell(spellId, toMapId, toPos, toIsUI, toAreaId, cost, condition)
+    local from = { actionOptions = { { type = "spell", data = spellId } }, condition = function() return (not condition or condition()) and MRP.UI:CanUseSpell(spellId) end, unknown1 = 0, dynLoc = function() return MRP.Util.GetPlayerLocation() end, flags = 8, type = 1, important = true, locaId = MRP.SpecialLocaId.SpellTo, locaArgs = function() return { MRP.Util.GetSpellNameSafe(spellId), C_Map.GetAreaInfo(toAreaId) or L["Area_" .. toAreaId] } end }
+    local to = { unknown1 = 0, flags = 0, loc = { mapId = toMapId, pos = toPos, isUI = toIsUI }, type = 2, locaId = MRP.SpecialLocaId.SpellTo, locaArgs = function() return { MRP.Util.GetSpellNameSafe(spellId), C_Map.GetAreaInfo(toAreaId) } end }
+    addEntry(MRP.SpecialLocaId.SpellTo + spellCount, from, to, false, cost)
+    spellCount = spellCount + 1
+end
+
 local hearthstones = {}
 
 local function addHearthstone(itemId)
@@ -359,6 +368,8 @@ addHearthstone(6948)                                                  -- Hearths
 addItem(18984, 83, { x = 0.5985, y = 0.4976, z = 0 }, true, 2255, 60) -- Dimensional Ripper - Everlook
 addItem(18986, 71, { x = 0.5151, y = 0.3025, z = 0 }, true, 976, 60)  -- Ultrasafe Transporter: Gadgetzan
 addItem(22631, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 5)  -- Atiesh, Greatstaff of the Guardian
+addHearthstone(54452)                                                 -- Ethereal Portal
+addHearthstone(64488)                                                 -- The Innkeeper's Daughter
 addHearthstone(172179)                                                -- Eternal Traveler's Hearthstone
 addHearthstone(193588)                                                -- Timewalker's Hearthstone
 addHearthstone(200630)                                                -- Ohn'ir Windsage's Hearthstone
@@ -377,18 +388,44 @@ end
 if GetExpansionLevel() >= 2 then
     -- Both
     addItem(46874, 118, { x = 0.6938, y = 0.2264, z = 0 }, true, 4658, 30)   -- Argent Crusader's Tabard
+    addItem(40585, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Signet of the Kirin Tor
     addItem(40586, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Band of the Kirin Tor
+    addItem(44934, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Loop of the Kirin Tor
+    addItem(44935, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Ring of the Kirin Tor
     addItem(45688, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Inscribed Band of the Kirin Tor
+    addItem(45689, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Inscribed Loop of the Kirin Tor
+    addItem(45690, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Inscribed Ring of the Kirin Tor
+    addItem(45691, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Inscribed Signet of the Kirin Tor
     addItem(48954, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Etched Band of the Kirin Tor
+    addItem(48955, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Etched Loop of the Kirin Tor
+    addItem(48956, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Etched Ring of the Kirin Tor
+    addItem(48957, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Etched Signet of the Kirin Tor
+    addItem(50287, 224, { x = 0.3692, y = 0.7599, z = 9 }, true, 35, 30)     -- Boots of the Bay
+    addItem(51557, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Runed Signet of the Kirin Tor
+    addItem(51558, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Runed Loop of the Kirin Tor
+    addItem(51559, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Runed Ring of the Kirin Tor
     addItem(51560, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Runed Band of the Kirin Tor
     addItem(52251, 125, { x = 0.5592, y = 0.4679, z = 661 }, true, 4613, 30) -- Jaina's Locket
-    addItem(50287, 224, { x = 0.3692, y = 0.7599, z = 9 }, true, 35, 30)     -- Boots of the Bay
 end
 
 -- Cataclysm
 if GetExpansionLevel() >= 3 then
     -- Both
     addItem(58487, 207, { x = 0.4873, y = 0.5356, z = -48 }, true, 5042, 10) -- Potion of Deepholm
+
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addItem(63206, 84, { x = 0.4637, y = 0.9028, z = 67 }, true, 1519, 30) -- Wrap of Unity
+        addItem(63352, 84, { x = 0.4637, y = 0.9028, z = 67 }, true, 1519, 30) -- Shroud of Cooperation
+        addItem(65360, 84, { x = 0.4637, y = 0.9028, z = 67 }, true, 1519, 30) -- Cloak of Coordination
+    end
+
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addItem(63207, 85, { x = 0.5710, y = 0.8981, z = 18 }, true, 1637, 30) -- Wrap of Unity
+        addItem(63353, 85, { x = 0.5710, y = 0.8981, z = 18 }, true, 1637, 30) -- Shroud of Cooperation
+        addItem(65274, 85, { x = 0.5710, y = 0.8981, z = 18 }, true, 1637, 30) -- Cloak of Coordination
+    end
 end
 
 -- Mists of Pandaria
@@ -396,6 +433,16 @@ if GetExpansionLevel() >= 4 then
     -- Both
     addHearthstone(93672)                                                   -- Dark Portal
     addItem(103678, 554, { x = 0.3451, y = 0.5550, z = 0 }, true, 6757, 10) -- Time-Lost Artifact
+
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addItem(95567, 504, { x = 0.6470, y = 0.7348, z = 0 }, true, 6507, 10) -- Kirin Tor Beacon
+    end
+
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addItem(95568, 504, { x = 0.3315, y = 0.3285, z = 0 }, true, 6507, 10) -- Sunreaver Beacon
+    end
 end
 
 -- Warlords of Draenor
@@ -414,6 +461,9 @@ end
 -- Legion
 if GetExpansionLevel() >= 6 then
     -- Both
+    addItem(139599, 627, { x = 0.6092, y = 0.4472, z = 739 }, true, 7502, 30)                                                                                                               -- Empowered Ring of the Kirin Tor
+    addHearthstone(142298)                                                                                                                                                                  -- Astonishingly Scarlet Slippers
+    addHearthstone(142542)                                                                                                                                                                  -- Tome of Town Portal
     addItem(140192, 627, { x = 0.6092, y = 0.4472, z = 739 }, true, 7502, 30, function() return C_QuestLog.IsQuestFlaggedCompleted(44184) or C_QuestLog.IsQuestFlaggedCompleted(44663) end) -- Dalaran Hearthstone
     addItem(142469, 42, { x = 0.4735, y = 0.7532, z = 0 }, true, 2562, 30)                                                                                                                  -- Violet Seal of the Grand Magus
 end
@@ -422,6 +472,16 @@ end
 if GetExpansionLevel() >= 7 then
     -- Both
     addHearthstone(168907) -- Holographic Digitalization Hearthstone
+
+    -- Alliance
+    if UnitFactionGroup("player") == "Alliance" then
+        addItem(166560, 1161, { x = 0.668, y = 0.256, z = 0 }, true, 8718, 30) -- Captain's Signet of Command
+    end
+
+    -- Horde
+    if UnitFactionGroup("player") == "Horde" then
+        addItem(166559, 862, { x = 0.512, y = 0.952, z = 0 }, true, 8665, 30) -- Commander's Signet of Battle
+    end
 end
 
 -- Shadowlands
@@ -441,7 +501,17 @@ if GetExpansionLevel() >= 10 then
     addHearthstone(165802) -- Noble Gardener's Hearthstone
     addHearthstone(166746) -- Fire Eater's Hearthstone
     addHearthstone(166747) -- Brewfest Reveler's Hearthstone
+    addHearthstone(212337) -- Stone of the Hearth
+    addHearthstone(228940) -- Notorious Thread's Hearthstone
+    addHearthstone(235016) -- Redeployment Module
     addHearthstone(236687) -- Explosive Hearthstone
+    addHearthstone(246565) -- Cosmic Hearthstone
+    addHearthstone(245970) -- P.O.S.T. Master's Express Hearthstone
+
+    -- Draenei and Lightforged Draenei
+    if select(3, UnitRace("player")) == 11 or select(3, UnitRace("player")) == 30 then
+        addHearthstone(210455) -- Draenic Hologem
+    end
 end
 
 addDynamicItemWithMultipleIds(hearthstones, MRP.Util.GetBindingLocation, GetBindLocation, (select(3, UnitRace("player")) == 1 and GetExpansionLevel() >= 10) and 12.5 or 30, function() return MRP.AreaL[GetBindLocation()] end) -- Hearthstones

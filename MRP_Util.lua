@@ -73,3 +73,18 @@ end
 function Util.GetItemNameSafe(itemId)
     return Util.GetItem(itemId):GetItemName() or L["Item_" .. itemId]
 end
+
+---@type table<number, SpellMixin>
+local spellCache = {}
+
+function Util.GetSpell(spellId)
+    if not spellCache[spellId] then
+        spellCache[spellId] = Spell:CreateFromSpellID(spellId)
+    end
+
+    return spellCache[spellId]
+end
+
+function Util.GetSpellNameSafe(spellId)
+    return Util.GetSpell(spellId):GetSpellName() or L["Spell_" .. spellId]
+end

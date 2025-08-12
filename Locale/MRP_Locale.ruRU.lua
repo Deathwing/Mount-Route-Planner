@@ -125,6 +125,7 @@ MRP.L = {
   ["Waypoint_1003"] = "Take the boat from %s to %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Waypoint_1004"] = "Take the zeppelin from %s to %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Waypoint_1005"] = "Use %s to %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Waypoint_1006"] = "Cast %s to %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Waypoint_Instance"] = "Enter %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Waypoint_WorldBoss"] = "Kill %s", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Wrong Difficulty"] = "Wrong Difficulty", -- MISSING TRANSLATION / SAME AS ENGLISH,
