@@ -1,11 +1,15 @@
 ## Interface: 50500
 ## Title: Mount Route Planner (MRP)
+## Title-zhCN: 坐骑路线规划助手 (MRP)
+## Title-zhTW: 坐騎路線規劃助手 (MRP)
 ## Author: Deathwing
 ## Version: v1.1.4
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
 ## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
 ## Notes: Plan and track your mount farming route with automatic collection scans, smart skipping, filters, waypoints, and travel-based routing.
+## Notes-zhCN: 规划和跟踪您的坐骑收集路线，支持自动扫描、智能跳过、过滤器、导航点和基于旅行的路线规划。
+## Notes-zhTW: 規劃和追蹤您的坐騎收集路線，支援自動掃描、智能跳過、過濾器、導航點和基於旅行的路線規劃。
 ## SavedVariables: MRP_Settings
 ## SavedVariablesPerCharacter: MRP_CharacterSettings
 
@@ -22,7 +26,7 @@
 ## Category-zhCN: 战团藏品
 ## Category-zhTW: 戰隊收藏
 
-## X-Localizations: enUS, enGB, deDE, ruRU
+## X-Localizations: enUS, enGB, deDE, ruRU, zhCN, zhTW
 ## X-CompatibleLocales: enUS, enGB, deDE, frFR, esES, esMX, itIT, ptBR, ruRU, koKR, zhCN, zhTW
 
 # MRP_REMOVE_NEXT_LINE
@@ -31,6 +35,8 @@ MRP.d.lua
 Locale\MRP_Locale.enUS.lua
 Locale\MRP_Locale.deDE.lua
 Locale\MRP_Locale.ruRU.lua
+Locale\MRP_Locale.zhCN.lua
+Locale\MRP_Locale.zhTW.lua
 
 MRP_Enums.lua
 MRP_CharacterSettings.lua
