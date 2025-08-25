@@ -130,6 +130,7 @@ MRP.L = {
   ["Waypoint_1003"] = "Сядьте на корабль из %s в %s",
   ["Waypoint_1004"] = "Сядьте на дирижабль из %s в %s",
   ["Waypoint_1005"] = "Используйте %s для %s",
+  ["Waypoint_1006"] = "Каст %s на %s",
   ["Waypoint_Instance"] = "Войдите в %s",
   ["Waypoint_WorldBoss"] = "Убейте %s",
   ["Wrong Difficulty"] = "Неверная сложность",

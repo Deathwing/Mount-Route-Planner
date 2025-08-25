@@ -130,6 +130,7 @@ MRP.L = {
   ["Waypoint_1003"] = "从%s搭船到%s",
   ["Waypoint_1004"] = "从%s搭飞艇到%s",
   ["Waypoint_1005"] = "使用%s到%s",
+  ["Waypoint_1006"] = "施放%s到%s",
   ["Waypoint_Instance"] = "进入%s",
   ["Waypoint_WorldBoss"] = "击杀%s",
   ["Wrong Difficulty"] = "错误难度",

@@ -1,13 +1,19 @@
 # Mount Route Planner
 
-## [v1.1.5](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.5) (2025-08-26)
-[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.5) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+## [v1.1.6](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.6) (2025-08-26)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.6) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 
 ### Added
 - Added chinese (China/Taiwan) translation (thanks to fang2hou)
 
 ### Changes
 - Updated russian translation (thanks to ZamestoTV)
+
+## [v1.1.5](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.5) (2025-08-12)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.5) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added more items
 
 ## [v1.1.4](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.1.4) (2025-08-05)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.1.4) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)

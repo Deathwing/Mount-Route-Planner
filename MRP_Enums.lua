@@ -62,6 +62,7 @@ MRP.SpecialLocaId = {
     BoatTo = 1003,
     ZeppelinTo = 1004,
     ItemTo = 1005,
+    SpellTo = 1006,
     DalaranArgusPortalStart = 2000,
     DalaranArgusPortalEnd = 2001,
     HearthstoneStart = 3000,
