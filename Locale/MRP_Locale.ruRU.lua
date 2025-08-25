@@ -1,6 +1,11 @@
 -- MRP_Locale.ruRU.lua
 -- local _, MRP = ...
--- Translator ZamestoTV
+
+--[[
+  Contributors:
+  * ZamestoTV (https://github.com/Hubbotu)
+]]
+
 if (GetLocale() ~= "ruRU") then
   return;
 end
@@ -44,17 +49,17 @@ MRP.L = {
   ["Enable this to ignore LFR difficulty on all steps."] = "Включите, чтобы игнорировать сложность ЛФР на всех шагах.",
   ["Enable this to show a difficulty warning if the current difficulty is not suitable for the current step while within a dungeon or raid."] = "Включите, чтобы показывать предупреждение о сложности, если текущая сложность не подходит для текущего шага в подземелье или рейде.",
   ["Enable this to use TomTom for waypoint navigation."] = "Включите, чтобы использовать TomTom для навигации по путевым точкам.",
-  ["Expansion_BattleForAzeroth"] = "Battle for Azeroth",
-  ["Expansion_Cataclysm"] = "Cataclysm",
-  ["Expansion_Classic"] = "Classic",
-  ["Expansion_Dragonflight"] = "Dragonflight",
-  ["Expansion_Legion"] = "Legion",
-  ["Expansion_MistsOfPandaria"] = "Mists of Pandaria",
-  ["Expansion_Shadowlands"] = "Shadowlands",
-  ["Expansion_TheBurningCrusade"] = "The Burning Crusade",
-  ["Expansion_TheWarWithin"] = "The War Within",
-  ["Expansion_WarlordsOfDraenor"] = "Warlords of Draenor",
-  ["Expansion_WrathOfTheLichKing"] = "Wrath of the Lich King",
+  ["Expansion_BattleForAzeroth"] = "Battle for Azeroth", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_Cataclysm"] = "Cataclysm", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_Classic"] = "Classic", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_Dragonflight"] = "Dragonflight", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_Legion"] = "Legion", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_MistsOfPandaria"] = "Mists of Pandaria", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_Shadowlands"] = "Shadowlands", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_TheBurningCrusade"] = "The Burning Crusade", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_TheWarWithin"] = "The War Within", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_WarlordsOfDraenor"] = "Warlords of Draenor", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  ["Expansion_WrathOfTheLichKing"] = "Wrath of the Lich King", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["Expansions"] = "Дополнения",
   ["Failed to add TomTom waypoint for: '%s', please report it."] = "Не удалось добавить путевую точку TomTom для: '%s', пожалуйста, сообщите об этом.",
   ["Feedback? Questions? Join our Discord!"] = "Обратная связь? Вопросы? Присоединяйтесь к нашему Discord!",

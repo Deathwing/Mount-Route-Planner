@@ -1,5 +1,10 @@
 -- MRP_Locale.zhCN.lua
-local _, MRP = ...
+-- local _, MRP = ...
+
+--[[
+  Contributors:
+  * fang2hou (https://github.com/fang2hou)
+]]
 
 if (GetLocale() ~= "zhCN") then
   return;
@@ -125,7 +130,6 @@ MRP.L = {
   ["Waypoint_1003"] = "从%s搭船到%s",
   ["Waypoint_1004"] = "从%s搭飞艇到%s",
   ["Waypoint_1005"] = "使用%s到%s",
-  ["Waypoint_1006"] = "施放%s到%s",
   ["Waypoint_Instance"] = "进入%s",
   ["Waypoint_WorldBoss"] = "击杀%s",
   ["Wrong Difficulty"] = "错误难度",
