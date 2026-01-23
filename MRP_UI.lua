@@ -251,6 +251,14 @@ if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
 end
 actionBtn:Hide()
 
+function UI:SetGlowOverlay(button, show)
+    if show then
+        ActionButtonSpellAlertManager:ShowAlert(button)
+    else
+        ActionButtonSpellAlertManager:HideAlert(button)
+    end
+end
+
 function UI:AddPossibleInCombatWarning()
     if InCombatLockdown() then
         GameTooltip:AddLine(" ")
@@ -276,7 +284,7 @@ function UI:ShowActionUseSpell(spellId)
             GameTooltip:Hide()
         end)
         actionBtn:Show()
-        ActionButton_ShowOverlayGlow(actionBtn)
+        UI:SetGlowOverlay(actionBtn, true)
     end
 end
 
@@ -315,7 +323,7 @@ function UI:ShowActionUseItem(itemId)
             GameTooltip:Hide()
         end)
         actionBtn:Show()
-        ActionButton_ShowOverlayGlow(actionBtn)
+        UI:SetGlowOverlay(actionBtn, true)
     end
 end
 
@@ -364,7 +372,7 @@ function UI:ShowActionTrashIt()
         GameTooltip:Hide()
     end)
     actionBtn:Show()
-    ActionButton_ShowOverlayGlow(actionBtn)
+    UI:SetGlowOverlay(actionBtn, true)
 end
 
 local difficultyConfig = {
@@ -426,12 +434,30 @@ function UI:ShowActionSwitchDifficulty(difficultyId)
         GameTooltip:Hide()
     end)
     actionBtn:Show()
-    ActionButton_ShowOverlayGlow(actionBtn)
+    UI:SetGlowOverlay(actionBtn, true)
 end
 
 function UI:HideCenterAction()
-    ActionButton_HideOverlayGlow(actionBtn)
+    UI:SetGlowOverlay(actionBtn, false)
     actionBtn:Hide()
+end
+
+function UI:ShowActionResetInstances()
+    actionBtn:SetNormalTexture("Interface\\Icons\\Spell_Shadow_SacrificialShield")
+    actionBtn:SetHighlightTexture("Interface\\Icons\\Spell_Shadow_SacrificialShield")
+    actionBtn:SetPushedTexture("Interface\\Icons\\Spell_Shadow_SacrificialShield")
+    actionBtn:SetAttribute("macrotext", "/script ResetInstances()")
+    actionBtn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(L["Reset Instances"], 1, 1, 1)
+        GameTooltip:AddLine(L["Click to reset all instances."], 0.6, 0.6, 0.6)
+        UI:AddPossibleInCombatWarning()
+        GameTooltip:Show()
+    end)
+    actionBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    actionBtn:Show()
 end
 
 frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -800,6 +826,11 @@ function UI:UpdateDisplay()
                 end
             end
         end
+
+        -- Show reset button when we have a repeatable instance, not in PvP, not inside the instance, and no other action is showing
+        if isRepeatable and not isInPvP and not alreadyInInstance and not actionBtn:IsShown() then
+            self:ShowActionResetInstances()
+        end
     end
 
     frame.noteText:SetText("")
@@ -1078,7 +1109,12 @@ end
 ---@return boolean
 function UI:CanUseSpell(spellId)
     if not spellId then return false end
-    if not IsSpellKnown(spellId) then return false end
+
+    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+        if InCombatLockdown() then return false end
+    end
+
+    if not IsSpellKnown(spellId, false) then return false end
 
     local chargeInfo = C_Spell.GetSpellCharges(spellId)
     if chargeInfo and chargeInfo.currentCharges > 0 then return true end

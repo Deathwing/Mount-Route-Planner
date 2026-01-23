@@ -32,6 +32,7 @@ local dungeons = {
     ["Freehold"] = { x = 84.32, y = 78.91, mapName = "Tiragarde Sound", mapID = 895, instanceId = 1754, availableDifficultyIds = { 1, 2, 23, 24 }, expansionLevel = 7 },
     ["King's Rest"] = { x = 37.51, y = 39.12, mapName = "Zuldazar", mapID = 862, instanceId = 1762, availableDifficultyIds = { 2, 23, 24 }, expansionLevel = 7 },
     ["The Underrot"] = { x = 51.43, y = 64.97, mapName = "Nazimir", mapID = 863, instanceId = 1841, availableDifficultyIds = { 1, 2, 23 }, expansionLevel = 7 },
+    ["Operation: Mechagon"] = { x = 72.85, y = 36.48, mapName = "Mechagon Island", mapID = 1462, instanceId = 2097, availableDifficultyIds = { 2, 23 }, expansionLevel = 7 },
 
     ["The Necrotic Wake"] = { x = 39.79, y = 54.89, mapName = "Bastion", mapID = 1533, instanceId = 2286, availableDifficultyIds = { 1, 2, 23 }, expansionLevel = 8 },
     ["Tazavesh, the Veiled Market"] = { x = 31.15, y = 76.31, mapName = "The Shadowlands", mapID = 1550, instanceId = 2441, availableDifficultyIds = { 2, 23 }, expansionLevel = 8 },

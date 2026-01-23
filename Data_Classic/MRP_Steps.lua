@@ -817,8 +817,7 @@ local steps = {
             3,
             4,
             5,
-            6,
-            7
+            6
           },
           journalEncounter = {
             id = 331,
@@ -848,8 +847,7 @@ local steps = {
             3,
             4,
             5,
-            6,
-            7
+            6
           },
           journalEncounter = {
             id = 333,
@@ -1294,6 +1292,39 @@ local steps = {
     id = 24,
     mounts = {
       {
+        id = 533,
+        name = "Cobalt Primordial Direhorn",
+        icon = "interface/icons/ability_mount_triceratopsmount_blue.blp",
+        itemId = 94228,
+        spellId = 138423,
+        source = {
+          mapId = 870,
+          uiMapIds = {
+            507
+          },
+          allowedDifficultyIds = {
+            -1
+          },
+          bonusRoll = true,
+          journalEncounter = {
+            id = 826,
+            name = "Oondasta",
+            instanceId = 322,
+            uiMapId = 507
+          }
+        }
+      }
+    },
+    source = {
+      type = "WorldBoss",
+      name = "Oondasta"
+    },
+    expansion = 4
+  },
+  {
+    id = 25,
+    mounts = {
+      {
         id = 478,
         name = "Astral Cloud Serpent",
         icon = "interface/icons/inv_celestialserpentmount.blp",
@@ -1327,6 +1358,109 @@ local steps = {
     source = {
       type = "Raid",
       name = "Mogu'shan Vaults"
+    },
+    expansion = 4
+  },
+  {
+    id = 26,
+    mounts = {
+      {
+        id = 542,
+        name = "Thundering Cobalt Cloud Serpent",
+        icon = "interface/icons/inv_pandarenserpentmount_lightning_blue.blp",
+        itemId = 95057,
+        spellId = 139442,
+        source = {
+          mapId = 1064,
+          uiMapIds = {
+            504
+          },
+          allowedDifficultyIds = {
+            -1
+          },
+          bonusRoll = true,
+          journalEncounter = {
+            id = 814,
+            name = "Nalak, The Storm Lord",
+            instanceId = 322,
+            uiMapId = 504
+          }
+        }
+      }
+    },
+    source = {
+      type = "WorldBoss",
+      name = "Nalak, The Storm Lord"
+    },
+    expansion = 4
+  },
+  {
+    id = 27,
+    mounts = {
+      {
+        id = 531,
+        name = "Spawn of Horridon",
+        icon = "interface/icons/ability_mount_triceratopsmount.blp",
+        itemId = 93666,
+        spellId = 136471,
+        source = {
+          mapId = 1098,
+          uiMapIds = {
+            509
+          },
+          allowedDifficultyIds = {
+            3,
+            4,
+            5,
+            6
+          },
+          journalEncounter = {
+            id = 819,
+            name = "Horridon",
+            instanceId = 362,
+            uiMapId = 509
+          },
+          dungeonEncounter = {
+            id = 1575,
+            name = "Horridon",
+            mapId = 1098
+          }
+        }
+      },
+      {
+        id = 543,
+        name = "Clutch of Ji-Kun",
+        icon = "interface/icons/achievement_boss_ji-kun.blp",
+        itemId = 95059,
+        spellId = 139448,
+        source = {
+          mapId = 1098,
+          uiMapIds = {
+            511
+          },
+          allowedDifficultyIds = {
+            3,
+            4,
+            5,
+            6
+          },
+          journalEncounter = {
+            id = 828,
+            name = "Ji-Kun",
+            instanceId = 362,
+            uiMapId = 511
+          },
+          dungeonEncounter = {
+            id = 1573,
+            name = "Ji-Kun",
+            mapId = 1098
+          }
+        }
+      }
+    },
+    source = {
+      type = "Raid",
+      name = "Throne of Thunder"
     },
     expansion = 4
   }

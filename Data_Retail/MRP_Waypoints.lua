@@ -155,7 +155,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -177,7 +177,7 @@ local waypoints = {
     id = 5,
     from = {
       locaId = 6,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -569,7 +569,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -591,7 +591,7 @@ local waypoints = {
     id = 18,
     from = {
       locaId = 30,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -645,7 +645,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -667,7 +667,7 @@ local waypoints = {
     id = 20,
     from = {
       locaId = 27,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -705,7 +705,7 @@ local waypoints = {
     id = 21,
     from = {
       locaId = 37,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -794,7 +794,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -816,7 +816,7 @@ local waypoints = {
     id = 24,
     from = {
       locaId = 9,
-      flags = 0,
+      flags = 16,
       loc = {
         mapId = 0,
         pos = {
@@ -832,7 +832,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -854,13 +854,13 @@ local waypoints = {
     id = 26,
     from = {
       locaId = 42,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
-          x = -9061.08984375,
-          y = 886.90698242188,
-          z = 68.34539794922
+          x = -9036.23046875,
+          y = 1004.5300292969,
+          z = 73.93900299072
         }
       },
       type = 1,
@@ -908,7 +908,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -930,13 +930,13 @@ local waypoints = {
     id = 30,
     from = {
       locaId = 48,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
-          x = -9077.75,
-          y = 908.87799072266,
-          z = 68.32929992676
+          x = -9053.8603515625,
+          y = 991.80499267578,
+          z = 73.99990081787
         }
       },
       type = 1,
@@ -983,7 +983,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -1005,7 +1005,7 @@ local waypoints = {
     id = 32,
     from = {
       locaId = 51,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -1053,12 +1053,11 @@ local waypoints = {
       },
       type = 1,
       unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = true
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -1096,7 +1095,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -1134,7 +1133,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -1972,7 +1971,7 @@ local waypoints = {
     id = 66,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -1988,13 +1987,13 @@ local waypoints = {
     },
     to = {
       locaId = 42,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
-          x = -9061.08984375,
-          y = 886.90698242188,
-          z = 68.34539794922
+          x = -9036.23046875,
+          y = 1004.5300292969,
+          z = 73.93900299072
         }
       },
       type = 1,
@@ -2010,7 +2009,7 @@ local waypoints = {
     id = 67,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -2026,13 +2025,13 @@ local waypoints = {
     },
     to = {
       locaId = 48,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
-          x = -9077.75,
-          y = 908.87799072266,
-          z = 68.32929992676
+          x = -9053.8603515625,
+          y = 991.80499267578,
+          z = 73.99990081787
         }
       },
       type = 1,
@@ -2047,7 +2046,7 @@ local waypoints = {
     id = 68,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -2063,7 +2062,7 @@ local waypoints = {
     },
     to = {
       locaId = 51,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -2084,7 +2083,7 @@ local waypoints = {
     id = 69,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -2100,7 +2099,7 @@ local waypoints = {
     },
     to = {
       locaId = 27,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -2122,7 +2121,7 @@ local waypoints = {
     id = 70,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -2138,7 +2137,7 @@ local waypoints = {
     },
     to = {
       locaId = 6,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -2159,7 +2158,7 @@ local waypoints = {
     id = 71,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -2175,7 +2174,7 @@ local waypoints = {
     },
     to = {
       locaId = 37,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -2197,7 +2196,7 @@ local waypoints = {
     id = 72,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -2213,7 +2212,7 @@ local waypoints = {
     },
     to = {
       locaId = 30,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -2283,7 +2282,6 @@ local waypoints = {
       },
       type = 1,
       unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Horde") end,
       important = true
     },
     to = {
@@ -2616,9 +2614,9 @@ local waypoints = {
       loc = {
         mapId = 1,
         pos = {
-          x = 1463.9000244141,
-          y = -4480,
-          z = 20.05900001526
+          x = 1438.9399414062,
+          y = -4456.490234375,
+          z = -2.86433005333
         }
       },
       type = 1,
@@ -2957,9 +2955,9 @@ local waypoints = {
       loc = {
         mapId = 1,
         pos = {
-          x = 1448.6400146484,
-          y = -4530.7900390625,
-          z = 20.0578994751
+          x = 1463.1400146484,
+          y = -4501.3901367188,
+          z = -2.95267009735
         }
       },
       type = 1,
@@ -3032,9 +3030,9 @@ local waypoints = {
       loc = {
         mapId = 1,
         pos = {
-          x = 1427.3699951172,
-          y = -4525.2700195312,
-          z = 19.80450057983
+          x = 1444.8800048828,
+          y = -4512.0698242188,
+          z = -3.08709001541
         }
       },
       type = 1,
@@ -4581,7 +4579,6 @@ local waypoints = {
       },
       type = 1,
       unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Horde") end,
       important = true
     },
     to = {
@@ -4983,7 +4980,7 @@ local waypoints = {
     id = 155,
     from = {
       locaId = 205,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -5036,7 +5033,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -5069,7 +5066,6 @@ local waypoints = {
       },
       type = 1,
       unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = true
     },
     to = {
@@ -5112,7 +5108,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -5245,7 +5241,7 @@ local waypoints = {
     id = 165,
     from = {
       locaId = 219,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -5319,7 +5315,7 @@ local waypoints = {
     id = 167,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -5335,7 +5331,7 @@ local waypoints = {
     },
     to = {
       locaId = 219,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -6728,7 +6724,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -7207,7 +7203,7 @@ local waypoints = {
     id = 216,
     from = {
       locaId = 312,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -7217,7 +7213,7 @@ local waypoints = {
         }
       },
       type = 1,
-      unknown1 = 30,
+      unknown1 = 10,
       condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = true
     },
@@ -7245,7 +7241,7 @@ local waypoints = {
     id = 217,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -7261,7 +7257,7 @@ local waypoints = {
     },
     to = {
       locaId = 312,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -7271,7 +7267,7 @@ local waypoints = {
         }
       },
       type = 1,
-      unknown1 = 30,
+      unknown1 = 10,
       condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = true
     },
@@ -7283,7 +7279,7 @@ local waypoints = {
     id = 218,
     from = {
       locaId = 314,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -7299,7 +7295,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -7337,7 +7333,7 @@ local waypoints = {
     },
     to = {
       locaId = 314,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
@@ -8362,7 +8358,7 @@ local waypoints = {
     id = 255,
     from = {
       locaId = 372,
-      flags = 0,
+      flags = 64,
       loc = {
         mapId = 0,
         pos = {
@@ -8545,22 +8541,6 @@ local waypoints = {
   {
     id = 260,
     from = {
-      locaId = 382,
-      flags = 0,
-      loc = {
-        mapId = 2444,
-        pos = {
-          x = -676.29901123047,
-          y = 7022.5498046875,
-          z = 14.54609966278
-        }
-      },
-      type = 1,
-      unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
-      important = true
-    },
-    to = {
       locaId = 383,
       flags = 0,
       loc = {
@@ -8571,52 +8551,27 @@ local waypoints = {
           z = 147.27699279785
         }
       },
-      type = 2,
-      unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
-      important = false
-    },
-    bidirectional = false,
-    cost = 300,
-    condition = function() return (UnitFactionGroup("player") == "Alliance") end
-  },
-  {
-    id = 261,
-    from = {
-      locaId = 384,
-      flags = 0,
-      loc = {
-        mapId = 1220,
-        pos = {
-          x = 2325.5700683594,
-          y = 6583.8999023438,
-          z = 147.27699279785
-        }
-      },
       type = 1,
       unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = true
     },
     to = {
-      locaId = 385,
+      locaId = 384,
       flags = 0,
       loc = {
         mapId = 2444,
         pos = {
-          x = -1967.8100585938,
-          y = 6864,
-          z = 187.2440032959
+          x = -1940.6099853516,
+          y = 6875.1201171875,
+          z = 183.03199768066
         }
       },
       type = 2,
       unknown1 = 0,
-      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = false
     },
     bidirectional = false,
-    cost = 300,
-    condition = function() return (UnitFactionGroup("player") == "Alliance") end
+    cost = 300
   },
   {
     id = 262,
@@ -8632,7 +8587,7 @@ local waypoints = {
         }
       },
       type = 1,
-      unknown1 = 0,
+      unknown1 = 30,
       condition = function() return (UnitFactionGroup("player") == "Alliance") end,
       important = true
     },
@@ -8778,9 +8733,9 @@ local waypoints = {
       loc = {
         mapId = 1,
         pos = {
-          x = 1444.8100585938,
-          y = -4512.7700195312,
-          z = -2.95481991768
+          x = 1427.6099853516,
+          y = -4524.990234375,
+          z = 20.34379959106
         }
       },
       type = 1,
@@ -8812,13 +8767,13 @@ local waypoints = {
     id = 267,
     from = {
       locaId = 395,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
-          x = -9070.509765625,
-          y = 1013.7600097656,
-          z = 73.9774017334
+          x = -9061.099609375,
+          y = 886.67901611328,
+          z = 68.43589782715
         }
       },
       type = 1,
@@ -9572,7 +9527,7 @@ local waypoints = {
     id = 297,
     from = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -9588,13 +9543,13 @@ local waypoints = {
     },
     to = {
       locaId = 395,
-      flags = 4,
+      flags = 68,
       loc = {
         mapId = 0,
         pos = {
-          x = -9070.509765625,
-          y = 1013.7600097656,
-          z = 73.9774017334
+          x = -9061.099609375,
+          y = 886.67901611328,
+          z = 68.43589782715
         }
       },
       type = 1,
@@ -9626,7 +9581,7 @@ local waypoints = {
     },
     to = {
       locaId = 8,
-      flags = 4,
+      flags = 84,
       loc = {
         mapId = 0,
         pos = {
@@ -9783,6 +9738,76 @@ local waypoints = {
     },
     bidirectional = false,
     cost = 30
+  },
+  {
+    id = 307,
+    from = {
+      locaId = 464,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = -1646.8000488281,
+          y = -461.97198486328,
+          z = 545.89398193359
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 466,
+      flags = 0,
+      loc = {
+        mapId = 2222,
+        pos = {
+          x = 4718.8901367188,
+          y = 7637.3198242188,
+          z = 4771.83984375
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 50
+  },
+  {
+    id = 308,
+    from = {
+      locaId = 467,
+      flags = 0,
+      loc = {
+        mapId = 2222,
+        pos = {
+          x = 4714.080078125,
+          y = 7636.4702148438,
+          z = 4772.5698242188
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 468,
+      flags = 0,
+      loc = {
+        mapId = 2738,
+        pos = {
+          x = -1638.5699462891,
+          y = -463.14001464844,
+          z = 545.89001464844
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 50
   },
   {
     id = 309,
@@ -10170,6 +10195,1197 @@ local waypoints = {
     },
     bidirectional = false,
     cost = 30
+  },
+  {
+    id = 335,
+    from = {
+      locaId = 502,
+      flags = 0,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -869.96002197266,
+          y = 4503.0200195312,
+          z = 580.4580078125
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 503,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -11123.299804688,
+          y = -2014.4399414062,
+          z = 47.09000015259
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 5
+  },
+  {
+    id = 336,
+    from = {
+      locaId = 504,
+      flags = 16,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -897.72601318359,
+          y = 4548.3798828125,
+          z = 744.51300048828
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    to = {
+      locaId = 505,
+      flags = 16,
+      loc = {
+        mapId = 1512,
+        pos = {
+          x = 1232.9599609375,
+          y = 1344.1999511719,
+          z = 185.08099365234
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 300,
+    condition = function() return (UnitFactionGroup("player") == "Alliance") end
+  },
+  {
+    id = 337,
+    from = {
+      locaId = 510,
+      flags = 0,
+      loc = {
+        mapId = 1512,
+        pos = {
+          x = 1232.9599609375,
+          y = 1344.1999511719,
+          z = 185.08099365234
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Horde") end,
+      important = false
+    },
+    to = {
+      locaId = 511,
+      flags = 0,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -680.28497314453,
+          y = 4356.1000976562,
+          z = 748.57598876953
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Horde") end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 300,
+    condition = function() return (UnitFactionGroup("player") == "Horde") end
+  },
+  {
+    id = 338,
+    from = {
+      locaId = 508,
+      flags = 16,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -680.28497314453,
+          y = 4356.1000976562,
+          z = 748.57598876953
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Horde") end,
+      important = false
+    },
+    to = {
+      locaId = 509,
+      flags = 16,
+      loc = {
+        mapId = 1512,
+        pos = {
+          x = 1232.9599609375,
+          y = 1344.1999511719,
+          z = 185.08099365234
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Horde") end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 300,
+    condition = function() return (UnitFactionGroup("player") == "Horde") end
+  },
+  {
+    id = 339,
+    from = {
+      locaId = 506,
+      flags = 0,
+      loc = {
+        mapId = 1512,
+        pos = {
+          x = 1232.9599609375,
+          y = 1344.1999511719,
+          z = 185.08099365234
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    to = {
+      locaId = 507,
+      flags = 0,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -897.72601318359,
+          y = 4548.3798828125,
+          z = 744.51300048828
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 300,
+    condition = function() return (UnitFactionGroup("player") == "Alliance") end
+  },
+  {
+    id = 341,
+    from = {
+      locaId = 514,
+      flags = 0,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -853.76098632813,
+          y = 4261.9501953125,
+          z = 746.28100585938
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 515,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 389.98001098633,
+          y = 1417.0999755859,
+          z = 769.59997558594
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 342,
+    from = {
+      locaId = 516,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 505.08200073242,
+          y = 1472.0300292969,
+          z = 765.79699707031
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 518,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = -2637.0900878906,
+          y = 8703.8203125,
+          z = -70.81890106201
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = true,
+    cost = 30
+  },
+  {
+    id = 343,
+    from = {
+      locaId = 516,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 505.08200073242,
+          y = 1472.0300292969,
+          z = 765.79699707031
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 517,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 4731.2998046875,
+          y = 9863.23046875,
+          z = 64.29070281982
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = true,
+    cost = 30
+  },
+  {
+    id = 344,
+    from = {
+      locaId = 518,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = -2637.0900878906,
+          y = 8703.8203125,
+          z = -70.81890106201
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 517,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 4731.2998046875,
+          y = 9863.23046875,
+          z = 64.29070281982
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 345,
+    from = {
+      locaId = 516,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 505.08200073242,
+          y = 1472.0300292969,
+          z = 765.79699707031
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 519,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 985.81896972656,
+          y = 1711.8900146484,
+          z = 517.12902832031
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 346,
+    from = {
+      locaId = 520,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 985.81896972656,
+          y = 1711.8900146484,
+          z = 517.12902832031
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 516,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 505.08200073242,
+          y = 1472.0300292969,
+          z = 765.79699707031
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 347,
+    from = {
+      locaId = 515,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 389.98001098633,
+          y = 1417.0999755859,
+          z = 769.59997558594
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 516,
+      flags = 0,
+      loc = {
+        mapId = 1669,
+        pos = {
+          x = 505.08200073242,
+          y = 1472.0300292969,
+          z = 765.79699707031
+        }
+      },
+      type = 0,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 0
+  },
+  {
+    id = 348,
+    from = {
+      locaId = 521,
+      flags = 16,
+      loc = {
+        mapId = 1469,
+        pos = {
+          x = 1010.1900024414,
+          y = 1118.5100097656,
+          z = 33.43569946289
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (select(2, UnitClassBase("player")) == 64) end,
+      important = true
+    },
+    to = {
+      locaId = 522,
+      flags = 16,
+      loc = {
+        mapId = 646,
+        pos = {
+          x = 2336.9599609375,
+          y = 176.58000183106,
+          z = 180.05999755859
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (select(2, UnitClassBase("player")) == 64) end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 10,
+    condition = function() return (select(2, UnitClassBase("player")) == 64) end
+  },
+  {
+    id = 349,
+    from = {
+      locaId = 523,
+      flags = 16,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -847.12799072266,
+          y = 4321.1401367188,
+          z = 744.82202148438
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 541,
+      flags = 16,
+      loc = {
+        mapId = 1469,
+        pos = {
+          x = 1002.2700195312,
+          y = 1093.9799804688,
+          z = 15.84189987183
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 10
+  },
+  {
+    id = 350,
+    from = {
+      locaId = 525,
+      flags = 0,
+      loc = {
+        mapId = 1,
+        pos = {
+          x = 1463.6999511719,
+          y = -4479.8999023438,
+          z = 20.00370025635
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 526,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8296.3095703125,
+          y = -4616.6298828125,
+          z = 18.66670036316
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 351,
+    from = {
+      locaId = 496,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8552.400390625,
+          y = -4800,
+          z = 45.8643989563
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 527,
+      flags = 0,
+      loc = {
+        mapId = 1,
+        pos = {
+          x = 1445.2099609375,
+          y = -4499.5600585938,
+          z = 18.30669975281
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 352,
+    from = {
+      locaId = 8,
+      flags = 84,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9004.4443359375,
+          y = 870.625,
+          z = 64.86025238037
+        }
+      },
+      type = 0,
+      unknown1 = 30,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    to = {
+      locaId = 528,
+      flags = 86,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9096.6201171875,
+          y = 877.23199462891,
+          z = 68.13980102539
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    bidirectional = false,
+    cost = 0
+  },
+  {
+    id = 353,
+    from = {
+      locaId = 497,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8565.8798828125,
+          y = -4812.3598632812,
+          z = 45.86610031128
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 530,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9041.6103515625,
+          y = 917.32000732422,
+          z = 66.68699645996
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 354,
+    from = {
+      locaId = 528,
+      flags = 86,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9096.6201171875,
+          y = 877.23199462891,
+          z = 68.13980102539
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 529,
+      flags = 20,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8547.419921875,
+          y = -4818.4399414062,
+          z = 45.54690170288
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 5
+  },
+  {
+    id = 355,
+    from = {
+      locaId = 531,
+      flags = 0,
+      loc = {
+        mapId = 1514,
+        pos = {
+          x = 768.81597900391,
+          y = 3579.7299804688,
+          z = 140.8869934082
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (C_QuestLog.IsQuestFlaggedCompleted(12103)) end,
+      important = true
+    },
+    to = {
+      locaId = 532,
+      flags = 0,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -838.30999755859,
+          y = 4317.4599609375,
+          z = 744.79998779297
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (C_QuestLog.IsQuestFlaggedCompleted(12103)) end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 10,
+    condition = function() return (C_QuestLog.IsQuestFlaggedCompleted(12103)) end
+  },
+  {
+    id = 358,
+    from = {
+      locaId = 8,
+      flags = 84,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9004.4443359375,
+          y = 870.625,
+          z = 64.86025238037
+        }
+      },
+      type = 0,
+      unknown1 = 30,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    to = {
+      locaId = 535,
+      flags = 68,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9076.490234375,
+          y = 906.85601806641,
+          z = 68.26239776611
+        }
+      },
+      type = 1,
+      unknown1 = 10,
+      important = true
+    },
+    bidirectional = false,
+    cost = 5,
+    condition = function() return (UnitFactionGroup("player") == "Alliance") end
+  },
+  {
+    id = 359,
+    from = {
+      locaId = 535,
+      flags = 68,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9076.490234375,
+          y = 906.85601806641,
+          z = 68.26239776611
+        }
+      },
+      type = 1,
+      unknown1 = 10,
+      important = true
+    },
+    to = {
+      locaId = 536,
+      flags = 0,
+      loc = {
+        mapId = 2735,
+        pos = {
+          x = 3796.830078125,
+          y = -157.16999816895,
+          z = 192.5
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30,
+    condition = function() return (UnitFactionGroup("player") == "Alliance") end
+  },
+  {
+    id = 360,
+    from = {
+      locaId = 538,
+      flags = 0,
+      loc = {
+        mapId = 1,
+        pos = {
+          x = 1448.6500244141,
+          y = -4529.6801757812,
+          z = 19.0468006134
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 537,
+      flags = 0,
+      loc = {
+        mapId = 2736,
+        pos = {
+          x = 2074.0100097656,
+          y = 184.83399963379,
+          z = 175.96800231934
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30,
+    condition = function() return (UnitFactionGroup("player") == "Horde") end
+  },
+  {
+    id = 361,
+    from = {
+      locaId = 8,
+      flags = 84,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9004.4443359375,
+          y = 870.625,
+          z = 64.86025238037
+        }
+      },
+      type = 0,
+      unknown1 = 30,
+      condition = function() return (UnitFactionGroup("player") == "Alliance") end,
+      important = false
+    },
+    to = {
+      locaId = 528,
+      flags = 86,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = -9096.6201171875,
+          y = 877.23199462891,
+          z = 68.13980102539
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    bidirectional = true,
+    cost = 5
+  },
+  {
+    id = 362,
+    from = {
+      locaId = 539,
+      flags = 16,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -962.55603027344,
+          y = 4067.2199707031,
+          z = 648.18298339844
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (C_UnitAuras.GetPlayerAuraBySpellID(203211) ~= nil) end,
+      important = false
+    },
+    to = {
+      locaId = 540,
+      flags = 16,
+      loc = {
+        mapId = 1519,
+        pos = {
+          x = 1474.1700439453,
+          y = 1411.4599609375,
+          z = 243.39999389648
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (C_UnitAuras.GetPlayerAuraBySpellID(203211) ~= nil) end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 10,
+    condition = function() return (C_UnitAuras.GetPlayerAuraBySpellID(203211) ~= nil) end
+  },
+  {
+    id = 364,
+    from = {
+      locaId = 543,
+      flags = 16,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -841.49798583984,
+          y = 4254.7900390625,
+          z = 746.28100585938
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = false
+    },
+    to = {
+      locaId = 544,
+      flags = 16,
+      loc = {
+        mapId = 1479,
+        pos = {
+          x = 1028.6400146484,
+          y = 7225.2299804688,
+          z = 100.18000030518
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 5
+  },
+  {
+    id = 365,
+    from = {
+      locaId = 545,
+      flags = 16,
+      loc = {
+        mapId = 1479,
+        pos = {
+          x = 1101.3800048828,
+          y = 7223.7998046875,
+          z = 89.88289642334
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return (select(2, UnitClassBase("player")) == 1) end,
+      important = false
+    },
+    to = {
+      locaId = 546,
+      flags = 16,
+      loc = {
+        mapId = 1220,
+        pos = {
+          x = -835.44000244141,
+          y = 4276.8198242188,
+          z = 746.25
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return (select(2, UnitClassBase("player")) == 1) end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 5,
+    condition = function() return (select(2, UnitClassBase("player")) == 1) end
+  },
+  {
+    id = 366,
+    from = {
+      locaId = 547,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8500.5400390625,
+          y = -4372.3999023438,
+          z = -6.72634983063
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 548,
+      flags = 0,
+      loc = {
+        mapId = 2694,
+        pos = {
+          x = -266.76000976563,
+          y = -444.85000610352,
+          z = 934.08697509766
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 367,
+    from = {
+      locaId = 494,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8536.5,
+          y = -4325.6298828125,
+          z = 21.7091999054
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return ((C_QuestLog.IsQuestFlaggedCompleted(86549) or C_QuestLog.IsQuestFlaggedCompleted(92423))) end,
+      important = true
+    },
+    to = {
+      locaId = 495,
+      flags = 0,
+      loc = {
+        mapId = 2771,
+        pos = {
+          x = 1551.4399414062,
+          y = 1325.1899414062,
+          z = 34.17539978027
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return ((C_QuestLog.IsQuestFlaggedCompleted(86549) or C_QuestLog.IsQuestFlaggedCompleted(92423))) end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30,
+    condition = function() return ((C_QuestLog.IsQuestFlaggedCompleted(86549) or C_QuestLog.IsQuestFlaggedCompleted(92423))) end
+  },
+  {
+    id = 368,
+    from = {
+      locaId = 549,
+      flags = 0,
+      loc = {
+        mapId = 2694,
+        pos = {
+          x = -274.0710144043,
+          y = -462.61599731445,
+          z = 934.15301513672
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 550,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8485.76953125,
+          y = -4361.6801757812,
+          z = -7.40000009537
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30
+  },
+  {
+    id = 369,
+    from = {
+      locaId = 551,
+      flags = 0,
+      loc = {
+        mapId = 2771,
+        pos = {
+          x = 1543.3299560547,
+          y = 1345.8900146484,
+          z = 39.91070175171
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      condition = function() return ((C_QuestLog.IsQuestFlaggedCompleted(86549) or C_QuestLog.IsQuestFlaggedCompleted(92423))) end,
+      important = true
+    },
+    to = {
+      locaId = 552,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 8554.2197265625,
+          y = -4325.5600585938,
+          z = 21.69000053406
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      condition = function() return ((C_QuestLog.IsQuestFlaggedCompleted(86549) or C_QuestLog.IsQuestFlaggedCompleted(92423))) end,
+      important = false
+    },
+    bidirectional = false,
+    cost = 30,
+    condition = function() return ((C_QuestLog.IsQuestFlaggedCompleted(86549) or C_QuestLog.IsQuestFlaggedCompleted(92423))) end
+  },
+  {
+    id = 370,
+    from = {
+      locaId = 554,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 3475.8000488281,
+          y = -4463.2900390625,
+          z = 137.57899475098
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 555,
+      flags = 0,
+      loc = {
+        mapId = 530,
+        pos = {
+          x = 6123.2299804688,
+          y = -7006.5698242188,
+          z = 138.50799560547
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 100
+  },
+  {
+    id = 371,
+    from = {
+      locaId = 556,
+      flags = 0,
+      loc = {
+        mapId = 530,
+        pos = {
+          x = 6109.8500976562,
+          y = -6997.080078125,
+          z = 137.48199462891
+        }
+      },
+      type = 1,
+      unknown1 = 0,
+      important = true
+    },
+    to = {
+      locaId = 557,
+      flags = 0,
+      loc = {
+        mapId = 0,
+        pos = {
+          x = 3468.419921875,
+          y = -4479.6000976562,
+          z = 137.32899475098
+        }
+      },
+      type = 2,
+      unknown1 = 0,
+      important = false
+    },
+    bidirectional = false,
+    cost = 100
   },
   {
     id = 238,

@@ -1,9 +1,9 @@
-## Interface: 110107, 110200
+## Interface: 120000, 110107, 110200
 ## Title: Mount Route Planner (MRP)
 ## Title-zhCN: 坐骑路线规划助手 (MRP)
 ## Title-zhTW: 坐騎路線規劃助手 (MRP)
 ## Author: Deathwing
-## Version: v1.1.6
+## Version: v1.2.0
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
 ## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga

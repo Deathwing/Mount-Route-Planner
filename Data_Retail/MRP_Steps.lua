@@ -817,8 +817,7 @@ local steps = {
             3,
             4,
             5,
-            6,
-            7
+            6
           },
           journalEncounter = {
             id = 331,
@@ -848,8 +847,7 @@ local steps = {
             3,
             4,
             5,
-            6,
-            7
+            6
           },
           journalEncounter = {
             id = 333,
@@ -2056,6 +2054,71 @@ local steps = {
     id = 40,
     mounts = {
       {
+        id = 1252,
+        name = "Mechagon Peacekeeper",
+        icon = "interface/icons/inv_mechagonspidertank_brass.blp",
+        itemId = 168826,
+        spellId = 299158,
+        source = {
+          mapId = 2097,
+          uiMapIds = {
+            1490
+          },
+          allowedDifficultyIds = {
+            23
+          },
+          journalEncounter = {
+            id = 2355,
+            name = "HK-8 Aerial Oppression Unit",
+            instanceId = 1178,
+            uiMapId = 1490
+          },
+          dungeonEncounter = {
+            id = 2291,
+            name = "HK-8 Aerial Oppression Unit",
+            mapId = 2097
+          }
+        }
+      },
+      {
+        id = 1227,
+        name = "Aerial Unit R-21/X",
+        icon = "interface/icons/inv_hunterkillershipyellow.blp",
+        itemId = 168830,
+        spellId = 290718,
+        source = {
+          mapId = 2097,
+          uiMapIds = {
+            1497
+          },
+          allowedDifficultyIds = {
+            23
+          },
+          note = "In order for the mount to drop, you must complete the dungeon on Hard Mode.",
+          journalEncounter = {
+            id = 2331,
+            name = "King Mechagon",
+            instanceId = 1178,
+            uiMapId = 1497
+          },
+          dungeonEncounter = {
+            id = 2260,
+            name = "King Mechagon",
+            mapId = 2097
+          }
+        }
+      }
+    },
+    source = {
+      type = "Dungeon",
+      name = "Operation: Mechagon"
+    },
+    expansion = 7
+  },
+  {
+    id = 41,
+    mounts = {
+      {
         id = 1293,
         name = "Ny'alotha Allseer",
         icon = "interface/icons/inv_eyeballjellyfishmount.blp",
@@ -2090,7 +2153,7 @@ local steps = {
     expansion = 7
   },
   {
-    id = 41,
+    id = 42,
     mounts = {
       {
         id = 1406,
@@ -2127,7 +2190,7 @@ local steps = {
     expansion = 8
   },
   {
-    id = 42,
+    id = 43,
     mounts = {
       {
         id = 1481,
@@ -2165,7 +2228,7 @@ local steps = {
     expansion = 8
   },
   {
-    id = 43,
+    id = 44,
     mounts = {
       {
         id = 1500,
@@ -2232,7 +2295,7 @@ local steps = {
     expansion = 8
   },
   {
-    id = 44,
+    id = 45,
     mounts = {
       {
         id = 1587,
@@ -2269,7 +2332,7 @@ local steps = {
     expansion = 8
   },
   {
-    id = 45,
+    id = 46,
     mounts = {
       {
         id = 69,
@@ -2727,7 +2790,7 @@ local steps = {
     expansion = 9
   },
   {
-    id = 46,
+    id = 47,
     mounts = {
       {
         id = 1818,
@@ -2764,7 +2827,7 @@ local steps = {
     expansion = 9
   },
   {
-    id = 47,
+    id = 48,
     mounts = {
       {
         id = 2204,
@@ -2802,7 +2865,7 @@ local steps = {
     expansion = 10
   },
   {
-    id = 48,
+    id = 49,
     mounts = {
       {
         id = 2219,
@@ -2869,7 +2932,7 @@ local steps = {
     expansion = 10
   },
   {
-    id = 49,
+    id = 50,
     mounts = {
       {
         id = 2507,
@@ -2936,7 +2999,7 @@ local steps = {
     expansion = 10
   },
   {
-    id = 50,
+    id = 51,
     mounts = {
       {
         id = 2606,
