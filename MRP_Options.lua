@@ -182,6 +182,119 @@ function Options:InitializeIgnoredHelpfulItems()
     ignoredHelpfulItemsInitialized = true
 end
 
+local ignoredTrashItItemsInitialized = false
+local ignoredTrashItContent
+
+function Options:InitializeIgnoredTrashItItems()
+    if ignoredTrashItItemsInitialized then
+        return
+    end
+
+    local ignoredTrashItItemsTitle = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    ignoredTrashItItemsTitle:SetPoint("TOPLEFT", ignoreLFRDifficultyToggle, "BOTTOMLEFT", 0, -260)
+    ignoredTrashItItemsTitle:SetText(L["Ignored TrashIt Items"])
+
+    local addItemIdOrName = CreateFrame("EditBox", nil, optionsFrame, "InputBoxTemplate")
+    addItemIdOrName:SetPoint("TOPLEFT", ignoredTrashItItemsTitle, "BOTTOMLEFT", 0, -4)
+    addItemIdOrName:SetSize(200, 20)
+    addItemIdOrName:SetAutoFocus(false)
+    addItemIdOrName:SetScript("OnEnterPressed", function(self)
+        local itemId = C_Item.GetItemInfo(self:GetText())
+        if itemId then
+            MRP_CharacterSettings.ignoredTrashItItems[itemId] = true
+            self:SetText("")
+            Options:UpdateIgnoredTrashItItems()
+        end
+    end)
+
+    local scrollFrame = CreateFrame("ScrollFrame", nil, optionsFrame, "UIPanelScrollFrameTemplate")
+    scrollFrame:SetPoint("TOPLEFT", addItemIdOrName, "BOTTOMLEFT", 4, -4)
+    scrollFrame:SetSize(340, 180)
+    scrollFrame.scrollBarHideable = true
+    scrollFrame.ScrollBar:Hide();
+
+    local content = CreateFrame("Frame", nil, scrollFrame)
+    content:SetSize(320, 1)
+
+    scrollFrame:SetScrollChild(content)
+
+    ignoredTrashItContent = content
+    Options:UpdateIgnoredTrashItItems()
+
+    ignoredTrashItItemsInitialized = true
+end
+
+function Options:UpdateIgnoredTrashItItems()
+    local content = ignoredTrashItContent
+
+    for _, child in ipairs({ content:GetChildren() }) do
+        child:Hide()
+        child:SetParent(nil)
+    end
+
+    local itemCount = 1
+    local lastFrame
+
+    local ITEM_HEIGHT = 32
+
+    for itemId, _ in pairs(MRP_CharacterSettings.ignoredTrashItItems) do
+        local item = MRP.Util.GetItem(itemId)
+        local itemName = item:GetItemName()
+        local itemIcon = item:GetItemIcon()
+
+        local itemFrame = CreateFrame("Frame", nil, content)
+        itemFrame:SetSize(300, ITEM_HEIGHT)
+        if itemCount == 1 then
+            itemFrame:SetPoint("TOPLEFT", content, "TOPLEFT", 0, -8)
+        else
+            itemFrame:SetPoint("TOPLEFT", lastFrame, "BOTTOMLEFT", 0, -4)
+        end
+
+        local removeBtn = CreateFrame("Button", nil, itemFrame, "UIPanelButtonTemplate")
+        removeBtn:SetSize(24, 24)
+        removeBtn:SetPoint("RIGHT", itemFrame, "RIGHT", -4, 0)
+        removeBtn:SetText("X")
+        removeBtn:SetScript("OnClick", function()
+            MRP_CharacterSettings.ignoredTrashItItems[itemId] = nil
+            Options:UpdateIgnoredTrashItItems()
+        end)
+
+        local icon = itemFrame:CreateTexture(nil, "ARTWORK")
+        icon:SetSize(28, 28)
+        icon:SetPoint("LEFT", itemFrame, "LEFT", 0, 0)
+        icon:SetTexture(itemIcon or "Interface\\Icons\\INV_Misc_QuestionMark")
+
+        local name = itemFrame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        name:SetPoint("LEFT", icon, "RIGHT", 8, 0)
+        name:SetPoint("RIGHT", removeBtn, "LEFT", -8, 0)
+        name:SetText(itemName or ("Item " .. itemId))
+        name:SetJustifyH("LEFT")
+
+        item:ContinueOnItemLoad(function()
+            icon:SetTexture(item:GetItemIcon())
+            name:SetText(item:GetItemName())
+        end)
+
+        itemFrame:SetScript("OnEnter", function(self)
+            GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+            GameTooltip:SetItemByID(itemId)
+            GameTooltip:Show()
+        end)
+        itemFrame:SetScript("OnLeave", function()
+            GameTooltip:Hide()
+        end)
+
+        lastFrame = itemFrame
+        itemCount = itemCount + 1
+    end
+
+    if lastFrame then
+        content:SetHeight((itemCount - 1) * (ITEM_HEIGHT + 4) + 16)
+    else
+        content:SetHeight(ITEM_HEIGHT)
+    end
+end
+
 local settingsCategory = Settings.RegisterCanvasLayoutCategory(optionsFrame, "Mount Route Planner")
 Settings.RegisterAddOnCategory(settingsCategory)
 
@@ -192,6 +305,7 @@ function Options:Show()
     for itemId, toggle in pairs(ignoredHelpfulItemToggles) do
         toggle:SetChecked(MRP_CharacterSettings.ignoredHelpfulItems[itemId])
     end
+    Options:UpdateIgnoredTrashItItems()
 
     Settings.OpenToCategory(settingsCategory:GetID())
 end

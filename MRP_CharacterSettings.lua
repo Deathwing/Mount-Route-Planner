@@ -6,7 +6,9 @@
 ---@field autoAdvance boolean Whether to automatically advance to the next step after completing the current one.
 ---@field currentStep number The current step in the route being followed.
 ---@field filter FilterSettings The filter settings for the character.
----@field ignoredHelpfulItems { number: boolean } A list of helpful items to ignore for this character.
+---@field ignoredHelpfulItems { [number]: boolean } A list of helpful items to ignore for this character.
+---@field trashItItems { [number]: boolean } A list of items to trash.
+---@field ignoredTrashItItems { [number]: boolean } A list of items to ignore when trashing.
 MRP_CharacterSettings = {
     autoSkip = true,
     autoAdvance = true,
@@ -35,5 +37,7 @@ MRP_CharacterSettings = {
             [MRP.FilterCollectedState.NotCollected] = true
         },
     },
-    ignoredHelpfulItems = {}
+    ignoredHelpfulItems = {},
+    trashItItems = {},
+    ignoredTrashItItems = {}
 }

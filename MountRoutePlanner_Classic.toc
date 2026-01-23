@@ -81,4 +81,6 @@ MRP_Options.lua
 MRP_UI.lua
 MRP_Minimap.lua
 
+MRP_TrashIt.lua
+
 MRP_Core.lua

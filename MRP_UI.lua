@@ -335,7 +335,7 @@ function UI:ShowActionUseItem(itemId)
 end
 
 function UI:ShowActionTrashIt()
-    local itemsToSell = MRP.Core:GatherTrashItData()
+    local itemsToSell = MRP.TrashIt:GatherTrashItData()
     if #itemsToSell == 0 then
         return
     end
@@ -879,9 +879,9 @@ function UI:UpdateDisplay()
         self:ClearCurrentPathfindingData()
     end
 
-    if (MRP.Core:CanPossiblyTrashIt()) then -- MRP_REMOVE_LINE
-        self:ShowActionTrashIt()            -- MRP_REMOVE_LINE
-    end                                     -- MRP_REMOVE_LINE
+    if (MRP.TrashIt:CanPossiblyTrashIt()) then
+        self:ShowActionTrashIt()
+    end
 
     frame.progress:SetText(L["Step %d of %d"]:format(idx, #steps))
     frame.progressBar:SetWidth(frame.progressBarBG:GetWidth() * (idx / #steps))

@@ -377,6 +377,20 @@ addHearthstone(200630)                                                -- Ohn'ir 
 addHearthstone(208704)                                                -- Deepdweller's Earthen Hearthstone
 addHearthstone(209035)                                                -- Hearthstone of the Flame
 
+-- Brawler's Guild items to capitals (fancy teleport toys/rings)
+-- if UnitFactionGroup("player") == "Alliance" then
+--     -- Stormwind City
+--     addItem(95051, 84, { x = 0.4897, y = 0.8736, z = 100 }, true, 1519, 10)  -- The Brassiest Knuckle (Bizmo's Brawlpub)
+--     addItem(118907, 84, { x = 0.4897, y = 0.8736, z = 100 }, true, 1519, 10) -- Pit Fighter's Punching Ring (Bizmo's)
+--     addItem(144391, 84, { x = 0.4897, y = 0.8736, z = 100 }, true, 1519, 10) -- Pugilist's Powerful Punching Ring (Bizmo's)
+-- end
+-- if UnitFactionGroup("player") == "Horde" then
+--     -- Orgrimmar
+--     addItem(95050, 85, { x = 0.6883, y = 0.4057, z = 40 }, true, 1637, 10)  -- The Brassiest Knuckle (Brawl'gar Arena)
+--     addItem(118908, 85, { x = 0.6883, y = 0.4057, z = 40 }, true, 1637, 10) -- Pit Fighter's Punching Ring (Brawl'gar)
+--     addItem(144392, 85, { x = 0.6883, y = 0.4057, z = 40 }, true, 1637, 10) -- Pugilist's Powerful Punching Ring (Brawl'gar)
+-- end
+
 -- The Burning Crusade
 if GetExpansionLevel() >= 1 then
     -- Both
@@ -490,6 +504,13 @@ if GetExpansionLevel() >= 8 then
     -- Both
     addHearthstone(188952) -- Dominated Hearthstone
     addHearthstone(190196) -- Enlightened Hearthstone
+    -- addItem(184501, 1525, { x = 0.51, y = 0.78, z = 0 }, true, 6145, 10)  -- Revendreth: 184501 (The Mad Duke's Tea?) fixed destination
+    -- addItem(190237, 1670, { x = 0.50, y = 0.50, z = 0 }, true, 10565, 10) -- Broker Translocation Matrix (Oribos)
+    -- addItem(172924, 1550, { x = 0.5, y = 0.5, z = 0 }, true, 1550, 60)    -- Wormhole Generator: Shadowlands (The Shadowlands continent)
+    -- addItem(184500, 1533, { x = 0.5, y = 0.5, z = 0 }, true, 1533, 10)    -- Attendant's Pocket Portal: Bastion
+    -- addItem(184502, 1536, { x = 0.5, y = 0.5, z = 0 }, true, 1536, 10)    -- Attendant's Pocket Portal: Maldraxxus
+    -- addItem(184503, 1565, { x = 0.5, y = 0.5, z = 0 }, true, 1565, 10)    -- Attendant's Pocket Portal: Ardenweald
+    -- addItem(184504, 1670, { x = 0.5, y = 0.5, z = 0 }, true, 1670, 10)    -- Attendant's Pocket Portal: Oribos
 end
 
 -- The War Within
@@ -514,6 +535,12 @@ if GetExpansionLevel() >= 10 then
         addHearthstone(210455) -- Draenic Hologem
     end
 end
+
+-- Misc fancy teleports (Classic/Draenor utility)
+-- addItem(128353, 572, { x = 0.2992, y = 0.3392, z = 0 }, true, 6790, 30, function() return C_QuestLog.IsQuestFlaggedCompleted(34586) end)                                                                                         -- Admiral's Compass (to your garrison shipyard)
+-- addItem(140324, 680, { x = 0.34, y = 0.51, z = 0 }, true, 761, 10)                                                                                                                                                               -- Mobile Telemancy Beacon (Suramar)
+-- addItem(139590, 36, { x = 0.71, y = 0.46, z = 0 }, true, 0, 10)                                                                                                                                                                  -- Scroll of Teleport: Ravenholdt (approx. Ravenholdt Manor)
+-- addItem(21711, 80, { x = 0.564, y = 0.466, z = 0 }, true, 493, 10)                                                                                                                                                               -- Lunar Festival Invitation (Moonglade)
 
 addDynamicItemWithMultipleIds(hearthstones, MRP.Util.GetBindingLocation, GetBindLocation, (select(3, UnitRace("player")) == 1 and GetExpansionLevel() >= 10) and 12.5 or 30, function() return MRP.AreaL[GetBindLocation()] end) -- Hearthstones
 
