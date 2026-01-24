@@ -77,13 +77,16 @@ local settingsBtn = CreateIconButton(frame, "Frame_Settings")
 settingsBtn:SetPoint("TOPRIGHT", closeBtn, "TOPLEFT", 0, 0)
 
 settingsBtn:SetScript("OnClick", function()
-    MRP.Options:Show()
+    if not InCombatLockdown() then
+        MRP.Options:Show()
+    end
 end)
 
 settingsBtn:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
     GameTooltip:AddLine(L["Settings"])
     GameTooltip:AddLine(L["Open the MRP settings panel"], 1, 1, 1)
+    UI:AddPossibleInCombatWarning()
     GameTooltip:Show()
 end)
 settingsBtn:SetScript("OnLeave", GameTooltip_Hide)
@@ -193,9 +196,9 @@ discordBtn:SetScript("OnClick", function()
             editBoxWidth = 300,
 
             OnShow = function(self)
-                self.editBox:SetText("https://discord.gg/TrJFGcah7z")
-                self.editBox:HighlightText(0)
-                self.editBox:SetFocus()
+                self.EditBox:SetText("https://discord.gg/TrJFGcah7z")
+                self.EditBox:HighlightText(0)
+                self.EditBox:SetFocus()
             end,
 
             EditBoxOnEnterPressed = function(self)
@@ -314,7 +317,11 @@ function UI:ShowActionUseItem(itemId)
             if C_ToyBox.GetToyInfo(itemId) then
                 GameTooltip:SetToyByItemID(itemId)
             else
-                GameTooltip:SetItemByID(itemId)
+                if InCombatLockdown() then
+                    GameTooltip:SetHyperlink("item:" .. itemId)
+                else
+                    GameTooltip:SetItemByID(itemId)
+                end
             end
             UI:AddPossibleInCombatWarning()
             GameTooltip:Show()

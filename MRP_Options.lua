@@ -157,7 +157,11 @@ function Options:InitializeIgnoredHelpfulItems()
 
             itemFrame:SetScript("OnEnter", function(self)
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                GameTooltip:SetItemByID(itemId)
+                if InCombatLockdown() then
+                    GameTooltip:SetHyperlink("item:" .. itemId)
+                else
+                    GameTooltip:SetItemByID(itemId)
+                end
                 GameTooltip:Show()
             end)
             itemFrame:SetScript("OnLeave", function()

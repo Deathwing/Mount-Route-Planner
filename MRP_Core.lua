@@ -620,6 +620,10 @@ function Core:HandleSlashCommand(msg)
     elseif cmd == "reset" then
         Core:Reset()
     elseif cmd == "settings" then
+        if InCombatLockdown() then
+            print(ERR_NOT_IN_COMBAT)
+            return
+        end
         MRP.Options:Show()
     elseif cmd == "tomtom" and (arg1 == "on" or arg1 == "off") then
         MRP_Settings.useTomTom = (arg1 == "on")
