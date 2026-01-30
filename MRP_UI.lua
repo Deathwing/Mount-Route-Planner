@@ -1121,7 +1121,7 @@ function UI:CanUseSpell(spellId)
         if InCombatLockdown() then return false end
     end
 
-    if not IsSpellKnown(spellId, false) then return false end
+    if not C_SpellBook.IsSpellInSpellBook(spellId) then return false end
 
     local chargeInfo = C_Spell.GetSpellCharges(spellId)
     if chargeInfo and chargeInfo.currentCharges > 0 then return true end
