@@ -80,5 +80,6 @@ MRP_Filter.lua
 MRP_Options.lua
 MRP_UI.lua
 MRP_Minimap.lua
+MRP_Quest.lua
 
 MRP_Core.lua
