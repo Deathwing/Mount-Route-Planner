@@ -1,0 +1,16 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+
+    <!-- Bootstrap -->
+    <Script file="MRPData.d.lua" /> <!-- MRP_REMOVE_LINE -->
+    <Script file="MRPData~Init.lua" />
+
+    <!-- Data: Steps (Mists) -->
+    <Include file="Steps\Mists\MRPData_Steps.xml" />
+
+    <!-- Data: Mounts (Mists) -->
+    <Include file="Mounts\Mists\MRPData_Mounts.xml" />
+
+    <!-- Cleanup -->
+    <Script file="MRPData~Finalizer.lua" />
+
+</Ui>

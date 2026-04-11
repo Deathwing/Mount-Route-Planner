@@ -14,6 +14,12 @@ Automatically checks your character's collected mounts and builds a personalized
 **Dynamic Route Planning**  
 Uses a built-in pathfinding system to determine the most efficient next objective. Supports in-game travel options such as hearthstones, mage teleports, and portals.
 
+**World Map Route Overview**
+Shows your filtered route directly on the world map with numbered pins, directional connectors, and current-step context.
+
+**In-Game Update Notes**
+Displays a changelog popup after addon updates so new features are visible immediately in-game.
+
 **Helpful Item Tracking**
 Tracks important items like teleportation stones, hearthstones, and other travel abilities. It will notify you if you are missing any required items for optimizing your route.
 
@@ -31,6 +37,9 @@ Skips unnecessary steps based on:
 
 **Auto-Advance Option**  
 Automatically moves to the next step when one is completed, if enabled.
+
+**Nearby Source Alerts**
+Highlights relevant world bosses, rares, treasures, quests, and vendors when they are nearby, including a quick target button.
 
 **Full Content Support**  
 Covers all mount content, including the latest expansion, _The War Within_.
@@ -53,6 +62,8 @@ Supports multiple languages (in progress).
 *   `/mrp` — Open or close the main window
 *   `/mrp reset` — Reset your current progress and steps
 *   `/mrp settings` — Open the settings panel
+*   `/mrp changelog` — Open the in-game changelog popup
+*   `/mrp route` — Recalculate the optimized route
 *   `/mrp tomtom on` or `/mrp tomtom off` — Enable or disable tomtom integration
 *   `/mrp updatedisplaydelayed <number>` — Force update of the display after a delay (default: 0.25 seconds)
 

@@ -47,7 +47,7 @@ local function CreateToggleWithLabelAndTooltip(parent, text, description)
     return toggle
 end
 
-local frame = CreateFrame("Frame", "MRPFrame", UIParent, "BackdropTemplate")
+local frame = CreateFrame("Frame", "MRP_Frame", UIParent, "BackdropTemplate")
 frame:SetSize(400, 260)
 frame:SetPoint("CENTER")
 frame:SetBackdrop({
@@ -111,7 +111,7 @@ end)
 local filterBtn = CreateTextButton(frame, L["Filter"])
 filterBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 14, -14)
 
-local dropdown = CreateFrame("Frame", "MountFilterDropdown", frame, "UIDropDownMenuTemplate")
+local dropdown = CreateFrame("Frame", "MRP_FilterDropdown", frame, "UIDropDownMenuTemplate")
 
 filterBtn:SetScript("OnClick", function()
     ToggleDropDownMenu(1, nil, dropdown, filterBtn, 0, 0)
@@ -136,7 +136,7 @@ end
 
 local function AddDropdownCheckboxButton_FilterExpansion(level, k)
     local v = MRP.FilterExpansion[k]
-    return AddDropdownCheckboxButton(level, L["Expansion_" .. k], MRP_CharacterSettings.filter.expansions[v], function(_, _, _, checked)
+    return AddDropdownCheckboxButton(level, _G["EXPANSION_NAME" .. v], MRP_CharacterSettings.filter.expansions[v], function(_, _, _, checked)
         MRP.Filter:SetExpansion(v, checked)
     end)
 end
@@ -145,6 +145,13 @@ local function AddDropdownCheckboxButton_FilterSourceType(level, k)
     local v = MRP.FilterSourceType[k]
     return AddDropdownCheckboxButton(level, L["SourceType_" .. k], MRP_CharacterSettings.filter.sourceTypes[v], function(_, _, _, checked)
         MRP.Filter:SetSourceType(v, checked)
+    end)
+end
+
+local function AddDropdownCheckboxButton_FilterFaction(level, k)
+    local v = MRP.FilterFaction[k]
+    return AddDropdownCheckboxButton(level, L[v], MRP_CharacterSettings.filter.factions[v], function(_, _, _, checked)
+        MRP.Filter:SetFaction(v, checked)
     end)
 end
 
@@ -163,10 +170,16 @@ UIDropDownMenu_Initialize(dropdown, function(_, level, menuList)
         for _, k in ipairs(MRP.FilterCollectedStateOrder) do
             AddDropdownCheckboxButton_FilterCollectedState(level, k)
         end
+        UIDropDownMenu_AddSeparator(level)
+        AddDropdownMenuButton(level, L["Factions"], "FACTION_MENU")
         AddDropdownMenuButton(level, L["Expansions"], "EXPANSION_MENU")
         AddDropdownMenuButton(level, L["SourceTypes"], "SOURCE_TYPE_MENU")
     elseif level == 2 then
-        if menuList == "EXPANSION_MENU" then
+        if menuList == "FACTION_MENU" then
+            for _, k in ipairs(MRP.FilterFactionOrder) do
+                AddDropdownCheckboxButton_FilterFaction(level, k)
+            end
+        elseif menuList == "EXPANSION_MENU" then
             for _, k in ipairs(MRP.FilterExpansionOrder) do
                 if GetExpansionLevel() >= MRP.FilterExpansion[k] then
                     AddDropdownCheckboxButton_FilterExpansion(level, k)
@@ -255,6 +268,7 @@ end
 actionBtn:Hide()
 
 function UI:SetGlowOverlay(button, show)
+    if not ActionButtonSpellAlertManager then return end
     if show then
         ActionButtonSpellAlertManager:ShowAlert(button)
     else
@@ -269,9 +283,17 @@ function UI:AddPossibleInCombatWarning()
     end
 end
 
+local function ResetActionBtnToMacro()
+    actionBtn:SetAttribute("type", "macro")
+    actionBtn:SetAttribute("house-neighborhood-guid", nil)
+    actionBtn:SetAttribute("house-guid", nil)
+    actionBtn:SetAttribute("house-plot-id", nil)
+end
+
 function UI:ShowActionUseSpell(spellId)
     local spellInfo = C_Spell.GetSpellInfo(spellId)
     if spellInfo then
+        ResetActionBtnToMacro()
         actionBtn:SetNormalTexture(spellInfo.iconID)
         actionBtn:SetHighlightTexture(spellInfo.iconID)
         actionBtn:SetPushedTexture(spellInfo.iconID)
@@ -292,6 +314,7 @@ function UI:ShowActionUseSpell(spellId)
 end
 
 function UI:ShowActionUseItem(itemId)
+    ResetActionBtnToMacro()
     local item = MRP.Util.GetItem(itemId)
     local name = item:GetItemName()
     if name then
@@ -335,6 +358,7 @@ function UI:ShowActionUseItem(itemId)
 end
 
 function UI:ShowActionTrashIt()
+    ResetActionBtnToMacro()
     local itemsToSell = MRP.Core:GatherTrashItData()
     if #itemsToSell == 0 then
         return
@@ -404,6 +428,7 @@ local difficultyConfig = {
 }
 
 function UI:ShowActionSwitchDifficulty(difficultyId)
+    ResetActionBtnToMacro()
     if MRP.Core:IsLFRDifficulty(difficultyId) then
         return
     end
@@ -450,6 +475,7 @@ function UI:HideCenterAction()
 end
 
 function UI:ShowActionResetInstances()
+    ResetActionBtnToMacro()
     actionBtn:SetNormalTexture("Interface\\Icons\\Spell_Shadow_SacrificialShield")
     actionBtn:SetHighlightTexture("Interface\\Icons\\Spell_Shadow_SacrificialShield")
     actionBtn:SetPushedTexture("Interface\\Icons\\Spell_Shadow_SacrificialShield")
@@ -465,6 +491,65 @@ function UI:ShowActionResetInstances()
         GameTooltip:Hide()
     end)
     actionBtn:Show()
+end
+
+function UI:ShowActionHousingTeleport()
+    local house = FarstriderLibData and FarstriderLibData.HousingData
+    if not house then return false end
+
+    actionBtn:SetAttribute("type", "teleporthome")
+    actionBtn:SetAttribute("house-neighborhood-guid", house.neighborhoodGUID)
+    actionBtn:SetAttribute("house-guid", house.houseGUID)
+    actionBtn:SetAttribute("house-plot-id", house.plotID)
+    actionBtn:SetAttribute("macrotext", nil)
+
+    actionBtn:SetScript("PreClick", function(self)
+        if self:GetAttribute("type") == "teleporthome" then
+            if not FarstriderLibData_CharacterSettings then
+                FarstriderLibData_CharacterSettings = {}
+            end
+
+            FarstriderLibData_CharacterSettings.housingExitLocation = MRP.Util.GetPlayerLocation()
+        end
+    end)
+
+    actionBtn:SetNormalAtlas("dashboard-panel-homestone-teleport-button")
+    actionBtn:SetHighlightAtlas("dashboard-panel-homestone-teleport-button")
+    actionBtn:SetPushedAtlas("dashboard-panel-homestone-teleport-button")
+    actionBtn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(L["Teleport to Plot"], 1, 1, 1)
+        GameTooltip:AddLine(L["Click to teleport to your housing plot."], 0.6, 0.6, 0.6)
+        UI:AddPossibleInCombatWarning()
+        GameTooltip:Show()
+    end)
+    actionBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    actionBtn:Show()
+    UI:SetGlowOverlay(actionBtn, true)
+    return true
+end
+
+function UI:ShowActionHousingReturn()
+    actionBtn:SetAttribute("type", "returnhome")
+    actionBtn:SetAttribute("macrotext", nil)
+
+    actionBtn:SetNormalAtlas("dashboard-panel-homestone-teleport-button")
+    actionBtn:SetHighlightAtlas("dashboard-panel-homestone-teleport-button")
+    actionBtn:SetPushedAtlas("dashboard-panel-homestone-teleport-button")
+    actionBtn:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(L["Return from Plot"], 1, 1, 1)
+        GameTooltip:AddLine(L["Click to return to your previous location."], 0.6, 0.6, 0.6)
+        UI:AddPossibleInCombatWarning()
+        GameTooltip:Show()
+    end)
+    actionBtn:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    actionBtn:Show()
+    UI:SetGlowOverlay(actionBtn, true)
 end
 
 frame.title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -539,10 +624,10 @@ frame.progressBar:SetPoint("LEFT", frame.progressBarBG, "LEFT", 0, 0)
 function UI:Toogle()
     if not frame:IsShown() then
         if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
-            UIParentLoadAddOn("Blizzard_Collections")
+            C_AddOns.LoadAddOn("Blizzard_Collections")
         end
         if not C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal") then
-            UIParentLoadAddOn("Blizzard_EncounterJournal")
+            C_AddOns.LoadAddOn("Blizzard_EncounterJournal")
         end
         autoSkipToggle:SetChecked(MRP_CharacterSettings.autoSkip)
         autoAdvanceToggle:SetChecked(MRP_CharacterSettings.autoAdvance)
@@ -552,6 +637,7 @@ function UI:Toogle()
         self:UpdateDisplay()
     else
         frame:Hide()
+        MRP.Map:ClearOverlay()
     end
 end
 
@@ -564,23 +650,42 @@ function UI:ShowPathfindingWarnings()
         return
     end
 
+    local setupIssues = MRP.Core and MRP.Core.GetSetupIssues and MRP.Core:GetSetupIssues() or {}
     local missingItems = {}
-    for _, itemId in ipairs(MRP.Data.helpfulItems) do
-        if not C_ToyBox.GetToyInfo(itemId) and not MRP_CharacterSettings.ignoredHelpfulItems[itemId] and not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
-            if C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
-                table.insert(missingItems, itemId)
+    local unsupportedHearthstoneBinding = false
+    local helpfulItems = FarstriderLibData and FarstriderLibData.Connections and FarstriderLibData.Connections.helpfulItems or nil
+    local areaLookup = FarstriderLibData and FarstriderLibData.AreaL or nil
+
+    if helpfulItems then
+        for _, itemId in ipairs(helpfulItems) do
+            if not C_ToyBox.GetToyInfo(itemId) and not MRP_CharacterSettings.ignoredHelpfulItems[itemId] and not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
+                if C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
+                    table.insert(missingItems, itemId)
+                end
             end
         end
     end
 
-    local unsupportedHearthstoneBinding = not MRP.AreaL[GetBindLocation()]
+    if areaLookup then
+        unsupportedHearthstoneBinding = not areaLookup[GetBindLocation()]
+    end
 
-    if #missingItems > 0 or unsupportedHearthstoneBinding then
+    if #setupIssues > 0 or #missingItems > 0 or unsupportedHearthstoneBinding then
         frame.titleButton:Show()
         frame.titleButton:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
 
+            if #setupIssues > 0 then
+                GameTooltip:AddLine(L["Missing addon packages detected:"], 1, 0.82, 0)
+                for _, issue in ipairs(setupIssues) do
+                    GameTooltip:AddLine(issue.message, 1, 0.6, 0.6, true)
+                end
+            end
+
             if #missingItems > 0 then
+                if #setupIssues > 0 then
+                    GameTooltip:AddLine(" ")
+                end
                 GameTooltip:AddLine(L["Missing helpful items from your inventory:"], 1, 1, 1)
                 for _, itemId in ipairs(missingItems) do
                     local item = MRP.Util.GetItem(itemId)
@@ -609,6 +714,7 @@ end
 
 function UI:UpdateDisplay()
     if not frame:IsShown() then
+        MRP.Map:UpdateOverlay()
         return
     end
 
@@ -642,12 +748,13 @@ function UI:UpdateDisplay()
     frame.rewardIcons = {}
 
     if not step then
-        frame.stepText:SetText(L["No steps available.\nAdjust your filter."])
+        frame.stepText:SetText(MRP.Core:GetNoStepsMessage())
         frame.stepInfoButton:Hide()
         frame.stepPathfindingText:SetText("")
         frame.noteText:SetText("")
         frame.progress:SetText(L["Step 0 of 0"])
         frame.progressBar:SetWidth(0)
+        MRP.Map:UpdateOverlay()
         return
     end
 
@@ -657,7 +764,7 @@ function UI:UpdateDisplay()
     local totalIconsForStep = 0
     for _, mount in ipairs(step.mounts) do
         local relevantDifficultyIds = MRP.Core:GetRelevantDifficultyIds(mount)
-        if #relevantDifficultyIds > 0 and (not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde)) then
+        if #relevantDifficultyIds > 0 and MRP.Core:IsMountFactionAllowed(mount) then
             totalIconsForStep = totalIconsForStep + 1
         end
     end
@@ -667,8 +774,8 @@ function UI:UpdateDisplay()
     local index = 1
     for _, mount in ipairs(step.mounts) do
         local relevantDifficultyIds = MRP.Core:GetRelevantDifficultyIds(mount)
-        if #relevantDifficultyIds > 0 and (not mount.source.factionMask or (mount.source.factionMask == -2 and isAlliance) or (mount.source.factionMask == -3 and isHorde)) then
-            local name, _, icon, _, _, _, _, _, _, _, isCollected = C_MountJournal.GetMountInfoByID(mount.id)
+        if #relevantDifficultyIds > 0 and MRP.Core:IsMountFactionAllowed(mount) then
+            local name, icon, isCollected = MRP.Util.GetMountInfoSafe(mount)
 
             local defeatedMap = {}
             local allAreDefeated = true
@@ -683,8 +790,11 @@ function UI:UpdateDisplay()
             local mountBtn = CreateFrame("Button", nil, frame, "InsecureActionButtonTemplate")
             mountBtn:SetSize(32, 32)
             do
-                local row = math.floor((index - 1) / 8)
-                local col = (index - 1) % 8
+                -- local row = math.floor((index - 1) / 8)
+                local row = math.min(1, math.floor((index - 1) / 8))
+                -- local col = (index - 1) % 8
+                local col = index <= 8 and (index - 1) or (index - 9)
+                -- local iconsInRow = row % 2 == 0 and math.min(8, totalIconsForStep - row * 8) or math.min(9, totalIconsForStep - row * 8)
                 local iconsInRow = row == 0 and math.min(8, totalIconsForStep) or (totalIconsForStep - 8)
                 local frameWidth = frame:GetWidth()
                 local startX = (frameWidth - (iconsInRow * 36)) / 2
@@ -701,7 +811,31 @@ function UI:UpdateDisplay()
                 noteIcon:SetTexture("Interface\\common\\help-i")
             end
 
-            local allowLeftClick = (mount.source.journalEncounter and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)) ~= nil or (mount.source.uiMapIds[1] and EJ_GetInstanceForMap(mount.source.uiMapIds[1])) > 0
+            local navMapId = mount.source.uiMapIds and mount.source.uiMapIds[1] or nil
+            -- Interior dungeon/raid maps require the Encounter Journal, introduced per-type:
+            --   Raid maps: available from Cataclysm (expansion 3+)
+            --   Dungeon maps: available from Mists of Pandaria (expansion 4+)
+            -- On older Classic clients, fall back to the entrance zone map from MRP.Data.
+            local sType = step.source.type
+            if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
+                local expLevel = GetExpansionLevel()
+                local needsFallback = not navMapId
+                    or (sType == MRP.FilterSourceType.Raid and expLevel < 3)
+                    or (sType == MRP.FilterSourceType.Dungeon and expLevel < 4)
+                if needsFallback and (sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid) then
+                    local inst = sType == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or MRP.Data.raids[step.source.name]
+                    if inst then navMapId = inst.mapID end
+                end
+            elseif not navMapId then
+                if sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid then
+                    local inst = sType == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or MRP.Data.raids[step.source.name]
+                    if inst then navMapId = inst.mapID end
+                end
+            end
+            local allowLeftClick = navMapId and C_Map.GetMapInfo(navMapId) ~= nil
+            local allowRightClick = (mount.source.journalEncounter and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)) ~= nil
+                or ((sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid or sType == MRP.FilterSourceType.WorldBoss) and mount.source.uiMapIds[1] and (EJ_GetInstanceForMap(mount.source.uiMapIds[1]) or 0) > 0)
+            local allowShiftLeftClick = SetCollectionsJournalShown and MountJournal_SetSelected
 
             mountBtn:SetScript("OnEnter", function()
                 ---@diagnostic disable-next-line: param-type-mismatch
@@ -713,26 +847,121 @@ function UI:UpdateDisplay()
                 end
                 for _, difficultyId in ipairs(relevantDifficultyIds) do
                     local state = defeatedMap[difficultyId]
-                    if difficultyId == -1 then
-                        if state.defeated then
-                            if state.onLegacyRaidDifficulty then
-                                GameTooltip:AddLine(L["This boss is dead (through legacy lockout)"], 1, 0.6, 1)
+                    local sType = step.source.type
+                    if difficultyId == -1 or difficultyId == 0 then
+                        if sType == MRP.FilterSourceType.Vendor then
+                            if state.defeated then
+                                GameTooltip:AddLine(L["This vendor has been visited"], 1, 0.6, 0.6)
                             else
-                                GameTooltip:AddLine(L["This boss is dead"], 1, 0.6, 0.6)
+                                GameTooltip:AddLine(L["This vendor is available"], 0.6, 1, 0.6)
+                            end
+                        elseif sType == MRP.FilterSourceType.Quest then
+                            if state.defeated then
+                                GameTooltip:AddLine(L["This quest is completed"], 1, 0.6, 0.6)
+                            else
+                                GameTooltip:AddLine(L["This quest is not yet completed"], 0.6, 0.6, 1)
+                            end
+                        elseif sType == MRP.FilterSourceType.Treasure then
+                            if state.defeated then
+                                GameTooltip:AddLine(L["This treasure has been looted"], 1, 0.6, 0.6)
+                            else
+                                GameTooltip:AddLine(L["This treasure has not been looted"], 0.6, 0.6, 1)
                             end
                         else
-                            GameTooltip:AddLine(L["This boss is still alive"], 0.6, 0.6, 1)
+                            if state.defeated then
+                                if state.onLegacyRaidDifficulty then
+                                    GameTooltip:AddLine(L["This boss is dead (through legacy lockout)"], 1, 0.6, 1)
+                                else
+                                    GameTooltip:AddLine(L["This boss is dead"], 1, 0.6, 0.6)
+                                end
+                            else
+                                GameTooltip:AddLine(L["This boss is still alive"], 0.6, 0.6, 1)
+                            end
                         end
                     else
                         local difficultyText = GetDifficultyInfo(difficultyId)
-                        if state.defeated then
-                            if state.onLegacyRaidDifficulty then
-                                GameTooltip:AddLine(format(L["%s: This boss is dead (through legacy lockout)"], difficultyText), 1, 0.6, 1)
+                        if sType == MRP.FilterSourceType.Vendor then
+                            if state.defeated then
+                                GameTooltip:AddLine(format(L["%s: This vendor has been visited"], difficultyText), 1, 0.6, 0.6)
                             else
-                                GameTooltip:AddLine(format(L["%s: This boss is dead"], difficultyText), 1, 0.6, 0.6)
+                                GameTooltip:AddLine(format(L["%s: This vendor is available"], difficultyText), 0.6, 1, 0.6)
+                            end
+                        elseif sType == MRP.FilterSourceType.Quest then
+                            if state.defeated then
+                                GameTooltip:AddLine(format(L["%s: This quest is completed"], difficultyText), 1, 0.6, 0.6)
+                            else
+                                GameTooltip:AddLine(format(L["%s: This quest is not yet completed"], difficultyText), 0.6, 0.6, 1)
+                            end
+                        elseif sType == MRP.FilterSourceType.Treasure then
+                            if state.defeated then
+                                GameTooltip:AddLine(format(L["%s: This treasure has been looted"], difficultyText), 1, 0.6, 0.6)
+                            else
+                                GameTooltip:AddLine(format(L["%s: This treasure has not been looted"], difficultyText), 0.6, 0.6, 1)
                             end
                         else
-                            GameTooltip:AddLine(format(L["%s: This boss is still alive"], difficultyText), 0.6, 0.6, 1)
+                            if state.defeated then
+                                if state.onLegacyRaidDifficulty then
+                                    GameTooltip:AddLine(format(L["%s: This boss is dead (through legacy lockout)"], difficultyText), 1, 0.6, 1)
+                                else
+                                    GameTooltip:AddLine(format(L["%s: This boss is dead"], difficultyText), 1, 0.6, 0.6)
+                                end
+                            else
+                                GameTooltip:AddLine(format(L["%s: This boss is still alive"], difficultyText), 0.6, 0.6, 1)
+                            end
+                        end
+                    end
+                end
+
+                local costs = mount.source.costs or (mount.source.cost and { mount.source.cost }) or nil
+                if costs and #costs > 0 then
+                    local parts = {}
+                    for _, c in ipairs(costs) do
+                        local part
+                        if c.type == "gold" then
+                            part = C_CurrencyInfo.GetCoinTextureString(c.amount)
+                        elseif c.type == "currency" and c.currencyId then
+                            local currencyInfo = C_CurrencyInfo.GetCurrencyInfo(c.currencyId)
+                            if currencyInfo then
+                                part = format("%s |T%s:0|t %s", c.amount, currencyInfo.iconFileID, currencyInfo.name)
+                            else
+                                part = tostring(c.amount)
+                            end
+                        elseif c.type == "item" and c.itemId then
+                            local name, _, _, _, _, _, _, _, _, icon = C_Item.GetItemInfo(c.itemId)
+                            if name and icon then
+                                part = format("%s |T%s:0|t %s", c.amount, icon, name)
+                            elseif name then
+                                part = c.amount .. " " .. name
+                            else
+                                part = tostring(c.amount)
+                            end
+                        end
+                        if part then
+                            parts[#parts + 1] = part
+                        end
+                    end
+                    if #parts > 0 then
+                        GameTooltip:AddLine(format(L["Cost: %s"], table.concat(parts, " + ")), 1, 1, 1)
+                    end
+                end
+
+                if mount.source.questChain and #mount.source.questChain > 0 then
+                    local totalSteps = #mount.source.questChain
+                    local currentStep = totalSteps + 1
+                    local currentQuestName = nil
+                    for qi, qStep in ipairs(mount.source.questChain) do
+                        if not C_QuestLog.IsQuestFlaggedCompleted(qStep.questID) then
+                            currentStep = qi
+                            currentQuestName = qStep.name
+                            break
+                        end
+                    end
+                    if currentStep > totalSteps then
+                        GameTooltip:AddLine(L["Quest chain completed!"], 0.6, 1, 0.6)
+                    else
+                        GameTooltip:AddLine(format(L["Quest chain: Step %d of %d"], currentStep, totalSteps), 1, 0.82, 0)
+                        if currentQuestName then
+                            GameTooltip:AddLine(format(L["Current quest: %s"], currentQuestName), 1, 1, 1)
                         end
                     end
                 end
@@ -740,10 +969,14 @@ function UI:UpdateDisplay()
                 GameTooltip:AddLine(" ")
 
                 if allowLeftClick then
-                    GameTooltip:AddLine(L["Left-click to view in Encounter Journal"], 1, 1, 1)
+                    GameTooltip:AddLine(L["Left-click to view on Map"], 1, 1, 1)
                 end
-                GameTooltip:AddLine(L["Right-click to view in Mount Journal"], 1, 1, 1)
-                GameTooltip:AddLine(L["Middle-click to view on Map"], 1, 1, 1)
+                if allowRightClick then
+                    GameTooltip:AddLine(L["Right-click to view in Encounter Journal"], 1, 1, 1)
+                end
+                if allowShiftLeftClick then
+                    GameTooltip:AddLine(L["Shift + Left-click to view in Mount Journal"], 1, 1, 1)
+                end
 
                 local sourceNote = self:GetLocalizedSourceNote(mount)
                 if sourceNote then
@@ -760,10 +993,16 @@ function UI:UpdateDisplay()
                 GameTooltip:Hide()
             end)
 
-            if allowLeftClick then
-                mountBtn:RegisterForClicks("LeftButtonUp", "RightButtonUp", "MiddleButtonUp")
-            else
-                mountBtn:RegisterForClicks("RightButtonUp", "MiddleButtonUp")
+            local callbacks = {}
+            if allowLeftClick or allowShiftLeftClick then
+                table.insert(callbacks, "LeftButtonUp")
+            end
+            if allowRightClick then
+                table.insert(callbacks, "RightButtonUp")
+            end
+
+            if #callbacks > 0 then
+                mountBtn:RegisterForClicks(unpack(callbacks))
             end
             mountBtn:SetScript("OnClick", function(self, button)
                 if InCombatLockdown() then
@@ -771,7 +1010,22 @@ function UI:UpdateDisplay()
                     return
                 end
 
-                if button == "LeftButton" then
+                if button == "LeftButton" and allowLeftClick then
+                    if IsModifiedClick("SHIFT") and allowShiftLeftClick then
+                        SetCollectionsJournalShown(true, COLLECTIONS_JOURNAL_TAB_INDEX_MOUNTS)
+                        MountJournal_SetSelected(mount.id, mount.spellId)
+                    else
+                        if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+                            OpenWorldMap(navMapId)
+                        else
+                            WorldMapFrame:SetShown(true)
+                            local ok = pcall(WorldMapFrame.SetMapID, WorldMapFrame, navMapId)
+                            if not ok then
+                                WorldMapFrame:SetShown(false)
+                            end
+                        end
+                    end
+                elseif button == "RightButton" and allowRightClick then
                     if mount.source.journalEncounter then
                         EncounterJournal_OpenJournal(relevantDifficultyIds[1], mount.source.journalEncounter.instanceId, mount.source.journalEncounter.id, nil, nil, mount.itemId)
                     else
@@ -784,11 +1038,6 @@ function UI:UpdateDisplay()
 
                         EncounterJournal_OpenJournal(relevantDifficultyIds[1], EJ_GetInstanceForMap(uiMapId), nil, nil, nil, mount.itemId)
                     end
-                elseif button == "RightButton" then
-                    SetCollectionsJournalShown(true, COLLECTIONS_JOURNAL_TAB_INDEX_MOUNTS)
-                    MountJournal_SetSelected(mount.id, mount.spellId)
-                elseif button == "MiddleButton" then
-                    OpenWorldMap(mount.source.uiMapIds[1])
                 end
             end)
 
@@ -845,7 +1094,14 @@ function UI:UpdateDisplay()
         frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff0000" .. warningText .. "|r")
     end
 
-    local entry = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.raids[step.source.name] or step.source.type == MRP.FilterSourceType.WorldBoss and MRP.Data.worldBosses[step.source.name] or nil
+    local entry = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.raids[step.source.name] or step.source.type == MRP.FilterSourceType.WorldBoss and MRP.Data.worldBosses[step.source.name] or step.source.type == MRP.FilterSourceType.OpenWorld and MRP.Data.openWorld[step.source.name] or step.source.type == MRP.FilterSourceType.Quest and MRP.Data.openWorld[step.source.name] or step.source.type == MRP.FilterSourceType.Treasure and MRP.Data.openWorld[step.source.name] or step.source.type == MRP.FilterSourceType.Vendor and MRP.Data.openWorld[step.source.name] or nil
+
+    -- Faction / condition-gated availability warning
+    if entry and entry.condition and not MRP.Core:EvaluateCondition(entry.condition) then
+        local condNote = MRP.Core:GetConditionMessage(entry.condition)
+        frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff9900" .. condNote .. "|r")
+    end
+
     local stepName = self:GetLocalizedStepName(step)
     frame.stepText:SetText(stepName)
     if isRepeatable then
@@ -856,14 +1112,32 @@ function UI:UpdateDisplay()
     end
     frame.stepPathfindingText:SetText("")
 
+    -- For quest chains, override entry coordinates to the current quest step's location
+    if entry and step.source.type == MRP.FilterSourceType.Quest then
+        local questChain = step.mounts[1] and step.mounts[1].source.questChain
+        if questChain and #questChain > 0 then
+            for _, qStep in ipairs(questChain) do
+                if not C_QuestLog.IsQuestFlaggedCompleted(qStep.questID) then
+                    if qStep.x and qStep.y then
+                        entry = MRP.Util.ShallowCopy(entry)
+                        entry.x = qStep.x
+                        entry.y = qStep.y
+                        if qStep.mapID then entry.mapID = qStep.mapID end
+                    end
+                    break
+                end
+            end
+        end
+    end
+
     if isInPvP then
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
         frame.stepPathfindingText:SetText(L["Pathfinding not available in PvP instances."])
     elseif entry and not alreadyInInstance then
         if entry.instanceId and entry.instanceId == 2070 and isHorde then
             self:UpdateCurrentPathfinding(MRP.Data.raids["Battle of Dazar'alor (H)"])
-        elseif entry.instanceId and entry.instanceId == 2217 and MRP.Core:IsEntranceOnMap(MRP.Data.raids["Ny'alotha the Waking City (VoEB)"].mapID, entry.instanceId) then
-            self:UpdateCurrentPathfinding(MRP.Data.raids["Ny'alotha the Waking City (VoEB)"])
+        elseif entry.instanceId and entry.instanceId == 2217 and MRP.Core:IsEntranceOnMap(MRP.Data.raids["Ny'alotha, the Waking City (VoEB)"].mapID, entry.instanceId) then
+            self:UpdateCurrentPathfinding(MRP.Data.raids["Ny'alotha, the Waking City (VoEB)"])
         else
             self:UpdateCurrentPathfinding(entry)
         end
@@ -878,6 +1152,9 @@ function UI:UpdateDisplay()
         end
         self:ClearCurrentPathfindingData()
     end
+
+    MRP.Map:SetOpenWorldOverlay(entry, step.source.name, step.mounts)
+    MRP.Map:UpdateOverlay()
 
     if (MRP.Core:CanPossiblyTrashIt()) then -- MRP_REMOVE_LINE
         self:ShowActionTrashIt()            -- MRP_REMOVE_LINE
@@ -908,16 +1185,13 @@ function UI:UpdateDisplay()
     end
 end
 
-local pathKey = nil
-local path = nil
-local pathPos = 1
-local pathStep = nil
-
 function UI:ClearCurrentPathfindingData()
-    pathKey = nil
-    path = nil
-    pathPos = 1
-    pathStep = nil
+    MRP.Map.pathKey = nil
+    MRP.Map.path = nil
+    MRP.Map.pathPos = 1
+    MRP.Map.pathStep = nil
+    MRP.Map:UpdateMinimapPin()
+    MRP.Map:UpdateOverlay()
 end
 
 function UI:UpdateCurrentPathfinding(entry)
@@ -926,14 +1200,14 @@ function UI:UpdateCurrentPathfinding(entry)
         ---@diagnostic disable-next-line: undefined-global -- MRP_REMOVE_LINE
         ClearLogs()   -- MRP_REMOVE_LINE
     end               -- MRP_REMOVE_LINE
-    ---@diagnostic disable-next-line: undefined-global
-    if not NavigateTo then
+    local unavailableText = MRP.Core:GetPathfindingUnavailableText()
+    if unavailableText then
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
-        frame.stepPathfindingText:SetText(L["Pathfinding not available"])
+        frame.stepPathfindingText:SetText(unavailableText)
         return
     end
     ---@diagnostic disable-next-line: undefined-global
-    local optimizedPath = NavigateTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
+    local optimizedPath = FarstriderLib.FindTrailTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
 
     local newPathKey = nil
     if optimizedPath then
@@ -946,18 +1220,18 @@ function UI:UpdateCurrentPathfinding(entry)
         end
     end
 
-    if pathKey ~= newPathKey then
-        pathKey = newPathKey
-        path = optimizedPath
-        pathPos = 1
-        pathStep = path and pathPos <= #path and path[pathPos] or nil
+    if MRP.Map.pathKey ~= newPathKey then
+        MRP.Map.pathKey = newPathKey
+        MRP.Map.path = optimizedPath
+        MRP.Map.pathPos = 1
+        MRP.Map.pathStep = MRP.Map.path and MRP.Map.pathPos <= #MRP.Map.path and MRP.Map.path[MRP.Map.pathPos] or nil
 
-        if DevTool then                                                                                             -- MRP_REMOVE_LINE
-            DevTool:AddData({ pathKey = pathKey, path = path, pathPos = pathPos, pathStep = pathStep }, "MRP_Path") -- MRP_REMOVE_LINE
-        end                                                                                                         -- MRP_REMOVE_LINE
+        if DevTool then                                                                                                                             -- MRP_REMOVE_LINE
+            DevTool:AddData({ pathKey = MRP.Map.pathKey, path = MRP.Map.path, pathPos = MRP.Map.pathPos, pathStep = MRP.Map.pathStep }, "MRP_Path") -- MRP_REMOVE_LINE
+        end                                                                                                                                         -- MRP_REMOVE_LINE
     end
 
-    if pathStep then
+    if MRP.Map.pathStep then
         self:ShowCurrentPathfindingStep()
     else
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
@@ -975,7 +1249,12 @@ function UI:GetLocalizedSourceNote(mount)
         if mount.id == 250 or mount.id == 253 then
             return L["SourceNote_AllDrakesAlive"]
         end
-        return L["SourceNote_" .. mount.id]
+
+        local key = "SourceNote_" .. mount.id
+        if L[key] ~= key then
+            return L[key]
+        end
+        return mount.source.note
     end
 
     return nil
@@ -997,6 +1276,10 @@ function UI:GetLocalizedStepName(step)
                     return instanceName
                 end
             end
+        end
+
+        if (step.source.type == MRP.FilterSourceType.OpenWorld or step.source.type == MRP.FilterSourceType.Quest or step.source.type == MRP.FilterSourceType.Treasure or step.source.type == MRP.FilterSourceType.Vendor) and mount.source.specialEncounter then
+            return mount.source.specialEncounter.name
         end
 
         local uiMapId = mount.source.uiMapIds and #mount.source.uiMapIds > 0 and mount.source.uiMapIds[#mount.source.uiMapIds] or nil
@@ -1148,26 +1431,30 @@ function UI:CanUseItem(itemId)
 end
 
 function UI:ShowCurrentPathfindingStep()
-    if not pathStep then
+    if not MRP.Map.pathStep then
         return
     end
 
-    local actionOptions = pathStep.actionOptions or {}
-    local loc = pathStep.loc
-    if not pathStep.loc.isUI then
-        local localUIMapId, localMapPos = C_Map.GetMapPosFromWorldPos(pathStep.loc.mapId, CreateVector2D(pathStep.loc.pos.x, pathStep.loc.pos.y))
+    local actionOptions = MRP.Map.pathStep.actionOptions or {}
+    local loc = MRP.Map.pathStep.loc
+    if not MRP.Map.pathStep.loc.isUI then
+        local localUIMapId, localMapPos = C_Map.GetMapPosFromWorldPos(MRP.Map.pathStep.loc.mapId, CreateVector2D(MRP.Map.pathStep.loc.pos.x, MRP.Map.pathStep.loc.pos.y))
         loc = { mapId = localUIMapId, pos = { x = localMapPos.x, y = localMapPos.y, z = loc.pos.z }, isUI = true }
     end
 
-    local loca = pathStep.loca
+    local loca = MRP.Map.pathStep.loca
     local key = string.format("%d:%d:%d:%d", loc.mapId, math.floor(loc.pos.x * (10 ^ 4) + 0.5), math.floor(loc.pos.y * (10 ^ 4) + 0.5), math.floor(loc.pos.z + 0.5))
 
-    if pathPos == #path then
+    if MRP.Map.pathPos == #MRP.Map.path then
         local step = MRP.Filter:GetCurrentStep()
         if step then
             local stepName = self:GetLocalizedStepName(step)
             if step.source.type == MRP.FilterSourceType.WorldBoss then
                 loca = format(L["Waypoint_WorldBoss"], stepName)
+            elseif step.source.type == MRP.FilterSourceType.OpenWorld then
+                local owEntry = MRP.Data.openWorld[step.source.name]
+                local mechanicKey = owEntry and owEntry.mechanic or "kill"
+                loca = format(L["Waypoint_OpenWorld_" .. mechanicKey], stepName)
             elseif step.source.type == MRP.FilterSourceType.Dungeon or step.source.type == MRP.FilterSourceType.Raid then
                 loca = format(L["Waypoint_Instance"], stepName)
             end
@@ -1186,6 +1473,12 @@ function UI:ShowCurrentPathfindingStep()
             if not actionOption.allowAny then
                 break
             end
+        elseif actionOption.type == "housing" then
+            table.insert(validActionOptions, actionOption)
+            break
+        elseif actionOption.type == "housing_return" then
+            table.insert(validActionOptions, actionOption)
+            break
         end
     end
 
@@ -1197,6 +1490,11 @@ function UI:ShowCurrentPathfindingStep()
             gotAction = true
         elseif randomActionOption.type == "item" then
             self:ShowActionUseItem(randomActionOption.data)
+            gotAction = true
+        elseif randomActionOption.type == "housing" then
+            gotAction = self:ShowActionHousingTeleport() or false
+        elseif randomActionOption.type == "housing_return" then
+            self:ShowActionHousingReturn()
             gotAction = true
         end
     end
@@ -1210,30 +1508,53 @@ function UI:ShowCurrentPathfindingStep()
 
     if MRP_Settings.useTomTom and TomTom and TomTom.AddWaypoint then
         self:AddTomTomWaypoint(loc, loca, key)
+
+        -- Add extra TomTom waypoints for open world route/spawn points
+        if MRP.Map.pathPos == #MRP.Map.path then
+            local step = MRP.Filter:GetCurrentStep()
+            if step and step.source.type == MRP.FilterSourceType.OpenWorld then
+                local owEntry = MRP.Data.openWorld[step.source.name]
+                if owEntry and owEntry.waypoints then
+                    for _, wp in ipairs(owEntry.waypoints) do
+                        local wpMapId = wp.mapID or owEntry.mapID
+                        self:AddTomTomWaypoint(
+                            { mapId = wpMapId, pos = { x = wp.x / 100, y = wp.y / 100, z = 0 }, isUI = true },
+                            loca,
+                            key .. "-route"
+                        )
+                    end
+                end
+            end
+        end
     else
         self:AddUserWaypoint(loc, loca, key)
     end
+
+    MRP.Map:UpdateMinimapPin()
+    MRP.Map:UpdateOverlay()
 end
 
 function UI:CheckCurrentPathfindingStep()
-    if pathStep and pathStep.checkDistance and not IsInInstance() then
+    if MRP.Map.pathStep and MRP.Map.pathStep.checkDistance and not IsInInstance() then
         local playerUiMapId = C_Map.GetBestMapForUnit("player")
         if playerUiMapId then
             local playerPos = C_Map.GetPlayerMapPosition(playerUiMapId, "player")
             if playerPos and playerPos.x and playerPos.y then
+                local completionLoc = MRP.Map.pathStep.completionLoc or MRP.Map.pathStep.loc
                 local _, worldA = C_Map.GetWorldPosFromMapPos(playerUiMapId, playerPos)
                 local _, worldB
-                if pathStep.loc.isUI then
-                    _, worldB = C_Map.GetWorldPosFromMapPos(pathStep.loc.mapId, CreateVector2D(pathStep.loc.pos.x, pathStep.loc.pos.y))
+                if completionLoc.isUI then
+                    _, worldB = C_Map.GetWorldPosFromMapPos(completionLoc.mapId, CreateVector2D(completionLoc.pos.x, completionLoc.pos.y))
                 else
-                    worldB = CreateVector2D(pathStep.loc.pos.x, pathStep.loc.pos.y)
+                    worldB = CreateVector2D(completionLoc.pos.x, completionLoc.pos.y)
                 end
                 if worldA and worldB then
                     local distance = math.sqrt((worldA.x - worldB.x) ^ 2 + (worldA.y - worldB.y) ^ 2)
                     if distance < 15 then
-                        pathPos = pathPos + 1
-                        pathStep = path and pathPos <= #path and path[pathPos] or nil
+                        MRP.Map.pathPos = MRP.Map.pathPos + 1
+                        MRP.Map.pathStep = MRP.Map.path and MRP.Map.pathPos <= #MRP.Map.path and MRP.Map.path[MRP.Map.pathPos] or nil
                         self:ShowCurrentPathfindingStep()
+                        MRP.Map:UpdateOverlay()
                     end
                 end
             end

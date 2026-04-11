@@ -11,6 +11,16 @@ function Core:Reset()
     MRP.UI:UpdateDisplay()
 end
 
+function Core:SetCurrentStep(stepIdx)
+    if #MRP.Filter.filteredSteps == 0 then
+        return
+    end
+
+    MRP_CharacterSettings.currentStep = math.max(1, math.min(stepIdx, #MRP.Filter.filteredSteps))
+
+    MRP.UI:UpdateDisplay()
+end
+
 function Core:PreviousStep()
     if #MRP.Filter.filteredSteps == 0 then
         return
@@ -65,6 +75,30 @@ function Core:IsLFRDifficulty(difficultyId)
     return difficultyId == 7 or difficultyId == 17 or difficultyId == 151
 end
 
+---@param mount Mount
+---@return boolean isAllowed
+function Core:IsMountFactionAllowed(mount)
+    if not mount or not mount.source then
+        return false
+    end
+
+    local factionMask = mount.source.factionMask
+    if factionMask == nil or factionMask == 0 or factionMask == -1 then
+        return true
+    end
+
+    local factionGroup = UnitFactionGroup("player")
+    if factionMask == -2 then
+        return factionGroup == "Alliance"
+    end
+
+    if factionMask == -3 then
+        return factionGroup == "Horde"
+    end
+
+    return false
+end
+
 function Core:IsInPvp()
     local inInstance, instanceType = IsInInstance()
     return inInstance and (instanceType == "pvp" or instanceType == "arena")
@@ -105,6 +139,20 @@ function Core:IsEncounterDefeated(mount, source, difficultyId)
 
         if worldBoss.questID then
             return C_QuestLog.IsQuestFlaggedCompleted(worldBoss.questID)
+        end
+
+        return false
+    end
+
+    if source.type == MRP.FilterSourceType.OpenWorld or source.type == MRP.FilterSourceType.Quest or source.type == MRP.FilterSourceType.Treasure or source.type == MRP.FilterSourceType.Vendor then
+        local entry = MRP.Data.openWorld[source.name]
+        if not entry then
+            print(string.format(L["|cffff0000[MRP]|r Unknown world boss: %s"], source.name))
+            return false
+        end
+
+        if entry.questID and entry.questID > 0 then
+            return C_QuestLog.IsQuestFlaggedCompleted(entry.questID)
         end
 
         return false
@@ -198,7 +246,8 @@ function Core:GetMostSuitableDifficultyIds(step)
     local mountsPerDifficultyId = {}
 
     for _, mount in ipairs(step.mounts) do
-        if not select(11, C_MountJournal.GetMountInfoByID(mount.id)) then
+        local _, _, isCollected = MRP.Util.GetMountInfoSafe(mount)
+        if not isCollected and self:IsMountFactionAllowed(mount) then
             for _, difficultyId in ipairs(MRP.Core:GetRelevantDifficultyIds(mount)) do
                 local usedDifficultyId = self:IsLegacyRaidDifficulty(difficultyId) and -1 or difficultyId
                 if not self:IsEncounterDefeated(mount, step.source, usedDifficultyId >= 0 and usedDifficultyId or nil) then
@@ -226,11 +275,96 @@ function Core:GetMostSuitableDifficultyIds(step)
     return bestDifficultyIds, mountsPerDifficultyId
 end
 
+--- Evaluate an open world condition string.
+--- Returns true if the condition is met (or absent), false if not.
+---@param condition string?
+---@return boolean
+function Core:EvaluateCondition(condition)
+    if not condition then return true end
+
+    if condition == "horde_only" then
+        return UnitFactionGroup("player") == "Horde"
+    end
+
+    if condition == "alliance_only" then
+        return UnitFactionGroup("player") == "Alliance"
+    end
+
+    if condition == "warfront_arathi" or condition == "warfront_darkshore" then
+        -- Warfront rares are only available when your faction controls the zone.
+        -- Check for active world quests on the warfront map as a proxy.
+        local mapID = (condition == "warfront_arathi") and 14 or 62
+        if C_QuestLog and C_QuestLog.GetQuestsOnMap then
+            local quests = C_QuestLog.GetQuestsOnMap(mapID)
+            return quests ~= nil and #quests > 0
+        end
+        return false
+    end
+
+    -- Reputation conditions: rep_<factionId>_<standing>
+    -- standing: 4=Friendly, 5=Honored, 6=Revered, 7=Exalted, 8=Renown
+    local factionId, requiredStanding = condition:match("^rep_(%d+)_(%d+)$")
+    if factionId then
+        factionId = tonumber(factionId)
+        requiredStanding = tonumber(requiredStanding)
+        local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
+        if factionData then
+            return factionData.currentStanding >= requiredStanding
+        end
+        return false
+    end
+
+    return true
+end
+
+--- Check if a step's condition is currently met.
+---@param step Step
+---@return boolean
+function Core:IsStepConditionMet(step)
+    local condition = self:GetStepCondition(step)
+    if not condition then return true end
+    return self:EvaluateCondition(condition)
+end
+
+--- Return the condition string for a step, or nil.
+---@param step Step
+---@return string?
+function Core:GetStepCondition(step)
+    local t = step.source.type
+    if t ~= MRP.FilterSourceType.OpenWorld and t ~= MRP.FilterSourceType.Quest and t ~= MRP.FilterSourceType.Treasure and t ~= MRP.FilterSourceType.Vendor then return nil end
+    local entry = MRP.Data.openWorld[step.source.name]
+    if not entry then return nil end
+    return entry.condition
+end
+
+--- Return a human-readable message for an unmet condition.
+---@param condition string
+---@return string
+function Core:GetConditionMessage(condition)
+    -- Reputation conditions: rep_<factionId>_<standing>
+    local factionId, requiredStanding = condition:match("^rep_(%d+)_(%d+)$")
+    if factionId then
+        factionId = tonumber(factionId)
+        local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
+        local factionName = factionData and factionData.name or tostring(factionId)
+        local standingNames = { [4] = FACTION_STANDING_LABEL4, [5] = FACTION_STANDING_LABEL5, [6] = FACTION_STANDING_LABEL6, [7] = FACTION_STANDING_LABEL7, [8] = FACTION_STANDING_LABEL8 }
+        local standingName = standingNames[tonumber(requiredStanding)] or requiredStanding
+        return format(L["Requires %s reputation with %s."], standingName, factionName)
+    end
+
+    return L["condition_" .. condition]
+end
+
 ---@param step Step
 ---@return boolean shouldSkip
 function Core:ShouldSkipStep(step)
     if not step then
         return false
+    end
+
+    -- Skip steps whose condition is not met (e.g. warfront not active)
+    if not self:IsStepConditionMet(step) then
+        return true
     end
 
     local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIds(step)
@@ -287,9 +421,9 @@ function Core:GatherTrashItData()
                 local item = Item:CreateFromBagAndSlot(bag, slot)
                 if item then
                     local inventoryType = item:GetInventoryType()
-                    if inventoryType >= Enum.InventoryType.IndexHeadType and inventoryType <= Enum.InventoryType.Index2HweaponType then
+                    if inventoryType and inventoryType >= Enum.InventoryType.IndexHeadType and inventoryType <= Enum.InventoryType.Index2HweaponType then
                         local itemQuality = item:GetItemQuality()
-                        if itemQuality >= Enum.ItemQuality.Rare and itemQuality <= Enum.ItemQuality.Epic then
+                        if itemQuality and itemQuality >= Enum.ItemQuality.Rare and itemQuality <= Enum.ItemQuality.Epic then
                             local expansionID = select(15, C_Item.GetItemInfo(itemId))
                             if expansionID and expansionID < expansionLevel then
                                 table.insert(itemsToSell, { bag = bag, slot = slot, item = item })
@@ -375,6 +509,110 @@ function Core:CheckForPathfindingWarnings(event)
     MRP.UI:ShowPathfindingWarnings()
 end
 
+local setupWarningsShown = false
+
+local setupAddonNamePlaceholders = {
+    { "MountRoutePlannerData",    "__MRP_SETUP_MOUNT_ROUTE_PLANNER_DATA__" },
+    { "Mount Route Planner Data", "__MRP_SETUP_MOUNT_ROUTE_PLANNER_DATA__" },
+    { "FarstriderLibData",        "__MRP_SETUP_FARSTRIDERLIB_DATA__" },
+    { "FarstriderLib Data",       "__MRP_SETUP_FARSTRIDERLIB_DATA__" },
+    { "FarstriderLib",            "__MRP_SETUP_FARSTRIDERLIB__" },
+}
+
+local setupAddonNameColors = {
+    ["__MRP_SETUP_MOUNT_ROUTE_PLANNER_DATA__"] = "|cff6fd3ffMount Route Planner Data|r",
+    ["__MRP_SETUP_FARSTRIDERLIB_DATA__"] = "|cff8bffb5FarstriderLib Data|r",
+    ["__MRP_SETUP_FARSTRIDERLIB__"] = "|cffffc56fFarstriderLib|r",
+}
+
+---@param text string?
+---@return string?
+function Core:HighlightSetupAddonNames(text)
+    if not text then
+        return nil
+    end
+
+    for _, replacement in ipairs(setupAddonNamePlaceholders) do
+        text = text:gsub(replacement[1], replacement[2])
+    end
+
+    if text then
+        for placeholder, coloredName in pairs(setupAddonNameColors) do
+            text = text:gsub(placeholder, coloredName)
+        end
+    end
+
+    return text
+end
+
+---@return boolean
+function Core:HasMissingStepData()
+    return not MRPData or type(MRPData.Steps) ~= "table" or #MRP.Steps == 0
+end
+
+---@return boolean
+function Core:HasPathfindingData()
+    return FarstriderLibData ~= nil
+        and type(FarstriderLibData.Waypoints) == "table"
+        and next(FarstriderLibData.Waypoints) ~= nil
+end
+
+---@return string?
+function Core:GetPathfindingUnavailableText()
+    if not FarstriderLib or not FarstriderLib.FindTrailTo then
+        return self:HighlightSetupAddonNames(L["Pathfinding unavailable.\nInstall FarstriderLib."])
+    end
+
+    if not self:HasPathfindingData() then
+        return self:HighlightSetupAddonNames(L["Pathfinding data missing.\nInstall FarstriderLibData."])
+    end
+
+    return nil
+end
+
+---@return { key: string, message: string }[]
+function Core:GetSetupIssues()
+    local issues = {}
+
+    if self:HasMissingStepData() then
+        table.insert(issues, {
+            key = "steps",
+            message = self:HighlightSetupAddonNames(L["No route data loaded. Install Mount Route Planner Data or another data source."]),
+        })
+    end
+
+    local pathfindingMessage = self:GetPathfindingUnavailableText()
+    if pathfindingMessage then
+        table.insert(issues, {
+            key = "pathfinding",
+            message = pathfindingMessage:gsub("\n", " "),
+        })
+    end
+
+    return issues
+end
+
+---@return string
+function Core:GetNoStepsMessage()
+    if self:HasMissingStepData() then
+        return self:HighlightSetupAddonNames(L["No route data loaded.\nInstall Mount Route Planner Data or another data source."])
+    end
+
+    return L["No steps available.\nAdjust your filter."]
+end
+
+function Core:PrintSetupWarnings()
+    if setupWarningsShown then
+        return
+    end
+
+    setupWarningsShown = true
+
+    for _, issue in ipairs(self:GetSetupIssues()) do
+        print("|cffffcc00[MRP]|r " .. issue.message)
+    end
+end
+
 ---@param event string
 function Core:CheckForDisplayUpdate(event)
     if not (event == "MERCHANT_CLOSED" or event == "NEW_MOUNT_ADDED" or event == "UPDATE_INSTANCE_INFO" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "ZONE_CHANGED_NEW_AREA") then
@@ -405,7 +643,7 @@ function Core:CheckDifficultyWarning(event)
     end
 
     local step = MRP.Filter:GetCurrentStep()
-    if not step or step.source.type == MRP.FilterSourceType.WorldBoss then
+    if not step or step.source.type == MRP.FilterSourceType.WorldBoss or step.source.type == MRP.FilterSourceType.OpenWorld or step.source.type == MRP.FilterSourceType.Quest or step.source.type == MRP.FilterSourceType.Treasure or step.source.type == MRP.FilterSourceType.Vendor then
         MRP.UI:HideDifficultyWarning()
         return
     end
@@ -516,6 +754,58 @@ function Core:InitializeSettings()
         MRP_Settings.ignoreLFRDifficulty = false
     end
 
+    if MRP_Settings.showRareAlert == nil then
+        MRP_Settings.showRareAlert = true
+    end
+
+    if MRP_Settings.alertPopupPoint == nil then
+        MRP_Settings.alertPopupPoint = "TOP"
+    end
+
+    if MRP_Settings.alertPopupRelativePoint == nil then
+        MRP_Settings.alertPopupRelativePoint = "TOP"
+    end
+
+    if MRP_Settings.alertPopupOffsetX == nil then
+        MRP_Settings.alertPopupOffsetX = 0
+    end
+
+    if MRP_Settings.alertPopupOffsetY == nil then
+        MRP_Settings.alertPopupOffsetY = -80
+    end
+
+    if MRP_Settings.showRouteOnMap == nil then
+        MRP_Settings.showRouteOnMap = true
+    end
+
+    if MRP_Settings.showRouteConnectionsOnMap == nil then
+        MRP_Settings.showRouteConnectionsOnMap = false
+    end
+
+    if MRP_Settings.showPathfindingLinesOnMap == nil then
+        MRP_Settings.showPathfindingLinesOnMap = true
+    end
+
+    if MRP_Settings.showOpenWorldOverlayOnMap == nil then
+        MRP_Settings.showOpenWorldOverlayOnMap = true
+    end
+
+    if MRP_Settings.maxStepsAhead == nil then
+        MRP_Settings.maxStepsAhead = 5
+    end
+
+    if MRP_Settings.unlimitedStepsAhead == nil then
+        MRP_Settings.unlimitedStepsAhead = false
+    end
+
+    if MRP_Settings.maxStepsBehind == nil then
+        MRP_Settings.maxStepsBehind = 1
+    end
+
+    if MRP_Settings.unlimitedStepsBehind == nil then
+        MRP_Settings.unlimitedStepsBehind = false
+    end
+
     if not MRP_CharacterSettings then
         MRP_CharacterSettings = {}
     end
@@ -536,7 +826,8 @@ function Core:InitializeSettings()
         MRP_CharacterSettings.filter = {
             expansions = {},
             sourceTypes = {},
-            collectedStates = {}
+            collectedStates = {},
+            factions = {}
         }
     end
 
@@ -560,6 +851,20 @@ function Core:InitializeSettings()
             ---@diagnostic disable-next-line: need-check-nil
             MRP_CharacterSettings.filter.collectedStates[collectedState] = not collectedState
         end
+    end
+
+    -- Faction filter: auto-detect on first load (old saves won't have this)
+    if MRP_CharacterSettings.filter.factions == nil then
+        local playerFaction = UnitFactionGroup("player")
+        MRP_CharacterSettings.filter.factions = {
+            [MRP.FilterFaction.Neutral] = true,
+            [MRP.FilterFaction.Alliance] = (playerFaction == "Alliance"),
+            [MRP.FilterFaction.Horde] = (playerFaction == "Horde"),
+        }
+    end
+    -- Backfill Neutral for saves that have factions but predate the Neutral option
+    if MRP_CharacterSettings.filter.factions[MRP.FilterFaction.Neutral] == nil then
+        MRP_CharacterSettings.filter.factions[MRP.FilterFaction.Neutral] = true
     end
 
     if MRP_CharacterSettings.ignoredHelpfulItems == nil then
@@ -588,16 +893,54 @@ watcher:SetScript("OnEvent", function(_, event)
     Core:CheckForTrashItInfo(event) -- MRP_REMOVE_LINE
     Core:CheckDifficultyWarning(event)
     Core:CheckCurrentStepComplete(false)
+
+    if (event == "ZONE_CHANGED" or event == "ZONE_CHANGED_NEW_AREA") and MRP.Alert then
+        MRP.Alert:OnZoneChanged()
+    end
 end)
 
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_LOGIN")
-f:SetScript("OnEvent", function()
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+    f:RegisterEvent("PLAYER_HOUSE_LIST_UPDATED")
+end
+f:SetScript("OnEvent", function(_, event, ...)
+    if event == "PLAYER_HOUSE_LIST_UPDATED" then
+        local houses = ...
+        if FarstriderLibData and houses then
+            for _, house in ipairs(houses) do
+                FarstriderLibData.HousingData = house
+                break
+            end
+        end
+        return
+    end
+
     Core:InitializeSettings()
     Core:FilterTimewalkingSteps()
     MRP.Filter:Apply(true)
+
+    if not MRP.Route:IsRouteValid() then
+        MRP.Route:Calculate()
+    end
+
     Core:CheckCurrentStepComplete(false)
     MRP.Options:InitializeIgnoredHelpfulItems()
+    Core:PrintSetupWarnings()
+
+    if MRP.Alert and MRP_Settings.showRareAlert then
+        MRP.Alert:Enable()
+    end
+
+    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+        if C_Housing then
+            C_Housing.GetPlayerOwnedHouses()
+        end
+    end
+
+    if MRP.Changelog then
+        MRP.Changelog:CheckShowOnLogin()
+    end
 
     if DevTool then                                                     -- MRP_REMOVE_LINE
         DevTool:AddData(MRP, "MRP")                                     -- MRP_REMOVE_LINE
@@ -628,8 +971,15 @@ function Core:HandleSlashCommand(msg)
     elseif cmd == "tomtom" and (arg1 == "on" or arg1 == "off") then
         MRP_Settings.useTomTom = (arg1 == "on")
         print(string.format(L["|cff00ff00[MRP]|r TomTom usage is now: %s"], (MRP_Settings.useTomTom and L["|cff00ff00ENABLED|r"] or L["|cffff0000DISABLED|r"])))
+    elseif cmd == "changelog" then
+        if MRP.Changelog then
+            MRP.Changelog:Show()
+        end
     elseif cmd == "trashit" then -- MRP_REMOVE_LINE
         Core:TrashIt()           -- MRP_REMOVE_LINE
+    elseif cmd == "route" then
+        MRP.Route:Calculate()
+        print(L["|cff00ff00[MRP]|r Route recalculated."])
     elseif cmd == "updatedisplaydelayed" then
         C_Timer.After(tonumber(arg1) or 0.25, function() MRP.UI:UpdateDisplay() end)
     else
@@ -638,6 +988,8 @@ function Core:HandleSlashCommand(msg)
         print(L[" - /mrp reset → Clears current progress and steps"])
         print(L[" - /mrp settings → Open addon settings"])
         print(L[" - /mrp tomtom on|off → Enable or disable TomTom integration"])
+        print(L[" - /mrp changelog → Open the latest changelog popup"])
+        print(L[" - /mrp route → Recalculate the optimized route"])
         print(L[" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"])
     end
 end

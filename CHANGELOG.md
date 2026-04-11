@@ -1,5 +1,31 @@
 # Mount Route Planner
 
+## [v2.0.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.0.0) (2026-04-10)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.0.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added an in-game changelog popup that shows after updates and can be reopened with `/mrp changelog`
+- Added brand-new support for Vanilla, TBC, Wrath, and Cataclysm clients; before 2.0.0, Mount Route Planner only supported Mists and Retail
+- Added a world map route overview with numbered pins, clustering, arrows, and current-step guidance
+- Added nearby source alerts for world bosses, open-world rares, quests, treasures, and vendors, including a target button and scan macro support
+- Added route recalculation plus persisted baseline route ordering
+- Added faction-aware filters, condition-gated step handling, quest-chain progress tracking, and housing teleport or return actions where supported
+
+### Changes
+- Switched mount, step, and travel data loading to generated `MRPData` and `FarstriderLib` exports instead of the legacy hardcoded tables
+- Expanded the step model to cover open-world mechanics, vendor costs, quest chains, targetable NPC names, and multi-flavor compatibility data
+- Reworked the shared data and packaging flow so all supported flavors ship from one common source of truth
+
+### Improvements
+- Improved Classic and Anniversary compatibility with safer mount collection fallbacks, lazy route validation, and guards around newer APIs
+- Improved tooltips and progress states for vendors, treasures, quests, helpful items, and difficulty guidance
+- Improved world map rendering by using native map pin pooling and dedicated route art assets
+
+### Bug Fixes
+- Fixed Classic clients returning nil mount collection data and hiding valid route steps
+- Fixed waypoint and travel export gaps across non-Standard flavors
+- Fixed stale saved route orders after data updates by recalculating invalid baselines automatically
+
 ## [v1.2.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v1.2.1) (2026-01-24)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v1.2.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

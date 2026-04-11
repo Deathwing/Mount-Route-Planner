@@ -4,7 +4,7 @@
 ---@class FilterSettings
 ---@field expansions { [FilterExpansion] : boolean } The expansion levels that are shown.
 ---@field sourceTypes { [FilterSourceType] : boolean } The sources types that are shown.
----@field collectedStates { [FilterCollectedState] : boolean } The  collected states that are shown.
+---@field collectedStates { [FilterCollectedState] : boolean } The collected states that are shown.
 
 local Filter = {
     ---@type Step[]
@@ -15,7 +15,7 @@ MRP.Filter = Filter
 
 ---@return Step? currentStep
 function Filter:GetCurrentStep()
-    if MRP_CharacterSettings.currentStep < 1 or MRP_CharacterSettings.currentStep > #MRP.Steps then
+    if MRP_CharacterSettings.currentStep < 1 or MRP_CharacterSettings.currentStep > #self.filteredSteps then
         return nil
     end
 
@@ -70,21 +70,54 @@ function Filter:SetCollectedState(collectedState, value)
     end
 end
 
+function Filter:SetFaction(faction, value)
+    if value then
+        if not MRP_CharacterSettings.filter.factions[faction] then
+            MRP_CharacterSettings.filter.factions[faction] = true
+            self:Apply()
+        end
+    else
+        if MRP_CharacterSettings.filter.factions[faction] then
+            MRP_CharacterSettings.filter.factions[faction] = false
+            self:Apply()
+        end
+    end
+end
+
+function Filter:GetStepFaction(step)
+    local entry = MRP.Data.openWorld[step.source.name]
+    local condition = entry and entry.condition or nil
+    if condition == "horde_only" then
+        return MRP.FilterFaction.Horde
+    elseif condition == "alliance_only" then
+        return MRP.FilterFaction.Alliance
+    else
+        return MRP.FilterFaction.Neutral
+    end
+end
+
 function Filter:UpdateFilteredSteps()
     self.filteredSteps = {}
 
     for _, step in ipairs(MRP.Steps) do
         if step.expansion and MRP_CharacterSettings.filter.expansions[step.expansion] then
             if step.source.type and MRP_CharacterSettings.filter.sourceTypes[step.source.type] then
-                for _, mount in ipairs(step.mounts) do
-                    local collected = select(11, C_MountJournal.GetMountInfoByID(mount.id))
-                    if MRP_CharacterSettings.filter.collectedStates[collected] then
-                        table.insert(self.filteredSteps, step)
-                        break
+                if MRP_CharacterSettings.filter.factions[self:GetStepFaction(step)] then
+                    for _, mount in ipairs(step.mounts) do
+                        local _, _, collected = MRP.Util.GetMountInfoSafe(mount)
+                        if MRP_CharacterSettings.filter.collectedStates[collected] then
+                            table.insert(self.filteredSteps, step)
+                            break
+                        end
                     end
                 end
             end
         end
+    end
+
+    -- Apply saved baseline route order if available
+    if MRP.Route then
+        MRP.Route:ApplyToFilteredSteps()
     end
 end
 

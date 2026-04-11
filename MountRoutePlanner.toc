@@ -1,17 +1,25 @@
-## Interface: 120000, 110107, 110200
+## Interface: 120001, 50503, 40402, 30405, 20505, 11508
 ## Title: Mount Route Planner (MRP)
 ## Title-zhCN: 坐骑路线规划助手 (MRP)
 ## Title-zhTW: 坐騎路線規劃助手 (MRP)
 ## Author: Deathwing
-## Version: v1.2.0
+## Version: v2.0.0
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
 ## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
 ## Notes: Plan and track your mount farming route with automatic collection scans, smart skipping, filters, waypoints, and travel-based routing.
 ## Notes-zhCN: 规划和跟踪您的坐骑收集路线，支持自动扫描、智能跳过、过滤器、导航点和基于旅行的路线规划。
 ## Notes-zhTW: 規劃和追蹤您的坐騎收集路線，支援自動掃描、智能跳過、過濾器、導航點和基於旅行的路線規劃。
+# MRP_UNCOMMENT_NEXT_LINE
+# ## OptionalDeps: FarstriderLib, MountRoutePlannerData
 ## SavedVariables: MRP_Settings
 ## SavedVariablesPerCharacter: MRP_CharacterSettings
+# MRP_REMOVE_NEXT_LINE
+Libs\FarstriderLib\Data\FarstriderLibData_[Game].xml
+# MRP_REMOVE_NEXT_LINE
+Libs\FarstriderLib\FarstriderLib.xml
+# MRP_REMOVE_NEXT_LINE
+Data\MRPData_[Game].xml
 
 ## Category-enUS: Collections
 ## Category-enGB: Collections
@@ -32,6 +40,8 @@
 # MRP_REMOVE_NEXT_LINE
 MRP.d.lua
 
+embeds.xml
+
 Locale\MRP_Locale.enUS.lua
 Locale\MRP_Locale.deDE.lua
 Locale\MRP_Locale.ruRU.lua
@@ -44,41 +54,17 @@ MRP_Settings.lua
 
 MRP_Util.lua
 
-Data_Retail\MRP_Areas.lua
-Data_Retail\MRP_Areas_enUS.lua
-Data_Retail\MRP_Areas_deDE.lua
-Data_Retail\MRP_Areas_frFR.lua
-Data_Retail\MRP_Areas_esES.lua
-Data_Retail\MRP_Areas_esMX.lua
-Data_Retail\MRP_Areas_itIT.lua
-Data_Retail\MRP_Areas_ptBR.lua
-Data_Retail\MRP_Areas_ruRU.lua
-Data_Retail\MRP_Areas_koKR.lua
-Data_Retail\MRP_Areas_zhCN.lua
-Data_Retail\MRP_Areas_zhTW.lua
-Data_Retail\MRP_Waypoints.lua
-Data_Retail\MRP_Waypoints_enUS.lua
-Data_Retail\MRP_Waypoints_deDE.lua
-Data_Retail\MRP_Waypoints_frFR.lua
-Data_Retail\MRP_Waypoints_esES.lua
-Data_Retail\MRP_Waypoints_esMX.lua
-Data_Retail\MRP_Waypoints_itIT.lua
-Data_Retail\MRP_Waypoints_ptBR.lua
-Data_Retail\MRP_Waypoints_ruRU.lua
-Data_Retail\MRP_Waypoints_koKR.lua
-Data_Retail\MRP_Waypoints_zhCN.lua
-Data_Retail\MRP_Waypoints_zhTW.lua
-Data_Retail\MRP_Steps.lua
-
+MRP_Steps.lua
 MRP_Data.lua
 
-# MRP_UNCOMMENT_NEXT_LINE
-# Navigation\embed.xml
-
 MRP_Filter.lua
+MRP_Route.lua
 
 MRP_Options.lua
+MRP_Alert.lua
+MRP_Map.lua
 MRP_UI.lua
 MRP_Minimap.lua
+MRP_Changelog.lua
 
 MRP_Core.lua

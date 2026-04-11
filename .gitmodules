@@ -1,0 +1,3 @@
+[submodule "Libs/FarstriderLib"]
+	path = Libs/FarstriderLib
+	url = https://github.com/Deathwing/FarstriderLib.git

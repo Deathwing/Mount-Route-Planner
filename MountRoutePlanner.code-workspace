@@ -2,9 +2,6 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"path": "../WaypointTest"
 		}
 	],
 	"settings": {
@@ -49,7 +46,66 @@
 			"DevTool",
 			"WOW_PROJECT_MISTS_CLASSIC",
 			"TomTom",
-			"WayPointTestMapOverlay"
+			"FarstriderLibMapOverlay",
+			"tContains",
+			"Item",
+			"WOW_PROJECT_ID",
+			"WOW_PROJECT_MAINLINE",
+			"Minimap",
+			"GameTooltip",
+			"UIParent",
+			"CreateVector2D",
+			"Spell",
+			"coroutine",
+			"GARRISON_LOCATION_TOOLTIP",
+			"EXPANSION_NAME0",
+			"EXPANSION_NAME1",
+			"EXPANSION_NAME2",
+			"EXPANSION_NAME3",
+			"EXPANSION_NAME4",
+			"EXPANSION_NAME5",
+			"EXPANSION_NAME6",
+			"EXPANSION_NAME7",
+			"EXPANSION_NAME8",
+			"EXPANSION_NAME9",
+			"EXPANSION_NAME10",
+			"SOUNDKIT",
+			"BASE_MOVEMENT_SPEED",
+			"ChatFrame1EditBox",
+			"ReloadUI",
+			"FlightMapFrame",
+			"GameTooltipTextLeft1",
+			"GameTooltipTextRight1",
+			"MapCanvasDataProviderMixin",
+			"TaxiFrame",
+			"RegisterAttributeDriver",
+			"UnregisterAttributeDriver",
+			"NUM_ACTIONBAR_BUTTONS",
+			"CreateFramePool",
+			"PetBattleFrame",
+			"MouseIsOver",
+			"MapUtil",
+			"FACTION_STANDING_LABEL4",
+			"FACTION_STANDING_LABEL5",
+			"FACTION_STANDING_LABEL6",
+			"FACTION_STANDING_LABEL7",
+			"FACTION_STANDING_LABEL8",
+			"UIDropDownMenu_AddSeparator",
+			"MapCanvasPinMixin",
+			"MapPinHighlight_CheckHighlightPin",
+			"MapPinHighlightType",
+			"BountyFrameType",
+			"RaidNotice_AddMessage",
+			"RaidWarningFrame",
+			"ChatTypeInfo",
+			"CreateUnsecuredRegionPoolInstance",
+			"MacroFrame",
+			"UNKNOWNOBJECT",
+			"WorldFrame",
+			"Lerp",
+			"GAMEOPTIONS_MENU",
+			"UISpecialFrames",
+			"GetAddOnMetadata"
 		],
 		"Lua.diagnostics.neededFileStatus": {
 			"undefined-global": "Any"
@@ -63,8 +119,7 @@
 		],
 		"Lua.workspace.library": [
 			"../MountRoutePlanner",
-			"../WaypointTest",
-			"~/.vscode-insiders/extensions/ketho.wow-api-0.22.3/Annotations/Core"
+			"~\\.vscode-insiders\\extensions\\ketho.wow-api-0.22.3\\Annotations\\Core"
 		],
 		"Lua.workspace.ignoreDir": [
 			"playground",
