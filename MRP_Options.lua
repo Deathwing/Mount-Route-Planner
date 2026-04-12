@@ -95,7 +95,7 @@ end)
 
 ignoreLFRDifficultyToggle:SetScript("OnClick", function(self)
     MRP_Settings.ignoreLFRDifficulty = self:GetChecked()
-    for _, step in ipairs(MRP.Steps) do
+    for _, step in ipairs(MRP.Data.STEPS) do
         for _, mount in ipairs(step.mounts) do
             mount.source.relevantDifficultyIds = nil
         end
@@ -175,28 +175,39 @@ recalculateRouteBtn:SetScript("OnClick", function()
     print(L["|cff00ff00[MRP]|r Route recalculated."])
 end)
 
-local ignoredHelpfulItemsInitialized = false
+local cachedHelpfulItems = {}
+local ignoredHelpfulItemScrollFrame = nil
 local ignoredHelpfulItemToggles = {}
 
 function Options:InitializeIgnoredHelpfulItems()
-    if ignoredHelpfulItemsInitialized then
+    local helpfulItems = MRP.Farstrider.DATA.GetHelpfulItems()
+
+    if helpfulItems ~= cachedHelpfulItems then
+        cachedHelpfulItems = helpfulItems
+
+        if ignoredHelpfulItemScrollFrame then
+            ignoredHelpfulItemScrollFrame:Hide()
+            ignoredHelpfulItemScrollFrame:SetParent(nil)
+            ignoredHelpfulItemScrollFrame = nil
+        end
+
+        ignoredHelpfulItemToggles = {}
+    end
+
+    if #helpfulItems == 0 then
         return
     end
 
-    if not FarstriderLibData or not FarstriderLibData.Connections or not FarstriderLibData.Connections.helpfulItems then
-        return
-    end
+    ignoredHelpfulItemScrollFrame = CreateFrame("ScrollFrame", nil, helpfulItemsFrame, "UIPanelScrollFrameTemplate")
+    ignoredHelpfulItemScrollFrame:SetPoint("TOPLEFT", helpfulItemsCategorySubtitle, "BOTTOMLEFT", 4, -8)
+    ignoredHelpfulItemScrollFrame:SetSize(420, 460)
+    ignoredHelpfulItemScrollFrame.scrollBarHideable = true
+    ignoredHelpfulItemScrollFrame.ScrollBar:Hide();
 
-    local scrollFrame = CreateFrame("ScrollFrame", nil, helpfulItemsFrame, "UIPanelScrollFrameTemplate")
-    scrollFrame:SetPoint("TOPLEFT", helpfulItemsCategorySubtitle, "BOTTOMLEFT", 4, -8)
-    scrollFrame:SetSize(420, 460)
-    scrollFrame.scrollBarHideable = true
-    scrollFrame.ScrollBar:Hide();
-
-    local content = CreateFrame("Frame", nil, scrollFrame)
+    local content = CreateFrame("Frame", nil, ignoredHelpfulItemScrollFrame)
     content:SetSize(400, 1)
 
-    scrollFrame:SetScrollChild(content)
+    ignoredHelpfulItemScrollFrame:SetScrollChild(content)
 
     local itemCount = 1
     local lastFrame
@@ -205,7 +216,7 @@ function Options:InitializeIgnoredHelpfulItems()
     local ICON_SIZE = 28
     local ITEM_HEIGHT = 32
 
-    for _, itemId in ipairs(FarstriderLibData.Connections.helpfulItems) do
+    for _, itemId in ipairs(helpfulItems) do
         if not C_ToyBox.GetToyInfo(itemId) and C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
             local item = MRP.Util.GetItem(itemId)
             local itemName = item:GetItemName()
@@ -272,8 +283,6 @@ function Options:InitializeIgnoredHelpfulItems()
     else
         content:SetHeight(ITEM_HEIGHT)
     end
-
-    ignoredHelpfulItemsInitialized = true
 end
 
 -- World Map subcategory
@@ -367,7 +376,7 @@ local maxStepsAheadLabel = worldMapFrame:CreateFontString(nil, "OVERLAY", "GameF
 maxStepsAheadLabel:SetPoint("TOPLEFT", showOpenWorldOverlayOnMapToggle, "BOTTOMLEFT", 4, -16)
 maxStepsAheadLabel:SetText(L["Max Steps Ahead"])
 
-local maxStepsAheadSlider = CreateFrame("Slider", "MRP_MaxStepsAheadSlider", worldMapFrame, "OptionsSliderTemplate")
+local maxStepsAheadSlider = CreateFrame("Slider", nil, worldMapFrame, "OptionsSliderTemplate")
 maxStepsAheadSlider:SetPoint("TOPLEFT", maxStepsAheadLabel, "BOTTOMLEFT", 0, -6)
 maxStepsAheadSlider:SetMinMaxValues(0, 50)
 maxStepsAheadSlider:SetValueStep(1)
@@ -435,7 +444,7 @@ local maxStepsBehindLabel = worldMapFrame:CreateFontString(nil, "OVERLAY", "Game
 maxStepsBehindLabel:SetPoint("TOPLEFT", unlimitedAheadToggle, "BOTTOMLEFT", 4, -16)
 maxStepsBehindLabel:SetText(L["Max Steps Behind"])
 
-local maxStepsBehindSlider = CreateFrame("Slider", "MRP_MaxStepsBehindSlider", worldMapFrame, "OptionsSliderTemplate")
+local maxStepsBehindSlider = CreateFrame("Slider", nil, worldMapFrame, "OptionsSliderTemplate")
 maxStepsBehindSlider:SetPoint("TOPLEFT", maxStepsBehindLabel, "BOTTOMLEFT", 0, -6)
 maxStepsBehindSlider:SetMinMaxValues(0, 50)
 maxStepsBehindSlider:SetValueStep(1)

@@ -1,5 +1,27 @@
 # Mount Route Planner
 
+## [v2.1.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.1.0) (2026-04-12)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.1.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added table-driven setup issue detection with clear, actionable warnings when required companion addons are missing or outdated
+
+### Changes
+- Introduced a stable public API (`MRP_API`) exposing DATA, FARSTRIDER, and Rebuild for external addons
+- Replaced direct global access to `MRPData`, `FarstriderLib`, and `FarstriderLibData` with proxy-based abstraction layers (`MRP.Data`, `MRP.Farstrider`) that fall back to safe defaults when dependencies are absent
+- Moved all data key names to UPPER_CASE (`DUNGEONS`, `RAIDS`, `WORLD_BOSSES`, `OPEN_WORLD`, `STEPS`) for API consistency
+- Moved player housing event handling from MRP into FarstriderLibData where it belongs
+- Relocated `GetPlayerLocation` from Util to Route and added `Util.HasData`, `Util.HasFarstrider`, `Util.HasFarstriderData` helpers
+- Removed named global frame identifiers (`MRP_Frame`, `MRP_FilterDropdown`, `MRP_MinimapButton`, sliders) in favor of anonymous frames
+
+### Improvements
+- Added `Core:Rebuild()` to allow full re-initialization after data updates
+- Added `UI:IsShown()` for cleaner visibility checks
+- Softened the unreachable destination message ("might be required" instead of "required")
+
+### Bug Fixes
+- Fixed heavy lag spikes from nearby rare alerts in crowded areas, especially with nameplates enabled
+
 ## [v2.0.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.0.0) (2026-04-10)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.0.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

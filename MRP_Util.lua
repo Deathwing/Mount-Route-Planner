@@ -30,36 +30,6 @@ function Util.ShallowCopy(t)
     return copy
 end
 
----@return Location playerLocation
-function Util.GetPlayerLocation()
-    local uiMapId = C_Map.GetBestMapForUnit("player")
-    local uiMapCoords = C_Map.GetPlayerMapPosition(C_Map.GetBestMapForUnit("player"), "player")
-
-    if not uiMapCoords then
-        local parentMapId = C_Map.GetMapInfo(uiMapId).parentMapID
-        if parentMapId then
-            uiMapId = parentMapId
-
-            local instanceId = EJ_GetInstanceForMap(uiMapId)
-            local dungeonEntrances = C_EncounterJournal.GetDungeonEntrancesForMap(parentMapId)
-
-            for _, entrance in ipairs(dungeonEntrances) do
-                if entrance.journalInstanceID == instanceId then
-                    uiMapId = parentMapId
-                    uiMapCoords = entrance.position
-                    break
-                end
-            end
-        end
-    end
-
-    if not uiMapCoords then
-        uiMapCoords = { x = 0.5, y = 0.5 }
-    end
-
-    return { mapId = uiMapId, pos = { x = uiMapCoords.x, y = uiMapCoords.y, z = 0 }, isUI = true }
-end
-
 ---@type table<number, ItemMixin>
 local itemCache = {}
 
@@ -149,4 +119,16 @@ function Util.GetMountInfoSafe(mount)
     end
 
     return name, icon, isCollected
+end
+
+function Util.HasData()
+    return MRP.Data.VERSION > 0
+end
+
+function Util.HasFarstrider()
+    return MRP.Farstrider.VERSION > 0
+end
+
+function Util.HasFarstriderData()
+    return MRP.Farstrider.DATA.VERSION > 0
 end

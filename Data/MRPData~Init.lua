@@ -1,9 +1,9 @@
 -- MRPData~Init.lua
 -- local _, MRPData = ...
 
-local VERSION = 10000
+local VERSION = 10100
 
-if _G.MRPData and (_G.MRPData.VERSION or 0) >= VERSION then return end
+if MRPData_API and (MRPData_API.VERSION or 0) >= VERSION then return end
 
 MRPData.VERSION = VERSION
 MRPData.Internal = {}

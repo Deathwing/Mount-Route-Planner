@@ -34,16 +34,16 @@ end
 ---@return table? entry
 function Route:GetStepEntry(step)
     if step.source.type == MRP.FilterSourceType.Dungeon then
-        return MRP.Data.dungeons[step.source.name]
+        return MRP.Data.DUNGEONS[step.source.name]
     elseif step.source.type == MRP.FilterSourceType.Raid then
-        return MRP.Data.raids[step.source.name]
+        return MRP.Data.RAIDS[step.source.name]
     elseif step.source.type == MRP.FilterSourceType.WorldBoss then
-        return MRP.Data.worldBosses[step.source.name]
+        return MRP.Data.WORLD_BOSSES[step.source.name]
     elseif step.source.type == MRP.FilterSourceType.OpenWorld
         or step.source.type == MRP.FilterSourceType.Quest
         or step.source.type == MRP.FilterSourceType.Treasure
         or step.source.type == MRP.FilterSourceType.Vendor then
-        return MRP.Data.openWorld[step.source.name]
+        return MRP.Data.OPEN_WORLD[step.source.name]
     end
     return nil
 end
@@ -61,7 +61,7 @@ function Route:IsRouteValid()
         routeSet[id] = true
     end
 
-    for _, step in ipairs(MRP.Steps) do
+    for _, step in ipairs(MRP.Data.STEPS) do
         if not routeSet[step.id] then
             return false
         end
@@ -92,10 +92,40 @@ function Route:ApplyToFilteredSteps()
     end)
 end
 
+---@return Location playerLocation
+function Route:GetPlayerLocation()
+    local uiMapId = C_Map.GetBestMapForUnit("player")
+    local uiMapCoords = C_Map.GetPlayerMapPosition(C_Map.GetBestMapForUnit("player"), "player")
+
+    if not uiMapCoords then
+        local parentMapId = C_Map.GetMapInfo(uiMapId).parentMapID
+        if parentMapId then
+            uiMapId = parentMapId
+
+            local instanceId = EJ_GetInstanceForMap(uiMapId)
+            local dungeonEntrances = C_EncounterJournal.GetDungeonEntrancesForMap(parentMapId)
+
+            for _, entrance in ipairs(dungeonEntrances) do
+                if entrance.journalInstanceID == instanceId then
+                    uiMapId = parentMapId
+                    uiMapCoords = entrance.position
+                    break
+                end
+            end
+        end
+    end
+
+    if not uiMapCoords then
+        uiMapCoords = { x = 0.5, y = 0.5 }
+    end
+
+    return { mapId = uiMapId, pos = { x = uiMapCoords.x, y = uiMapCoords.y, z = 0 }, isUI = true }
+end
+
 --- Calculate optimized baseline route using nearest-neighbor heuristic grouped by continent.
 --- Operates on ALL steps (MRP.Steps) to create an ordering independent of filters.
 function Route:Calculate()
-    local steps = MRP.Steps
+    local steps = MRP.Data.STEPS
     if #steps == 0 then
         MRP_CharacterSettings.routeOrder = nil
         return
@@ -132,7 +162,7 @@ function Route:Calculate()
     end
 
     -- Determine player's current continent and world position
-    local playerLoc = MRP.Util.GetPlayerLocation()
+    local playerLoc = self:GetPlayerLocation()
     local playerContinent, playerWorldX, playerWorldY
     if playerLoc and playerLoc.mapId then
         playerContinent = self:GetContinentForMap(playerLoc.mapId)

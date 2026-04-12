@@ -85,7 +85,7 @@ function Filter:SetFaction(faction, value)
 end
 
 function Filter:GetStepFaction(step)
-    local entry = MRP.Data.openWorld[step.source.name]
+    local entry = MRP.Data.OPEN_WORLD[step.source.name]
     local condition = entry and entry.condition or nil
     if condition == "horde_only" then
         return MRP.FilterFaction.Horde
@@ -99,7 +99,7 @@ end
 function Filter:UpdateFilteredSteps()
     self.filteredSteps = {}
 
-    for _, step in ipairs(MRP.Steps) do
+    for _, step in ipairs(MRP.Data.STEPS) do
         if step.expansion and MRP_CharacterSettings.filter.expansions[step.expansion] then
             if step.source.type and MRP_CharacterSettings.filter.sourceTypes[step.source.type] then
                 if MRP_CharacterSettings.filter.factions[self:GetStepFaction(step)] then

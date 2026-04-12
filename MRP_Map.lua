@@ -22,16 +22,37 @@ local routePins = {}
 local routeLines = {}
 local routeArrows = {}
 
--- High-strata overlay frame so pins/lines render above the fog of war
+local MAP_OVERLAY_FRAME_STRATA = "HIGH"
+local MAP_OVERLAY_LINE_LEVEL_OFFSET = 10
+local MAP_OVERLAY_ARROW_LEVEL_OFFSET = 20
+local MAP_OVERLAY_ARROW_CHILD_LEVEL_OFFSET = 1
+local ROUTE_PIN_FRAME_LEVEL_OFFSET = 30
+
+-- High-strata overlay frame so pins/lines render above the fog of war.
+-- Pins use a higher frame level so they stay in front of connector art.
 local overlayLineFrame = nil
 local overlayArrowFrame = nil
+
+local function SetOverlayFrameRenderOrder(frame, canvas, levelOffset)
+    frame:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
+    frame:SetFrameLevel((canvas:GetFrameLevel() or 0) + levelOffset)
+end
+
+local function GetRoutePinBaseFrameLevel()
+    if not WorldMapFrame or not WorldMapFrame.GetCanvas then
+        return ROUTE_PIN_FRAME_LEVEL_OFFSET
+    end
+
+    local canvas = WorldMapFrame:GetCanvas()
+    return ((canvas and canvas:GetFrameLevel()) or 0) + ROUTE_PIN_FRAME_LEVEL_OFFSET
+end
+
 local function GetOverlayLineFrame(canvas)
     if overlayLineFrame and overlayLineFrame:GetParent() == canvas then
         return overlayLineFrame
     end
     overlayLineFrame = CreateFrame("Frame", nil, canvas)
-    overlayLineFrame:SetFrameStrata("HIGH")
-    overlayLineFrame:SetFrameLevel(canvas:GetFrameLevel() + 10)
+    SetOverlayFrameRenderOrder(overlayLineFrame, canvas, MAP_OVERLAY_LINE_LEVEL_OFFSET)
     overlayLineFrame:SetAllPoints(canvas)
     return overlayLineFrame
 end
@@ -41,8 +62,7 @@ local function GetOverlayArrowFrame(canvas)
         return overlayArrowFrame
     end
     overlayArrowFrame = CreateFrame("Frame", nil, canvas)
-    overlayArrowFrame:SetFrameStrata("HIGH")
-    overlayArrowFrame:SetFrameLevel(canvas:GetFrameLevel() + 20)
+    SetOverlayFrameRenderOrder(overlayArrowFrame, canvas, MAP_OVERLAY_ARROW_LEVEL_OFFSET)
     overlayArrowFrame:SetAllPoints(canvas)
     return overlayArrowFrame
 end
@@ -324,7 +344,9 @@ local function ConfigureRoutePinLayout(pin, pinType)
     pin.label:ClearAllPoints()
     pin:UseFrameLevelType(ROUTE_PIN_FRAME_LEVEL_TYPE)
     ApplyRoutePinScalingLimits(pin)
-    pin:SetFrameLevel((pin:GetFrameLevel() or 0) + (pinType == RoutePinType.CurrentPath and CURRENT_PATH_PIN_FRAME_LEVEL_BOOST or 0))
+    pin:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
+    pin:SetFrameLevel(math.max(pin:GetFrameLevel() or 0, GetRoutePinBaseFrameLevel())
+        + (pinType == RoutePinType.CurrentPath and CURRENT_PATH_PIN_FRAME_LEVEL_BOOST or 0))
     pin.highlightGroup = pinType == RoutePinType.OpenWorld and "openWorldOverlay" or nil
     pin.alwaysGlow = pinType == RoutePinType.CurrentStep or pinType == RoutePinType.CurrentPath
     SetRoutePinEffectColors(pin, pinType)
@@ -622,6 +644,7 @@ local function ResetRoutePinVisuals(pin)
 end
 
 function RouteWorldMapPinMixin:OnLoad()
+    self:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
     self:UseFrameLevelType(ROUTE_PIN_FRAME_LEVEL_TYPE)
     ApplyRoutePinScalingLimits(self)
     InitializeRoutePinVisuals(self)
@@ -630,6 +653,7 @@ end
 
 function RouteWorldMapPinMixin:OnAcquired(x, y)
     InitializeRoutePinVisuals(self)
+    self:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
     self:UseFrameLevelType(ROUTE_PIN_FRAME_LEVEL_TYPE)
     ApplyRoutePinScalingLimits(self)
     self:SetParent(WorldMapFrame:GetCanvas())
@@ -680,6 +704,7 @@ local function EnsureRouteWorldMapPinPool(canvas)
         local pinCanvas = WorldMapFrame:GetCanvas() or canvas
         local frame = CreateFrame("Frame", nil, pinCanvas)
         frame:SetSize(1, 1)
+        frame:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
         return Mixin(frame, RouteWorldMapPinMixin)
     end
     pool.resetFunc = function(pinPool, pin)
@@ -732,7 +757,7 @@ local function GetOrCreateOverlayArrow(index, canvas)
     local arrow = mapOverlayArrows[index]
     if not arrow then
         arrow = CreateFrame("Frame", nil, overlay)
-        arrow:SetFrameLevel(overlay:GetFrameLevel() + index)
+        arrow:SetFrameLevel(overlay:GetFrameLevel() + MAP_OVERLAY_ARROW_CHILD_LEVEL_OFFSET)
         local icon = arrow:CreateTexture(nil, "OVERLAY")
         icon:SetAllPoints()
         icon:SetAtlas("Garr_FollowerPortrait_Arrow")
@@ -988,13 +1013,13 @@ end
 local function GetStepEntry(step)
     local t = step.source.type
     if t == MRP.FilterSourceType.Dungeon then
-        return MRP.Data.dungeons[step.source.name]
+        return MRP.Data.DUNGEONS[step.source.name]
     elseif t == MRP.FilterSourceType.Raid then
-        return MRP.Data.raids[step.source.name]
+        return MRP.Data.RAIDS[step.source.name]
     elseif t == MRP.FilterSourceType.WorldBoss then
-        return MRP.Data.worldBosses[step.source.name]
+        return MRP.Data.WORLD_BOSSES[step.source.name]
     elseif t == MRP.FilterSourceType.OpenWorld or t == MRP.FilterSourceType.Quest or t == MRP.FilterSourceType.Treasure or t == MRP.FilterSourceType.Vendor then
-        return MRP.Data.openWorld[step.source.name]
+        return MRP.Data.OPEN_WORLD[step.source.name]
     end
     return nil
 end
@@ -1015,7 +1040,7 @@ local function GetOrCreateRouteArrow(index, canvas)
     local arrow = routeArrows[index]
     if not arrow then
         arrow = CreateFrame("Frame", nil, overlay)
-        arrow:SetFrameLevel(overlay:GetFrameLevel() + index)
+        arrow:SetFrameLevel(overlay:GetFrameLevel() + MAP_OVERLAY_ARROW_CHILD_LEVEL_OFFSET)
         local icon = arrow:CreateTexture(nil, "OVERLAY")
         icon:SetAllPoints()
         icon:SetAtlas("Garr_FollowerPortrait_Arrow")
@@ -1115,9 +1140,6 @@ function Map:UpdateOverlay()
 
     local canvasW, canvasH = canvas:GetSize()
     if not canvasW or canvasW <= 0 then return end
-
-    ---@diagnostic disable-next-line: undefined-global
-    local mrpVisible = MRP_Frame and MRP_Frame:IsShown()
 
     local pinIdx = 0
     local lineIdx = 0
@@ -1279,7 +1301,7 @@ function Map:UpdateOverlay()
     end
 
     -- Phase 2: Draw open world overlay (routes or legacy waypoints; requires MRP frame open)
-    if mrpVisible and openWorldOverlayData and MRP_Settings.showOpenWorldOverlayOnMap ~= false then
+    if MRP.UI:IsShown() and openWorldOverlayData and MRP_Settings.showOpenWorldOverlayOnMap ~= false then
         -- Resolve creature portrait icon from first mount
         local creatureIcon
         local mounts = openWorldOverlayData.mounts

@@ -47,7 +47,7 @@ local function CreateToggleWithLabelAndTooltip(parent, text, description)
     return toggle
 end
 
-local frame = CreateFrame("Frame", "MRP_Frame", UIParent, "BackdropTemplate")
+local frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
 frame:SetSize(400, 260)
 frame:SetPoint("CENTER")
 frame:SetBackdrop({
@@ -111,7 +111,7 @@ end)
 local filterBtn = CreateTextButton(frame, L["Filter"])
 filterBtn:SetPoint("TOPLEFT", frame, "TOPLEFT", 14, -14)
 
-local dropdown = CreateFrame("Frame", "MRP_FilterDropdown", frame, "UIDropDownMenuTemplate")
+local dropdown = CreateFrame("Frame", nil, frame, "UIDropDownMenuTemplate")
 
 filterBtn:SetScript("OnClick", function()
     ToggleDropDownMenu(1, nil, dropdown, filterBtn, 0, 0)
@@ -494,7 +494,7 @@ function UI:ShowActionResetInstances()
 end
 
 function UI:ShowActionHousingTeleport()
-    local house = FarstriderLibData and FarstriderLibData.HousingData
+    local house = MRP.Farstrider.DATA.GetHousingData()
     if not house then return false end
 
     actionBtn:SetAttribute("type", "teleporthome")
@@ -505,11 +505,7 @@ function UI:ShowActionHousingTeleport()
 
     actionBtn:SetScript("PreClick", function(self)
         if self:GetAttribute("type") == "teleporthome" then
-            if not FarstriderLibData_CharacterSettings then
-                FarstriderLibData_CharacterSettings = {}
-            end
-
-            FarstriderLibData_CharacterSettings.housingExitLocation = MRP.Util.GetPlayerLocation()
+            MRP.Farstrider.DATA.UpdateHousingExitLocation()
         end
     end)
 
@@ -621,6 +617,10 @@ frame.progressBar:SetColorTexture(0.2, 0.8, 0.2, 0.8)
 frame.progressBar:SetSize(0, 20)
 frame.progressBar:SetPoint("LEFT", frame.progressBarBG, "LEFT", 0, 0)
 
+function UI:IsShown()
+    return frame:IsShown()
+end
+
 function UI:Toogle()
     if not frame:IsShown() then
         if not C_AddOns.IsAddOnLoaded("Blizzard_Collections") then
@@ -650,13 +650,11 @@ function UI:ShowPathfindingWarnings()
         return
     end
 
-    local setupIssues = MRP.Core and MRP.Core.GetSetupIssues and MRP.Core:GetSetupIssues() or {}
-    local missingItems = {}
-    local unsupportedHearthstoneBinding = false
-    local helpfulItems = FarstriderLibData and FarstriderLibData.Connections and FarstriderLibData.Connections.helpfulItems or nil
-    local areaLookup = FarstriderLibData and FarstriderLibData.AreaL or nil
+    local setupIssues = MRP.Core:GetSetupIssues()
 
-    if helpfulItems then
+    local missingItems = {}
+    local helpfulItems = MRP.Farstrider.DATA.GetHelpfulItems()
+    if #helpfulItems > 0 then
         for _, itemId in ipairs(helpfulItems) do
             if not C_ToyBox.GetToyInfo(itemId) and not MRP_CharacterSettings.ignoredHelpfulItems[itemId] and not self:CanUseItem(itemId) and C_Item.GetItemCount(itemId) == 0 then
                 if C_Item.GetItemCount(itemId, true, true, true, true) > 0 then
@@ -666,11 +664,9 @@ function UI:ShowPathfindingWarnings()
         end
     end
 
-    if areaLookup then
-        unsupportedHearthstoneBinding = not areaLookup[GetBindLocation()]
-    end
+    local isBindLocationSupported = MRP.Farstrider.DATA.IsBindLocationSupported()
 
-    if #setupIssues > 0 or #missingItems > 0 or unsupportedHearthstoneBinding then
+    if #setupIssues > 0 or #missingItems > 0 or not isBindLocationSupported then
         frame.titleButton:Show()
         frame.titleButton:SetScript("OnEnter", function(self)
             GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
@@ -700,7 +696,7 @@ function UI:ShowPathfindingWarnings()
                 GameTooltip:AddLine(L["Pathfinding will not use these items until you have them in your inventory."], 0.6, 0.6, 1)
             end
 
-            if unsupportedHearthstoneBinding then
+            if not isBindLocationSupported then
                 if #missingItems > 0 then GameTooltip:AddLine(" ") end
                 GameTooltip:AddLine(format(L["Hearthstone location '%s' not supported, please report it"], GetBindLocation()), 1, 0.6, 0.6)
             end
@@ -748,9 +744,10 @@ function UI:UpdateDisplay()
     frame.rewardIcons = {}
 
     if not step then
-        frame.stepText:SetText(MRP.Core:GetNoStepsMessage())
+        frame.stepText:SetText("")
         frame.stepInfoButton:Hide()
-        frame.stepPathfindingText:SetText("")
+        frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
+        frame.stepPathfindingText:SetText(MRP.Core:GetNoStepMessage())
         frame.noteText:SetText("")
         frame.progress:SetText(L["Step 0 of 0"])
         frame.progressBar:SetWidth(0)
@@ -823,12 +820,12 @@ function UI:UpdateDisplay()
                     or (sType == MRP.FilterSourceType.Raid and expLevel < 3)
                     or (sType == MRP.FilterSourceType.Dungeon and expLevel < 4)
                 if needsFallback and (sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid) then
-                    local inst = sType == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or MRP.Data.raids[step.source.name]
+                    local inst = sType == MRP.FilterSourceType.Dungeon and MRP.Data.DUNGEONS[step.source.name] or MRP.Data.RAIDS[step.source.name]
                     if inst then navMapId = inst.mapID end
                 end
             elseif not navMapId then
                 if sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid then
-                    local inst = sType == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or MRP.Data.raids[step.source.name]
+                    local inst = sType == MRP.FilterSourceType.Dungeon and MRP.Data.DUNGEONS[step.source.name] or MRP.Data.RAIDS[step.source.name]
                     if inst then navMapId = inst.mapID end
                 end
             end
@@ -1050,7 +1047,7 @@ function UI:UpdateDisplay()
 
     local isInPvP = MRP.Core:IsInPvp()
     local warningText = nil
-    local instance = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.raids[step.source.name] or nil
+    local instance = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.DUNGEONS[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.RAIDS[step.source.name] or nil
     local alreadyInInstance = false
     local isInstanceRelevant = false
     local isRepeatable = false
@@ -1094,7 +1091,7 @@ function UI:UpdateDisplay()
         frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff0000" .. warningText .. "|r")
     end
 
-    local entry = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.dungeons[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.raids[step.source.name] or step.source.type == MRP.FilterSourceType.WorldBoss and MRP.Data.worldBosses[step.source.name] or step.source.type == MRP.FilterSourceType.OpenWorld and MRP.Data.openWorld[step.source.name] or step.source.type == MRP.FilterSourceType.Quest and MRP.Data.openWorld[step.source.name] or step.source.type == MRP.FilterSourceType.Treasure and MRP.Data.openWorld[step.source.name] or step.source.type == MRP.FilterSourceType.Vendor and MRP.Data.openWorld[step.source.name] or nil
+    local entry = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.DUNGEONS[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.RAIDS[step.source.name] or step.source.type == MRP.FilterSourceType.WorldBoss and MRP.Data.WORLD_BOSSES[step.source.name] or step.source.type == MRP.FilterSourceType.OpenWorld and MRP.Data.OPEN_WORLD[step.source.name] or step.source.type == MRP.FilterSourceType.Quest and MRP.Data.OPEN_WORLD[step.source.name] or step.source.type == MRP.FilterSourceType.Treasure and MRP.Data.OPEN_WORLD[step.source.name] or step.source.type == MRP.FilterSourceType.Vendor and MRP.Data.OPEN_WORLD[step.source.name] or nil
 
     -- Faction / condition-gated availability warning
     if entry and entry.condition and not MRP.Core:EvaluateCondition(entry.condition) then
@@ -1135,9 +1132,9 @@ function UI:UpdateDisplay()
         frame.stepPathfindingText:SetText(L["Pathfinding not available in PvP instances."])
     elseif entry and not alreadyInInstance then
         if entry.instanceId and entry.instanceId == 2070 and isHorde then
-            self:UpdateCurrentPathfinding(MRP.Data.raids["Battle of Dazar'alor (H)"])
-        elseif entry.instanceId and entry.instanceId == 2217 and MRP.Core:IsEntranceOnMap(MRP.Data.raids["Ny'alotha, the Waking City (VoEB)"].mapID, entry.instanceId) then
-            self:UpdateCurrentPathfinding(MRP.Data.raids["Ny'alotha, the Waking City (VoEB)"])
+            self:UpdateCurrentPathfinding(MRP.Data.RAIDS["Battle of Dazar'alor (H)"])
+        elseif entry.instanceId and entry.instanceId == 2217 and MRP.Core:IsEntranceOnMap(MRP.Data.RAIDS["Ny'alotha, the Waking City (VoEB)"].mapID, entry.instanceId) then
+            self:UpdateCurrentPathfinding(MRP.Data.RAIDS["Ny'alotha, the Waking City (VoEB)"])
         else
             self:UpdateCurrentPathfinding(entry)
         end
@@ -1200,14 +1197,8 @@ function UI:UpdateCurrentPathfinding(entry)
         ---@diagnostic disable-next-line: undefined-global -- MRP_REMOVE_LINE
         ClearLogs()   -- MRP_REMOVE_LINE
     end               -- MRP_REMOVE_LINE
-    local unavailableText = MRP.Core:GetPathfindingUnavailableText()
-    if unavailableText then
-        frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
-        frame.stepPathfindingText:SetText(unavailableText)
-        return
-    end
     ---@diagnostic disable-next-line: undefined-global
-    local optimizedPath = FarstriderLib.FindTrailTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
+    local optimizedPath = MRP.Farstrider.FindTrailTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
 
     local newPathKey = nil
     if optimizedPath then
@@ -1235,7 +1226,7 @@ function UI:UpdateCurrentPathfinding(entry)
         self:ShowCurrentPathfindingStep()
     else
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
-        frame.stepPathfindingText:SetText(L["You can't reach this destination.\nFurther advancement in the Campaign required."])
+        frame.stepPathfindingText:SetText(MRP.Core:GetNoOptimizedPathMessage())
     end
 end
 
@@ -1292,7 +1283,7 @@ function UI:GetLocalizedStepName(step)
     end
 
     if step.source.type == MRP.FilterSourceType.Raid then
-        local raid = MRP.Data.raids[step.source.name]
+        local raid = MRP.Data.RAIDS[step.source.name]
         if raid and raid.areaId then
             local areaName = C_Map.GetAreaInfo(raid.areaId)
             if areaName then
@@ -1452,7 +1443,7 @@ function UI:ShowCurrentPathfindingStep()
             if step.source.type == MRP.FilterSourceType.WorldBoss then
                 loca = format(L["Waypoint_WorldBoss"], stepName)
             elseif step.source.type == MRP.FilterSourceType.OpenWorld then
-                local owEntry = MRP.Data.openWorld[step.source.name]
+                local owEntry = MRP.Data.OPEN_WORLD[step.source.name]
                 local mechanicKey = owEntry and owEntry.mechanic or "kill"
                 loca = format(L["Waypoint_OpenWorld_" .. mechanicKey], stepName)
             elseif step.source.type == MRP.FilterSourceType.Dungeon or step.source.type == MRP.FilterSourceType.Raid then
@@ -1513,7 +1504,7 @@ function UI:ShowCurrentPathfindingStep()
         if MRP.Map.pathPos == #MRP.Map.path then
             local step = MRP.Filter:GetCurrentStep()
             if step and step.source.type == MRP.FilterSourceType.OpenWorld then
-                local owEntry = MRP.Data.openWorld[step.source.name]
+                local owEntry = MRP.Data.OPEN_WORLD[step.source.name]
                 if owEntry and owEntry.waypoints then
                     for _, wp in ipairs(owEntry.waypoints) do
                         local wpMapId = wp.mapID or owEntry.mapID

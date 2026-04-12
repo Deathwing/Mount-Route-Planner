@@ -131,7 +131,7 @@ function Core:IsEncounterDefeated(mount, source, difficultyId)
             end
         end
 
-        local worldBoss = MRP.Data.worldBosses[source.name]
+        local worldBoss = MRP.Data.WORLD_BOSSES[source.name]
         if not worldBoss then
             print(string.format(L["|cffff0000[MRP]|r Unknown world boss: %s"], source.name))
             return false
@@ -145,7 +145,7 @@ function Core:IsEncounterDefeated(mount, source, difficultyId)
     end
 
     if source.type == MRP.FilterSourceType.OpenWorld or source.type == MRP.FilterSourceType.Quest or source.type == MRP.FilterSourceType.Treasure or source.type == MRP.FilterSourceType.Vendor then
-        local entry = MRP.Data.openWorld[source.name]
+        local entry = MRP.Data.OPEN_WORLD[source.name]
         if not entry then
             print(string.format(L["|cffff0000[MRP]|r Unknown world boss: %s"], source.name))
             return false
@@ -332,7 +332,7 @@ end
 function Core:GetStepCondition(step)
     local t = step.source.type
     if t ~= MRP.FilterSourceType.OpenWorld and t ~= MRP.FilterSourceType.Quest and t ~= MRP.FilterSourceType.Treasure and t ~= MRP.FilterSourceType.Vendor then return nil end
-    local entry = MRP.Data.openWorld[step.source.name]
+    local entry = MRP.Data.OPEN_WORLD[step.source.name]
     if not entry then return nil end
     return entry.condition
 end
@@ -509,20 +509,10 @@ function Core:CheckForPathfindingWarnings(event)
     MRP.UI:ShowPathfindingWarnings()
 end
 
-local setupWarningsShown = false
-
-local setupAddonNamePlaceholders = {
-    { "MountRoutePlannerData",    "__MRP_SETUP_MOUNT_ROUTE_PLANNER_DATA__" },
-    { "Mount Route Planner Data", "__MRP_SETUP_MOUNT_ROUTE_PLANNER_DATA__" },
-    { "FarstriderLibData",        "__MRP_SETUP_FARSTRIDERLIB_DATA__" },
-    { "FarstriderLib Data",       "__MRP_SETUP_FARSTRIDERLIB_DATA__" },
-    { "FarstriderLib",            "__MRP_SETUP_FARSTRIDERLIB__" },
-}
-
 local setupAddonNameColors = {
-    ["__MRP_SETUP_MOUNT_ROUTE_PLANNER_DATA__"] = "|cff6fd3ffMount Route Planner Data|r",
-    ["__MRP_SETUP_FARSTRIDERLIB_DATA__"] = "|cff8bffb5FarstriderLib Data|r",
-    ["__MRP_SETUP_FARSTRIDERLIB__"] = "|cffffc56fFarstriderLib|r",
+    ["__MRPData__"] = "|cff6fd3ffMount Route Planner Data|r",
+    ["__FarstriderLibData__"] = "|cff8bffb5FarstriderLib Data|r",
+    ["__FarstriderLib__"] = "|cffffc56fFarstriderLib|r",
 }
 
 ---@param text string?
@@ -532,74 +522,64 @@ function Core:HighlightSetupAddonNames(text)
         return nil
     end
 
-    for _, replacement in ipairs(setupAddonNamePlaceholders) do
-        text = text:gsub(replacement[1], replacement[2])
-    end
-
-    if text then
-        for placeholder, coloredName in pairs(setupAddonNameColors) do
-            text = text:gsub(placeholder, coloredName)
-        end
+    for placeholder, coloredName in pairs(setupAddonNameColors) do
+        text = text:gsub(placeholder, coloredName)
     end
 
     return text
 end
 
----@return boolean
-function Core:HasMissingStepData()
-    return not MRPData or type(MRPData.Steps) ~= "table" or #MRP.Steps == 0
-end
-
----@return boolean
-function Core:HasPathfindingData()
-    return FarstriderLibData ~= nil
-        and type(FarstriderLibData.Waypoints) == "table"
-        and next(FarstriderLibData.Waypoints) ~= nil
-end
-
----@return string?
-function Core:GetPathfindingUnavailableText()
-    if not FarstriderLib or not FarstriderLib.FindTrailTo then
-        return self:HighlightSetupAddonNames(L["Pathfinding unavailable.\nInstall FarstriderLib."])
-    end
-
-    if not self:HasPathfindingData() then
-        return self:HighlightSetupAddonNames(L["Pathfinding data missing.\nInstall FarstriderLibData."])
-    end
-
-    return nil
-end
+local addon_issue_checkers = {
+    [MRP.RequiredAddon.MRPData] = {
+        check = function() return not MRP.Util.HasData() end,
+        message = Core:HighlightSetupAddonNames(L["Addon '__MRPData__' or another data source is not installed. Route data is required for MRP to function."]),
+    },
+    [MRP.RequiredAddon.FarstriderLib] = {
+        check = function() return not MRP.Util.HasFarstrider() end,
+        message = Core:HighlightSetupAddonNames(L["Addon '__FarstriderLib__' or another farstrider library is not installed. Pathfinding features will be unavailable."]),
+    },
+    [MRP.RequiredAddon.FarstriderLibData] = {
+        check = function() return not MRP.Util.HasFarstriderData() end,
+        message = Core:HighlightSetupAddonNames(L["Addon '__FarstriderLibData__' or another farstrider data source is not installed. Pathfinding features will be unavailable."]),
+    },
+}
 
 ---@return { key: string, message: string }[]
 function Core:GetSetupIssues()
     local issues = {}
 
-    if self:HasMissingStepData() then
-        table.insert(issues, {
-            key = "steps",
-            message = self:HighlightSetupAddonNames(L["No route data loaded. Install Mount Route Planner Data or another data source."]),
-        })
-    end
-
-    local pathfindingMessage = self:GetPathfindingUnavailableText()
-    if pathfindingMessage then
-        table.insert(issues, {
-            key = "pathfinding",
-            message = pathfindingMessage:gsub("\n", " "),
-        })
+    for key, checker in pairs(addon_issue_checkers) do
+        if checker.check() then
+            table.insert(issues, { key = key, message = checker.message })
+        end
     end
 
     return issues
 end
 
 ---@return string
-function Core:GetNoStepsMessage()
-    if self:HasMissingStepData() then
-        return self:HighlightSetupAddonNames(L["No route data loaded.\nInstall Mount Route Planner Data or another data source."])
+function Core:GetNoStepMessage()
+    if addon_issue_checkers[MRP.RequiredAddon.MRPData].check() then
+        return addon_issue_checkers[MRP.RequiredAddon.MRPData].message
     end
 
-    return L["No steps available.\nAdjust your filter."]
+    return L["No step found.\nAdjust your filter."]
 end
+
+---@return string?
+function Core:GetNoOptimizedPathMessage()
+    if addon_issue_checkers[MRP.RequiredAddon.FarstriderLib].check() then
+        return addon_issue_checkers[MRP.RequiredAddon.FarstriderLib].message
+    end
+
+    if addon_issue_checkers[MRP.RequiredAddon.FarstriderLibData].check() then
+        return addon_issue_checkers[MRP.RequiredAddon.FarstriderLibData].message
+    end
+
+    return L["You can't reach this destination.\nFurther advancement in the Campaign might be required."]
+end
+
+local setupWarningsShown = false
 
 function Core:PrintSetupWarnings()
     if setupWarningsShown then
@@ -698,7 +678,7 @@ end
 function Core:FilterTimewalkingSteps()
     local activeTimewalkingMap = self:GetActiveTimewalkingMap()
 
-    for _, step in ipairs(MRP.Steps) do
+    for _, step in ipairs(MRP.Data.STEPS) do
         if not activeTimewalkingMap[step.expansion] then
             for _, mount in ipairs(step.mounts) do
                 local newAllowedDifficultyIds = {}
@@ -712,7 +692,7 @@ function Core:FilterTimewalkingSteps()
         end
     end
 
-    for _, dungeon in pairs(MRP.Data.dungeons) do
+    for _, dungeon in pairs(MRP.Data.DUNGEONS) do
         if not activeTimewalkingMap[dungeon.expansionLevel] then
             local newAllowedDifficultyIds = {}
             for _, difficultyId in ipairs(dungeon.availableDifficultyIds) do
@@ -724,7 +704,7 @@ function Core:FilterTimewalkingSteps()
         end
     end
 
-    for _, raid in pairs(MRP.Data.raids) do
+    for _, raid in pairs(MRP.Data.RAIDS) do
         if not activeTimewalkingMap[raid.expansionLevel] then
             local newAllowedDifficultyIds = {}
             for _, difficultyId in ipairs(raid.availableDifficultyIds) do
@@ -872,6 +852,18 @@ function Core:InitializeSettings()
     end
 end
 
+function Core:Rebuild()
+    MRP.Farstrider.Rebuild()
+    MRP.Filter:Apply(true)
+    MRP.Route:Calculate()
+    if MRP.Alert and MRP_Settings.showRareAlert then
+        MRP.Alert:Enable()
+    end
+    if MRP.UI then
+        MRP.UI:UpdateDisplay()
+    end
+end
+
 local watcher = CreateFrame("Frame")
 watcher:RegisterEvent("BAG_UPDATE_DELAYED")
 watcher:RegisterEvent("ENCOUNTER_END")
@@ -901,21 +893,7 @@ end)
 
 local f = CreateFrame("Frame")
 f:RegisterEvent("PLAYER_LOGIN")
-if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-    f:RegisterEvent("PLAYER_HOUSE_LIST_UPDATED")
-end
-f:SetScript("OnEvent", function(_, event, ...)
-    if event == "PLAYER_HOUSE_LIST_UPDATED" then
-        local houses = ...
-        if FarstriderLibData and houses then
-            for _, house in ipairs(houses) do
-                FarstriderLibData.HousingData = house
-                break
-            end
-        end
-        return
-    end
-
+f:SetScript("OnEvent", function()
     Core:InitializeSettings()
     Core:FilterTimewalkingSteps()
     MRP.Filter:Apply(true)

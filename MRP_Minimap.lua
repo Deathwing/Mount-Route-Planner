@@ -3,7 +3,7 @@
 
 local L = MRP.L
 
-local minimapButton = CreateFrame("Button", "MRP_MinimapButton", Minimap)
+local minimapButton = CreateFrame("Button", nil, Minimap)
 minimapButton:SetSize(28, 28)
 minimapButton:SetFrameStrata("HIGH")
 minimapButton:SetPoint("TOPLEFT", Minimap, "TOPLEFT", 0, 0)

@@ -4,7 +4,7 @@
 
 MRP automatically generates optimized farming routes based on your character's current collection, available travel options, and location. No more manually copying data from external websites—just open the addon and start farming.
 
-![Mount Route Planner](Screenshots/Gallery_0.png)
+![Mount Route Planner](Screenshots/Gallery_8.png)
 
 ### Features
 
@@ -16,6 +16,8 @@ Uses a built-in pathfinding system to determine the most efficient next objectiv
 
 **World Map Route Overview**
 Shows your filtered route directly on the world map with numbered pins, directional connectors, and current-step context.
+
+![World Map Routes](Screenshots/Gallery_7.png)
 
 **In-Game Update Notes**
 Displays a changelog popup after addon updates so new features are visible immediately in-game.

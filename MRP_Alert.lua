@@ -20,6 +20,7 @@ local NEARBY_SCAN_INTERVAL = 1
 local SCAN_MACRO_NAME = "MRP_SCAN"
 local SCAN_MACRO_ICON = "Interface/Icons/Ability_Hunter_SniperShot"
 local SCAN_MACRO_REFRESH_INTERVAL = 5
+local ALERT_CACHE_REFRESH_INTERVAL = 1
 local SCAN_MACRO_MAX_LENGTH = 255
 local SCAN_MACRO_NEAR_DISTANCE = 0.10
 local ALERT_DEFAULT_POINT = "TOP"
@@ -39,6 +40,15 @@ local ALERT_DEBUG_ENABLED = false
 
 local alertDebugStates = {}
 local handledAlertKeys = {}
+local alertableSteps = {}
+local alertableNpcEntries = {}
+local alertableNameEntries = {}
+local alertCacheDirty = true
+local alertCacheFilteredStepsRef = nil
+local alertCacheFilteredStepCount = 0
+local alertCacheLastRefresh = 0
+local alertHooksInstalled = false
+local IsStepAlertable
 
 local function FormatDebugValue(value)
     if value == nil or value == "" then
@@ -88,11 +98,11 @@ end
 
 local function BuildNpcLookup()
     wipe(npcToEntry)
-    for name, entry in pairs(MRP.Data.openWorld) do
+    for name, entry in pairs(MRP.Data.OPEN_WORLD) do
         AddNpcLookupEntry(name, entry)
     end
 
-    for name, entry in pairs(MRP.Data.worldBosses or {}) do
+    for name, entry in pairs(MRP.Data.WORLD_BOSSES) do
         AddNpcLookupEntry(name, entry)
     end
 end
@@ -132,9 +142,9 @@ local function GetTrackedEntryForStep(step)
 
     local entry = nil
     if step.source.type == MRP.FilterSourceType.WorldBoss then
-        entry = MRP.Data.worldBosses and MRP.Data.worldBosses[step.source.name]
+        entry = MRP.Data.WORLD_BOSSES[step.source.name]
     else
-        entry = MRP.Data.openWorld and MRP.Data.openWorld[step.source.name]
+        entry = MRP.Data.OPEN_WORLD[step.source.name]
     end
 
     local stepNpcID = step.source.npcID
@@ -183,6 +193,93 @@ local function GetTargetNameForStep(step)
     end
 
     return step.source.name
+end
+
+local function AddAlertableNameEntry(name, sourceName, targetName)
+    local normalizedName = NormalizeName(name)
+    if not normalizedName or alertableNameEntries[normalizedName] then
+        return
+    end
+
+    alertableNameEntries[normalizedName] = {
+        sourceName = sourceName,
+        targetName = targetName,
+    }
+end
+
+function Alert:MarkAlertCacheDirty()
+    alertCacheDirty = true
+end
+
+function Alert:InstallHooks()
+    if alertHooksInstalled then
+        return
+    end
+
+    if MRP.Filter and MRP.Filter.Apply then
+        hooksecurefunc(MRP.Filter, "Apply", function()
+            Alert:MarkAlertCacheDirty()
+        end)
+    end
+
+    if MRP.Core and MRP.Core.CheckCurrentStepComplete then
+        hooksecurefunc(MRP.Core, "CheckCurrentStepComplete", function()
+            Alert:MarkAlertCacheDirty()
+        end)
+    end
+
+    alertHooksInstalled = true
+end
+
+function Alert:RefreshAlertableCache()
+    wipe(alertableSteps)
+    wipe(alertableNpcEntries)
+    wipe(alertableNameEntries)
+
+    local steps = MRP.Filter and MRP.Filter.filteredSteps or nil
+    if steps then
+        for _, step in ipairs(steps) do
+            if IsStepAlertable(step) then
+                local entry = GetTrackedEntryForStep(step)
+                local targetName = GetTargetNameForStep(step)
+
+                table.insert(alertableSteps, step)
+
+                if entry and entry.npcID and not alertableNpcEntries[entry.npcID] then
+                    alertableNpcEntries[entry.npcID] = {
+                        sourceName = step.source.name,
+                        targetName = targetName,
+                    }
+                end
+
+                AddAlertableNameEntry(step.source.name, step.source.name, targetName)
+                if targetName and targetName ~= step.source.name then
+                    AddAlertableNameEntry(targetName, step.source.name, targetName)
+                end
+            end
+        end
+    end
+
+    alertCacheFilteredStepsRef = steps
+    alertCacheFilteredStepCount = steps and #steps or 0
+    alertCacheLastRefresh = GetTime()
+    alertCacheDirty = false
+end
+
+function Alert:EnsureAlertableCache(force)
+    local steps = MRP.Filter and MRP.Filter.filteredSteps or nil
+    local stepCount = steps and #steps or 0
+    local now = GetTime()
+
+    if not force
+        and not alertCacheDirty
+        and alertCacheFilteredStepsRef == steps
+        and alertCacheFilteredStepCount == stepCount
+        and (now - alertCacheLastRefresh) < ALERT_CACHE_REFRESH_INTERVAL then
+        return
+    end
+
+    self:RefreshAlertableCache()
 end
 
 function Alert:LogCurrentStepContext(context)
@@ -478,7 +575,7 @@ function Alert:HideAlert()
     end
 end
 
-local function IsStepAlertable(step)
+IsStepAlertable = function(step)
     if not step or not step.source or not alertSourceTypes[step.source.type] then
         return false
     end
@@ -493,17 +590,11 @@ end
 -- Check if a given npcID is a mount source the player should care about
 function Alert:IsRelevantMountSourceNpc(npcID)
     if not npcID or npcID == 0 then return false end
-    local entryNames = npcToEntry[npcID]
-    if not entryNames then return false end
+    self:EnsureAlertableCache()
 
-    -- Check if the player is on this step or if it's in their filtered route
-    local steps = MRP.Filter and MRP.Filter.filteredSteps
-    if not steps then return false end
-
-    for _, step in ipairs(steps) do
-        if IsStepAlertable(step) and entryNames[step.source.name] then
-            return true, step.source.name, GetTargetNameForStep(step)
-        end
+    local entry = alertableNpcEntries[npcID]
+    if entry then
+        return true, entry.sourceName, entry.targetName
     end
 
     return false
@@ -515,19 +606,11 @@ function Alert:IsRelevantMountSourceName(npcName)
         return false
     end
 
-    local steps = MRP.Filter and MRP.Filter.filteredSteps
-    if not steps then return false end
+    self:EnsureAlertableCache()
 
-    for _, step in ipairs(steps) do
-        if IsStepAlertable(step) then
-            local targetName = GetTargetNameForStep(step)
-            local normalizedTargetName = NormalizeName(targetName)
-            local normalizedSourceName = NormalizeName(step.source.name)
-
-            if normalizedName == normalizedTargetName or normalizedName == normalizedSourceName then
-                return true, step.source.name, targetName
-            end
-        end
+    local entry = alertableNameEntries[normalizedName]
+    if entry then
+        return true, entry.sourceName, entry.targetName
     end
 
     return false
@@ -569,37 +652,36 @@ function Alert:EnsureScanMacro()
 end
 
 function Alert:BuildScanMacroBody(nearbyOnly)
-    local steps = MRP.Filter and MRP.Filter.filteredSteps
     local playerMapID = C_Map.GetBestMapForUnit("player")
-    if not steps or not playerMapID then
+    if not playerMapID then
         return "", false
     end
+
+    self:EnsureAlertableCache()
 
     local playerMapPosition = C_Map.GetPlayerMapPosition(playerMapID, "player")
     local macroBody = ""
     local addedNames = {}
 
-    for _, step in ipairs(steps) do
-        if IsStepAlertable(step) then
-            local entry = GetTrackedEntryForStep(step)
-            local npcName = GetTargetNameForStep(step)
-            local isNearby = not nearbyOnly
+    for _, step in ipairs(alertableSteps) do
+        local entry = GetTrackedEntryForStep(step)
+        local npcName = GetTargetNameForStep(step)
+        local isNearby = not nearbyOnly
 
-            if nearbyOnly and entry and playerMapPosition and MapsOverlap(entry.mapID, playerMapID) and entry.x and entry.y then
-                local dx = playerMapPosition.x - (entry.x / 100)
-                local dy = playerMapPosition.y - (entry.y / 100)
-                isNearby = math.sqrt(dx * dx + dy * dy) <= SCAN_MACRO_NEAR_DISTANCE
+        if nearbyOnly and entry and playerMapPosition and MapsOverlap(entry.mapID, playerMapID) and entry.x and entry.y then
+            local dx = playerMapPosition.x - (entry.x / 100)
+            local dy = playerMapPosition.y - (entry.y / 100)
+            isNearby = math.sqrt(dx * dx + dy * dy) <= SCAN_MACRO_NEAR_DISTANCE
+        end
+
+        if entry and entry.npcID and MapsOverlap(entry.mapID, playerMapID) and npcName and not addedNames[npcName] and isNearby then
+            local nextBody, appended = AppendMacroLine(macroBody, npcName)
+            if not appended then
+                return macroBody, true
             end
 
-            if entry and entry.npcID and MapsOverlap(entry.mapID, playerMapID) and npcName and not addedNames[npcName] and isNearby then
-                local nextBody, appended = AppendMacroLine(macroBody, npcName)
-                if not appended then
-                    return macroBody, true
-                end
-
-                macroBody = nextBody
-                addedNames[npcName] = true
-            end
+            macroBody = nextBody
+            addedNames[npcName] = true
         end
     end
 
@@ -808,14 +890,15 @@ local scanMacroTicker = nil
 
 function Alert:Enable()
     BuildNpcLookup()
+    self:InstallHooks()
+    self:MarkAlertCacheDirty()
+    self:EnsureAlertableCache(true)
     self:ApplySavedPosition()
     wipe(alertDebugStates)
     vignetteWatcher:UnregisterAllEvents()
     vignetteWatcher:RegisterEvent("INSTANCE_ENCOUNTER_ENGAGE_UNIT")
     vignetteWatcher:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     vignetteWatcher:RegisterEvent("PLAYER_TARGET_CHANGED")
-    vignetteWatcher:RegisterEvent("UNIT_NAME_UPDATE")
-    vignetteWatcher:RegisterEvent("UNIT_TARGETABLE_CHANGED")
     vignetteWatcher:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
     if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
         vignetteWatcher:RegisterEvent("VIGNETTE_MINIMAP_UPDATED")
@@ -835,11 +918,6 @@ function Alert:Enable()
 
         if event == "PLAYER_TARGET_CHANGED" then
             Alert:OnTargetChanged()
-            return
-        end
-
-        if event == "UNIT_NAME_UPDATE" or event == "UNIT_TARGETABLE_CHANGED" then
-            Alert:OnUnitChanged(...)
             return
         end
 
@@ -893,12 +971,20 @@ function Alert:Disable()
     wipe(alertDebugStates)
     wipe(handledAlertKeys)
     wipe(nearbyNpcGuids)
+    wipe(alertableSteps)
+    wipe(alertableNpcEntries)
+    wipe(alertableNameEntries)
+    alertCacheFilteredStepsRef = nil
+    alertCacheFilteredStepCount = 0
+    alertCacheLastRefresh = 0
+    alertCacheDirty = true
     self:ClearScanMacro()
     self:HideAlert()
 end
 
 -- Zone change: clear alerted vignettes so we can re-alert in new zones
 function Alert:OnZoneChanged()
+    self:MarkAlertCacheDirty()
     wipe(alertedVignettes)
     wipe(alertDebugStates)
     wipe(handledAlertKeys)

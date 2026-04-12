@@ -11,21 +11,40 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 
 local CHANGELOG_CONTENT = [[
-|cffffd200Mount Route Planner 2.0.0|r
+|cffffd200Mount Route Planner 2.1.0|r
 
-|cff00ff00Highlights|r
-- Mount Route Planner now supports Vanilla, TBC, Wrath, and Cataclysm in addition to Mists and Retail.
-- The route can now be recalculated in-game and shown on the world map with numbered pins and step guidance.
-- Open-world steps now support rares, quests, treasures, vendors, and nearby source alerts.
-- Filters are smarter, tooltips are richer, and route progress is more informative overall.
-- Housing teleport and return support was added where available.
+|cff00ff00What's New|r
+- MRP now detects missing or outdated companion addons and shows clear setup warnings so you know exactly what to install.
+- Other addons can now interact with MRP through a public API.
+- MRP handles missing companion addons more gracefully instead of throwing errors.
 
-|cff00ff00Behind the Scenes|r
-- Data loading and packaging were reworked so all supported flavors can ship from one shared source.
-- Route validation, pathfinding, and compatibility handling were improved for Classic and Anniversary clients.
+|cff00ff00Improvements|r
+- Unreachable destination warnings are now less alarming ("flight path might be required" instead of "required").
+- Various internal cleanup and stability improvements.
 
 |cff00ff00Fixes|r
-- Fixed several issues with missing step visibility, travel data, and route rendering.
+- Fixed heavy lag spikes from nearby rare alerts in crowded areas, especially with nameplates enabled.
+
+
+|cffffd200Mount Route Planner 2.0.0|r
+
+|cff00ff00What's New|r
+- Added this changelog popup! Shows after updates and can be reopened with |cffffd200/mrp changelog|r.
+- Brand-new support for Vanilla, TBC, Wrath, and Cataclysm clients. Before 2.0.0, only Mists of Pandaria and Retail were supported.
+- Added a world map route overview with numbered pins, clustering, arrows, and current-step guidance.
+- Added nearby source alerts for world bosses, open-world rares, quests, treasures, and vendors, including a target button and scan macro.
+- Routes now recalculate automatically and remember your preferred step ordering.
+- Added faction-aware filters, condition-gated steps, quest-chain progress tracking, and housing teleport support where available.
+
+|cff00ff00Improvements|r
+- Better Classic and Anniversary compatibility with safer mount collection handling.
+- Improved tooltips and progress info for vendors, treasures, quests, helpful items, and difficulty ratings.
+- Smoother world map rendering with native pin pooling and dedicated route art.
+
+|cff00ff00Fixes|r
+- Fixed mount collection data not loading on Classic clients, which could hide valid route steps.
+- Fixed missing waypoints and travel data on non-Standard flavors.
+- Fixed stale route orders after data updates by automatically recalculating baselines.
 ]]
 
 local changelogFrame

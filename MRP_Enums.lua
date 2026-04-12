@@ -76,3 +76,10 @@ MRP.FilterFactionOrder = {
     "Alliance",
     "Horde"
 }
+
+---@enum RequiredAddon
+MRP.RequiredAddon = {
+    MRPData = "Mount Route Planner Data",
+    FarstriderLib = "FarstriderLib",
+    FarstriderLibData = "FarstriderLib Data",
+}

@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
+		"xml.validation.enabled": false,
 		"Lua.runtime.version": "Lua 5.1",
 		"Lua.runtime.builtin": {
 			"basic": "disable",
@@ -105,6 +106,7 @@
 			"Lerp",
 			"GAMEOPTIONS_MENU",
 			"UISpecialFrames",
+			"GetMinimapShape",
 			"GetAddOnMetadata"
 		],
 		"Lua.diagnostics.neededFileStatus": {
