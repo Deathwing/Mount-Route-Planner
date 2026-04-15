@@ -11,6 +11,20 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.2.0|r
+
+|cff00ff00What's New|r
+- Holiday and condition-based filters: Love is in the Air, Brewfest, Hallow's End, Feast of Winter Veil, WoW Anniversary, and more.
+- Filter dropdowns now automatically hide options that have no matching steps.
+
+|cff00ff00Changes|r
+- Added 7 missing holiday mounts: Love Witch's Sweeper, Spring Butterfly, Brewfest Bomber, Minion of Grumpus, The Headless Horseman's Ghoulish Charger, Illidari Doomhawk, and Azure Worldchiller.
+- Added Historian Ma'di (Anniversary vendor) and Izzy Hollyfizzle (Winter Veil vendor) as new step sources.
+
+|cff00ff00Fixes|r
+- Fixed restricted-identity errors from nearby rare alerts in delves and similar content where unit GUIDs or names can be secret.
+
+
 |cffffd200Mount Route Planner 2.1.0|r
 
 |cff00ff00What's New|r

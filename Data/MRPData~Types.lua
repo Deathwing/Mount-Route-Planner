@@ -3,46 +3,33 @@
 
 if not MRPData.Internal then return end
 
----@class Dungeon
----@field x number the x coordinate of the dungeon entrance
----@field y number the y coordinate of the dungeon entrance
----@field mapName string the name of the map where the dungeon is located
----@field mapID number the uiMapID of the dungeon entrance
+---@class BaseEntry
+---@field x number the x coordinate of the entry
+---@field y number the y coordinate of the entry
+---@field mapName string the name of the map where the entry is located
+---@field mapID number the uiMapID of the entry
+---@field expansionLevel number the expansionLevel of the entry
+---@field conditions string[]? an optional array of condition keys (faction, warfront, reputation, holiday, …)
+
+---@class Dungeon : BaseEntry
 ---@field instanceId number the instanceID (mapID)
 ---@field availableDifficultyIds number[] the available difficultyIDs for the dungeon
----@field expansionLevel number the expansionLevel of the dungeon
 
----@class Raid
----@field x number the x coordinate of raid entrance
----@field y number the y coordinate of raid entrance
----@field mapName string the name of the map where the raid is located
----@field mapID number the uiMapID of the raid entrance
+---@class Raid : BaseEntry
 ---@field instanceId number the instanceID (mapID)
 ---@field availableDifficultyIds number[] the available difficultyIDs for the raid
----@field expansionLevel number the expansionLevel of the raid
 ---@field areaId number? the areaID of the raid
 
----@class WorldBoss
----@field x number the x coordinate of the world boss
----@field y number the y coordinate of the world boss
----@field mapName string the name of the map where the world boss is located
----@field mapID number the uiMapID of the world boss
+---@class WorldBoss : BaseEntry
 ---@field questID number the questID for the world boss completion tracking
----@field expansionLevel number the expansionLevel of the world boss
 ---@field npcID number? the NPC ID for nearby detection and targeting
 ---@field targetName string? the exact targetable NPC name when it differs from the encounter/source name
 
----@class OpenWorld
----@field x number the x coordinate of the open world source
----@field y number the y coordinate of the open world source
----@field mapName string the name of the map where the source is located
----@field mapID number the uiMapID of the source
+---@class OpenWorld : BaseEntry
 ---@field questID number the questID for lockout tracking (0 = always farmable)
----@field expansionLevel number the expansionLevel of the source
 ---@field mechanic string the mechanic type ("kill", "click", "interact")
 ---@field npcID number? the NPC ID for targeting (nil or 0 for non-NPC sources)
 ---@field note string? an optional note about the source
----@field condition string? an optional condition key for phase gating
 ---@field waypoints OpenWorldWaypoint[]? additional map locations to highlight
 ---@field routeType string? visualization type ("patrol" = connected route, "spawns" = individual markers)
 ---@field routes OpenWorldRoute[]? multiple patrol routes, each drawn in a distinct color
@@ -91,7 +78,6 @@ if not MRPData.Internal then return end
 ---@field bonusRoll boolean? whether the source can be bonus rolled
 ---@field factionMask number? the faction mask for the source
 ---@field mechanic string? the open world mechanic type ("kill", "click", "interact")
----@field condition string? the open world condition key for phase gating
 ---@field journalEncounter JournalEncounter? the journal encounter details
 ---@field dungeonEncounter DungeonEncounter? the dungeon encounter details
 ---@field specialEncounter SpecialEncounter? the special encounter details

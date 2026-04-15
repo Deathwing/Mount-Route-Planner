@@ -11,6 +11,9 @@ local function CreateIconButton(parent, iconName)
     btn:SetNormalTexture("Interface\\AddOns\\MountRoutePlanner\\Assets\\" .. iconName .. ".tga")
     btn:SetPushedTexture("Interface\\AddOns\\MountRoutePlanner\\Assets\\P_" .. iconName .. ".tga")
     btn:SetHighlightTexture("Interface\\AddOns\\MountRoutePlanner\\Assets\\" .. iconName .. ".tga")
+    btn:SetDisabledTexture("Interface\\AddOns\\MountRoutePlanner\\Assets\\" .. iconName .. ".tga")
+    btn:GetDisabledTexture():SetDesaturated(true)
+    btn:GetDisabledTexture():SetAlpha(0.5)
     btn:SetSize(24, 24)
     return btn
 end
@@ -23,6 +26,10 @@ local function CreateTextButton(parent, text)
     btn:GetPushedTexture():SetTexCoord(0, 1, 0, 1)
     btn:SetHighlightTexture("Interface\\AddOns\\MountRoutePlanner\\Assets\\Frame.tga")
     btn:GetHighlightTexture():SetTexCoord(0, 1, 0, 1)
+    btn:SetDisabledTexture("Interface\\AddOns\\MountRoutePlanner\\Assets\\Frame.tga")
+    btn:GetDisabledTexture():SetTexCoord(0, 1, 0, 1)
+    btn:GetDisabledTexture():SetDesaturated(true)
+    btn:GetDisabledTexture():SetAlpha(0.5)
     btn:SetSize(60, 24)
     btn:SetText(text)
     btn:SetPushedTextOffset(0, 0)
@@ -155,6 +162,13 @@ local function AddDropdownCheckboxButton_FilterFaction(level, k)
     end)
 end
 
+local function AddDropdownCheckboxButton_FilterHoliday(level, k)
+    local v = MRP.FilterHoliday[k]
+    return AddDropdownCheckboxButton(level, L["Holiday_" .. k], MRP_CharacterSettings.filter.holidays[v], function(_, _, _, checked)
+        MRP.Filter:SetHoliday(v, checked)
+    end)
+end
+
 local function AddDropdownMenuButton(level, text, menuList)
     local info = UIDropDownMenu_CreateInfo()
     info.text = text
@@ -174,20 +188,31 @@ UIDropDownMenu_Initialize(dropdown, function(_, level, menuList)
         AddDropdownMenuButton(level, L["Factions"], "FACTION_MENU")
         AddDropdownMenuButton(level, L["Expansions"], "EXPANSION_MENU")
         AddDropdownMenuButton(level, L["SourceTypes"], "SOURCE_TYPE_MENU")
+        AddDropdownMenuButton(level, L["Holidays"], "HOLIDAY_MENU")
     elseif level == 2 then
         if menuList == "FACTION_MENU" then
             for _, k in ipairs(MRP.FilterFactionOrder) do
-                AddDropdownCheckboxButton_FilterFaction(level, k)
+                if MRP.Filter.availableFactions and MRP.Filter.availableFactions[MRP.FilterFaction[k]] then
+                    AddDropdownCheckboxButton_FilterFaction(level, k)
+                end
             end
         elseif menuList == "EXPANSION_MENU" then
             for _, k in ipairs(MRP.FilterExpansionOrder) do
-                if GetExpansionLevel() >= MRP.FilterExpansion[k] then
+                if GetExpansionLevel() >= MRP.FilterExpansion[k] and MRP.Filter.availableExpansions and MRP.Filter.availableExpansions[MRP.FilterExpansion[k]] then
                     AddDropdownCheckboxButton_FilterExpansion(level, k)
                 end
             end
         elseif menuList == "SOURCE_TYPE_MENU" then
             for _, k in ipairs(MRP.FilterSourceTypeOrder) do
-                AddDropdownCheckboxButton_FilterSourceType(level, k)
+                if MRP.Filter.availableSourceTypes and MRP.Filter.availableSourceTypes[MRP.FilterSourceType[k]] then
+                    AddDropdownCheckboxButton_FilterSourceType(level, k)
+                end
+            end
+        elseif menuList == "HOLIDAY_MENU" then
+            for _, k in ipairs(MRP.FilterHolidayOrder) do
+                if MRP.Filter.availableHolidays and MRP.Filter.availableHolidays[MRP.FilterHoliday[k]] then
+                    AddDropdownCheckboxButton_FilterHoliday(level, k)
+                end
             end
         end
     end
@@ -239,14 +264,14 @@ nextBtn:SetScript("OnClick", function()
     MRP.Core:NextStep()
 end)
 
-local autoAdvanceToggle = CreateToggleWithLabelAndTooltip(frame, L["Auto-Advance Steps"], L["Automatically advances to the next step after completing the current one."])
+local autoAdvanceToggle = CreateToggleWithLabelAndTooltip(frame, L["Auto-Advance Steps"], L["Automatically advances to the next step after completing the current one or when its conditions are not met."])
 autoAdvanceToggle:SetPoint("BOTTOMLEFT", prevBtn, "TOPLEFT", 0, 0)
 
 autoAdvanceToggle:SetScript("OnClick", function(self)
     MRP_CharacterSettings.autoAdvance = self:GetChecked()
 end)
 
-local autoSkipToggle = CreateToggleWithLabelAndTooltip(frame, L["Auto-Skip Steps"], L["Automatically skips steps that are already completed."])
+local autoSkipToggle = CreateToggleWithLabelAndTooltip(frame, L["Auto-Skip Steps"], L["Automatically skips steps that are already completed or whose conditions are not met."])
 autoSkipToggle:SetPoint("BOTTOMLEFT", autoAdvanceToggle, "TOPLEFT", 0, 0)
 
 autoSkipToggle:SetScript("OnClick", function(self)
@@ -751,6 +776,9 @@ function UI:UpdateDisplay()
         frame.noteText:SetText("")
         frame.progress:SetText(L["Step 0 of 0"])
         frame.progressBar:SetWidth(0)
+        prevBtn:Disable()
+        nextBtn:Disable()
+        resetBtn:Disable()
         MRP.Map:UpdateOverlay()
         return
     end
@@ -1091,12 +1119,14 @@ function UI:UpdateDisplay()
         frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff0000" .. warningText .. "|r")
     end
 
-    local entry = step.source.type == MRP.FilterSourceType.Dungeon and MRP.Data.DUNGEONS[step.source.name] or step.source.type == MRP.FilterSourceType.Raid and MRP.Data.RAIDS[step.source.name] or step.source.type == MRP.FilterSourceType.WorldBoss and MRP.Data.WORLD_BOSSES[step.source.name] or step.source.type == MRP.FilterSourceType.OpenWorld and MRP.Data.OPEN_WORLD[step.source.name] or step.source.type == MRP.FilterSourceType.Quest and MRP.Data.OPEN_WORLD[step.source.name] or step.source.type == MRP.FilterSourceType.Treasure and MRP.Data.OPEN_WORLD[step.source.name] or step.source.type == MRP.FilterSourceType.Vendor and MRP.Data.OPEN_WORLD[step.source.name] or nil
+    local entry = MRP.Util.GetStepEntry(step)
 
-    -- Faction / condition-gated availability warning
-    if entry and entry.condition and not MRP.Core:EvaluateCondition(entry.condition) then
-        local condNote = MRP.Core:GetConditionMessage(entry.condition)
-        frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff9900" .. condNote .. "|r")
+    -- Show warnings for any unmet conditions (faction, warfront, reputation, holiday, …)
+    local conditions = MRP.Util.GetStepConditions(step)
+    for _, cond in ipairs(conditions) do
+        if not cond.met then
+            frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff9900" .. cond.message .. "|r")
+        end
     end
 
     local stepName = self:GetLocalizedStepName(step)
@@ -1159,6 +1189,10 @@ function UI:UpdateDisplay()
 
     frame.progress:SetText(L["Step %d of %d"]:format(idx, #steps))
     frame.progressBar:SetWidth(frame.progressBarBG:GetWidth() * (idx / #steps))
+
+    if idx <= 1 then prevBtn:Disable() else prevBtn:Enable() end
+    if idx >= #steps then nextBtn:Disable() else nextBtn:Enable() end
+    if idx <= 1 then resetBtn:Disable() else resetBtn:Enable() end
 
     if step ~= lastStep then
         if lastStep ~= nil then

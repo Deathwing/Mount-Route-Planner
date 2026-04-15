@@ -132,3 +132,107 @@ end
 function Util.HasFarstriderData()
     return MRP.Farstrider.DATA.VERSION > 0
 end
+
+-- =====================================================================
+-- Unified step conditions API
+-- =====================================================================
+
+--- Condition types returned by GetStepConditions.
+---@alias ConditionType "faction"|"warfront"|"reputation"|"holiday"
+
+---@class StepCondition
+---@field type ConditionType
+---@field key string the raw condition/holiday key (e.g. "horde_only", "event_brewfest")
+---@field met boolean whether this condition is currently satisfied
+---@field message string human-readable description of the requirement
+
+--- Look up the data-table entry for any step, regardless of source type.
+---@param step Step
+---@return table?
+function Util.GetStepEntry(step)
+    local t = step.source.type
+    local name = step.source.name
+    if t == MRP.FilterSourceType.Dungeon then
+        return MRP.Data.DUNGEONS[name]
+    elseif t == MRP.FilterSourceType.Raid then
+        return MRP.Data.RAIDS[name]
+    elseif t == MRP.FilterSourceType.WorldBoss then
+        return MRP.Data.WORLD_BOSSES[name]
+    else
+        return MRP.Data.OPEN_WORLD[name]
+    end
+end
+
+--- Build the list of ALL conditions that apply to a step.
+--- Each entry is { type, key, met, message }.
+---@param step Step
+---@return StepCondition[]
+function Util.GetStepConditions(step)
+    local entry = Util.GetStepEntry(step)
+    if not entry then return {} end
+
+    -- Gather every raw condition key from the entry
+    local rawKeys = {}
+    if entry.conditions then
+        for _, key in ipairs(entry.conditions) do
+            table.insert(rawKeys, key)
+        end
+    end
+
+    local conditions = {}
+    for _, key in ipairs(rawKeys) do
+        local condType, met
+        if key == "horde_only" then
+            condType = "faction"
+            met = UnitFactionGroup("player") == "Horde"
+        elseif key == "alliance_only" then
+            condType = "faction"
+            met = UnitFactionGroup("player") == "Alliance"
+        elseif key:find("^warfront_") then
+            condType = "warfront"
+            local mapID = (key == "warfront_arathi") and 14 or 62
+            if C_QuestLog and C_QuestLog.GetQuestsOnMap then
+                local quests = C_QuestLog.GetQuestsOnMap(mapID)
+                met = quests ~= nil and #quests > 0
+            else
+                met = false
+            end
+        elseif key:find("^rep_") then
+            condType = "reputation"
+            local factionId, requiredStanding = key:match("^rep_(%d+)_(%d+)$")
+            if factionId then
+                factionId = tonumber(factionId)
+                requiredStanding = tonumber(requiredStanding)
+                local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
+                met = factionData and factionData.currentStanding >= requiredStanding or false
+            else
+                met = true
+            end
+        elseif key:find("^event_") then
+            condType = "holiday"
+            met = MRP.Holidays:IsHolidayEventActive(key)
+        else
+            condType = "faction"
+            met = true
+        end
+        table.insert(conditions, {
+            type = condType,
+            key = key,
+            met = met,
+            message = MRP.Core:GetConditionMessage(key),
+        })
+    end
+
+    return conditions
+end
+
+--- Returns true only when every condition on the step is satisfied.
+---@param step Step
+---@return boolean
+function Util.AreStepConditionsMet(step)
+    local conditions = Util.GetStepConditions(step)
+    for _, c in ipairs(conditions) do
+        if not c.met then return false end
+    end
+    return true
+end

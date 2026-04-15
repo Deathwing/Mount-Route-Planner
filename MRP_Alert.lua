@@ -51,11 +51,16 @@ local alertHooksInstalled = false
 local IsStepAlertable
 
 local function FormatDebugValue(value)
-    if value == nil or value == "" then
+    if value == nil then
         return "nil"
     end
 
-    return tostring(value)
+    local ok, formattedValue = pcall(tostring, value)
+    if not ok or formattedValue == "" then
+        return "<secret>"
+    end
+
+    return formattedValue
 end
 
 local function FormatDebugBool(value)
@@ -110,16 +115,28 @@ end
 local function GetNpcIDFromGUID(guid)
     if not guid then return nil end
 
-    local npcID = select(6, strsplit("-", guid))
-    return npcID and tonumber(npcID) or nil
-end
-
-local function NormalizeName(name)
-    if not name or name == "" then
+    local ok, npcID = pcall(function()
+        return select(6, strsplit("-", guid))
+    end)
+    if not ok or not npcID then
         return nil
     end
 
-    return strlower(name)
+    local convertOk, numericNpcID = pcall(tonumber, npcID)
+    return convertOk and numericNpcID or nil
+end
+
+local function NormalizeName(name)
+    if name == nil then
+        return nil
+    end
+
+    local ok, normalizedName = pcall(strlower, name)
+    if not ok or normalizedName == "" then
+        return nil
+    end
+
+    return normalizedName
 end
 
 local function GetAlertKey(npcName, npcID, targetName)
@@ -161,7 +178,7 @@ local function GetTrackedEntryForStep(step)
                 targetName = step.source.targetName or entry.targetName,
                 mechanic = entry.mechanic,
                 note = entry.note,
-                condition = entry.condition,
+                conditions = entry.conditions,
                 waypoints = entry.waypoints,
                 routeType = entry.routeType,
                 routes = entry.routes,
@@ -718,34 +735,44 @@ function Alert:TryAlertUnit(unitToken, seenGuids)
 
     local unitName = UnitName(unitToken)
     local guid = UnitGUID(unitToken)
-    if not guid then
-        return false
-    end
-    if seenGuids then
-        seenGuids[guid] = true
-    end
-
-    if nearbyNpcGuids[guid] then
-        return false
-    end
-
     local npcID = GetNpcIDFromGUID(guid)
-    if not npcID then
+    if not npcID and not unitName then
         return false
     end
 
-    local trackedByNpc = npcToEntry[npcID] ~= nil
+    local trackedByNpc = npcID and npcToEntry[npcID] ~= nil or false
     local isRelevantByNpc, entryName, targetName = self:IsRelevantMountSourceNpc(npcID)
-    local isRelevantByName, nameEntryName, nameTargetName = self:IsRelevantMountSourceName(unitName)
+    local isRelevantByName, nameEntryName, nameTargetName = false, nil, nil
+    local nearbyKey = nil
     local shown = false
 
-    if isRelevantByNpc then
-        shown = self:ShowAlert(unitName, npcID, targetName)
+    if not isRelevantByNpc then
+        isRelevantByName, nameEntryName, nameTargetName = self:IsRelevantMountSourceName(unitName)
     end
 
-    if trackedByNpc or isRelevantByName then
+    if isRelevantByNpc then
+        nearbyKey = GetAlertKey(unitName, npcID, targetName)
+    elseif isRelevantByName then
+        nearbyKey = GetAlertKey(unitName, nil, nameTargetName or unitName)
+    end
+
+    if seenGuids and nearbyKey then
+        seenGuids[nearbyKey] = true
+    end
+
+    if nearbyKey and nearbyNpcGuids[nearbyKey] then
+        return false
+    end
+
+    if isRelevantByNpc then
+        shown = self:ShowAlert(targetName or entryName or L["Rare Found!"], npcID, targetName)
+    elseif isRelevantByName then
+        shown = self:ShowAlert(nameTargetName or nameEntryName or L["Rare Found!"], nil, nameTargetName)
+    end
+
+    if ALERT_DEBUG_ENABLED and (trackedByNpc or isRelevantByName) then
         DebugLogOnce(
-            "unit:" .. guid .. ":" .. FormatDebugBool(shown),
+            "unit:" .. (nearbyKey or (npcID and ("npc:" .. npcID) or unitToken)) .. ":" .. FormatDebugBool(shown),
             "unit token=%s name=%s guid=%s npcID=%s trackedNpc=%s matchNpc=%s matchName=%s entry=%s target=%s shown=%s",
             FormatDebugValue(unitToken),
             FormatDebugValue(unitName),
@@ -760,8 +787,8 @@ function Alert:TryAlertUnit(unitToken, seenGuids)
         )
     end
 
-    if shown or isRelevantByNpc or isRelevantByName then
-        nearbyNpcGuids[guid] = true
+    if nearbyKey and (shown or isRelevantByNpc or isRelevantByName) then
+        nearbyNpcGuids[nearbyKey] = true
     end
 
     if shown then

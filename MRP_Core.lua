@@ -45,6 +45,10 @@ function Core:NextStep()
 
     repeat
         MRP_CharacterSettings.currentStep = MRP_CharacterSettings.currentStep + 1
+        if MRP_CharacterSettings.currentStep > #MRP.Filter.filteredSteps then
+            MRP_CharacterSettings.currentStep = #MRP.Filter.filteredSteps
+            break
+        end
         local step = MRP.Filter:GetCurrentStep()
     until not (MRP_CharacterSettings.autoSkip and step and self:ShouldSkipStep(step))
 
@@ -275,68 +279,6 @@ function Core:GetMostSuitableDifficultyIds(step)
     return bestDifficultyIds, mountsPerDifficultyId
 end
 
---- Evaluate an open world condition string.
---- Returns true if the condition is met (or absent), false if not.
----@param condition string?
----@return boolean
-function Core:EvaluateCondition(condition)
-    if not condition then return true end
-
-    if condition == "horde_only" then
-        return UnitFactionGroup("player") == "Horde"
-    end
-
-    if condition == "alliance_only" then
-        return UnitFactionGroup("player") == "Alliance"
-    end
-
-    if condition == "warfront_arathi" or condition == "warfront_darkshore" then
-        -- Warfront rares are only available when your faction controls the zone.
-        -- Check for active world quests on the warfront map as a proxy.
-        local mapID = (condition == "warfront_arathi") and 14 or 62
-        if C_QuestLog and C_QuestLog.GetQuestsOnMap then
-            local quests = C_QuestLog.GetQuestsOnMap(mapID)
-            return quests ~= nil and #quests > 0
-        end
-        return false
-    end
-
-    -- Reputation conditions: rep_<factionId>_<standing>
-    -- standing: 4=Friendly, 5=Honored, 6=Revered, 7=Exalted, 8=Renown
-    local factionId, requiredStanding = condition:match("^rep_(%d+)_(%d+)$")
-    if factionId then
-        factionId = tonumber(factionId)
-        requiredStanding = tonumber(requiredStanding)
-        local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
-        if factionData then
-            return factionData.currentStanding >= requiredStanding
-        end
-        return false
-    end
-
-    return true
-end
-
---- Check if a step's condition is currently met.
----@param step Step
----@return boolean
-function Core:IsStepConditionMet(step)
-    local condition = self:GetStepCondition(step)
-    if not condition then return true end
-    return self:EvaluateCondition(condition)
-end
-
---- Return the condition string for a step, or nil.
----@param step Step
----@return string?
-function Core:GetStepCondition(step)
-    local t = step.source.type
-    if t ~= MRP.FilterSourceType.OpenWorld and t ~= MRP.FilterSourceType.Quest and t ~= MRP.FilterSourceType.Treasure and t ~= MRP.FilterSourceType.Vendor then return nil end
-    local entry = MRP.Data.OPEN_WORLD[step.source.name]
-    if not entry then return nil end
-    return entry.condition
-end
-
 --- Return a human-readable message for an unmet condition.
 ---@param condition string
 ---@return string
@@ -362,8 +304,8 @@ function Core:ShouldSkipStep(step)
         return false
     end
 
-    -- Skip steps whose condition is not met (e.g. warfront not active)
-    if not self:IsStepConditionMet(step) then
+    -- Skip steps where any condition is unmet (faction, warfront, reputation, holiday, …)
+    if not MRP.Util.AreStepConditionsMet(step) then
         return true
     end
 
@@ -807,7 +749,8 @@ function Core:InitializeSettings()
             expansions = {},
             sourceTypes = {},
             collectedStates = {},
-            factions = {}
+            factions = {},
+            holidays = {}
         }
     end
 
@@ -833,18 +776,27 @@ function Core:InitializeSettings()
         end
     end
 
-    -- Faction filter: auto-detect on first load (old saves won't have this)
     if MRP_CharacterSettings.filter.factions == nil then
-        local playerFaction = UnitFactionGroup("player")
-        MRP_CharacterSettings.filter.factions = {
-            [MRP.FilterFaction.Neutral] = true,
-            [MRP.FilterFaction.Alliance] = (playerFaction == "Alliance"),
-            [MRP.FilterFaction.Horde] = (playerFaction == "Horde"),
-        }
+        MRP_CharacterSettings.filter.factions = {}
     end
-    -- Backfill Neutral for saves that have factions but predate the Neutral option
-    if MRP_CharacterSettings.filter.factions[MRP.FilterFaction.Neutral] == nil then
-        MRP_CharacterSettings.filter.factions[MRP.FilterFaction.Neutral] = true
+
+    for _, factionKey in ipairs(MRP.FilterFactionOrder) do
+        local faction = MRP.FilterFaction[factionKey]
+        if MRP_CharacterSettings.filter.factions[faction] == nil then
+            local playerFaction = UnitFactionGroup("player")
+            MRP_CharacterSettings.filter.factions[faction] = factionKey == "Neutral" or (factionKey == playerFaction)
+        end
+    end
+
+    if MRP_CharacterSettings.filter.holidays == nil then
+        MRP_CharacterSettings.filter.holidays = {}
+    end
+
+    for _, holidayKey in ipairs(MRP.FilterHolidayOrder) do
+        local holiday = MRP.FilterHoliday[holidayKey]
+        if MRP_CharacterSettings.filter.holidays[holiday] == nil then
+            MRP_CharacterSettings.filter.holidays[holiday] = true
+        end
     end
 
     if MRP_CharacterSettings.ignoredHelpfulItems == nil then

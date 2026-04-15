@@ -5,6 +5,6 @@
 ## Author: Deathwing
 ## X-License: All Rights Reserved
 ## X-Category: Library
-## Version: 1.1.0
+## Version: 1.2.0
 
 MRPData_[Game].xml

@@ -77,6 +77,56 @@ MRP.FilterFactionOrder = {
     "Horde"
 }
 
+---@enum FilterHoliday
+MRP.FilterHoliday = {
+    None = "none",
+    LunarFestival = "event_lunar",
+    LoveIsInTheAir = "event_love",
+    Noblegarden = "event_noblegarden",
+    ChildrensWeek = "event_childrens",
+    MidsummerFireFestival = "event_midsummer",
+    Brewfest = "event_brewfest",
+    HallowsEnd = "event_hallows",
+    DayOfTheDead = "event_dead",
+    PilgrimsBounty = "event_pilgrims",
+    FeastOfWinterVeil = "event_winterveil",
+    PiratesDay = "event_pirates",
+    WoWAnniversary = "event_anniversary",
+}
+
+MRP.FilterHolidayOrder = {
+    "None",
+    "LunarFestival",
+    "LoveIsInTheAir",
+    "Noblegarden",
+    "ChildrensWeek",
+    "MidsummerFireFestival",
+    "Brewfest",
+    "HallowsEnd",
+    "DayOfTheDead",
+    "PilgrimsBounty",
+    "FeastOfWinterVeil",
+    "PiratesDay",
+    "WoWAnniversary",
+}
+
+--- Map from FilterHoliday condition strings to known calendar event IDs.
+--- Used by the runtime calendar scanner to match active events.
+MRP.HolidayCalendarEventIDs = {
+    ["event_lunar"] = { 181 },                    -- Lunar Festival
+    ["event_love"] = { 335, 423 },                -- Love is in the Air
+    ["event_noblegarden"] = { 233 },              -- Noblegarden
+    ["event_childrens"] = { 201 },                -- Children's Week
+    ["event_midsummer"] = { 341, 424 },           -- Midsummer Fire Festival
+    ["event_brewfest"] = { 372 },                 -- Brewfest
+    ["event_hallows"] = { 324, 425 },             -- Hallow's End
+    ["event_dead"] = { 409 },                     -- Day of the Dead
+    ["event_pilgrims"] = { 404 },                 -- Pilgrim's Bounty
+    ["event_winterveil"] = { 141 },               -- Feast of Winter Veil
+    ["event_pirates"] = { 398 },                  -- Pirates' Day
+    ["event_anniversary"] = { 1262, 1418, 1266 }, -- WoW Anniversary / Bronze Celebration
+}
+
 ---@enum RequiredAddon
 MRP.RequiredAddon = {
     MRPData = "Mount Route Planner Data",

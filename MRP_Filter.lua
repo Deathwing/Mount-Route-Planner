@@ -5,6 +5,8 @@
 ---@field expansions { [FilterExpansion] : boolean } The expansion levels that are shown.
 ---@field sourceTypes { [FilterSourceType] : boolean } The sources types that are shown.
 ---@field collectedStates { [FilterCollectedState] : boolean } The collected states that are shown.
+---@field factions { [FilterFaction] : boolean } The factions that are shown.
+---@field holidays { [FilterHoliday] : boolean } The holidays that are shown.
 
 local Filter = {
     ---@type Step[]
@@ -84,15 +86,67 @@ function Filter:SetFaction(faction, value)
     end
 end
 
-function Filter:GetStepFaction(step)
-    local entry = MRP.Data.OPEN_WORLD[step.source.name]
-    local condition = entry and entry.condition or nil
-    if condition == "horde_only" then
-        return MRP.FilterFaction.Horde
-    elseif condition == "alliance_only" then
-        return MRP.FilterFaction.Alliance
+function Filter:SetHoliday(holiday, value)
+    if value then
+        if not MRP_CharacterSettings.filter.holidays[holiday] then
+            MRP_CharacterSettings.filter.holidays[holiday] = true
+            self:Apply()
+        end
     else
-        return MRP.FilterFaction.Neutral
+        if MRP_CharacterSettings.filter.holidays[holiday] then
+            MRP_CharacterSettings.filter.holidays[holiday] = false
+            self:Apply()
+        end
+    end
+end
+
+---Gets the faction for a step based on its conditions, defaulting to Neutral if no faction-specific conditions are found.
+---@param step Step
+---@return FilterFaction
+function Filter:GetStepFaction(step)
+    local entry = MRP.Util.GetStepEntry(step)
+    if entry and entry.conditions then
+        for _, key in ipairs(entry.conditions) do
+            if key == "horde_only" then
+                return MRP.FilterFaction.Horde
+            elseif key == "alliance_only" then
+                return MRP.FilterFaction.Alliance
+            end
+        end
+    end
+    return MRP.FilterFaction.Neutral
+end
+
+---Gets the holiday condition key for a step based on its conditions, defaulting to None if no holiday conditions are found.
+---@param step Step
+---@return FilterHoliday
+function Filter:GetStepHoliday(step)
+    local entry = MRP.Util.GetStepEntry(step)
+    if entry and entry.conditions then
+        for _, key in ipairs(entry.conditions) do
+            if key:find("^event_") then return key end
+        end
+    end
+    return MRP.FilterHoliday.None
+end
+
+function Filter:BuildAvailability()
+    self.availableExpansions = {}
+    self.availableSourceTypes = {}
+    self.availableFactions = {}
+    self.availableHolidays = {}
+
+    for _, step in ipairs(MRP.Data.STEPS) do
+        if step.mounts and #step.mounts > 0 then
+            if step.expansion then
+                self.availableExpansions[step.expansion] = true
+            end
+            if step.source and step.source.type then
+                self.availableSourceTypes[step.source.type] = true
+            end
+            self.availableFactions[self:GetStepFaction(step)] = true
+            self.availableHolidays[self:GetStepHoliday(step)] = true
+        end
     end
 end
 
@@ -103,11 +157,13 @@ function Filter:UpdateFilteredSteps()
         if step.expansion and MRP_CharacterSettings.filter.expansions[step.expansion] then
             if step.source.type and MRP_CharacterSettings.filter.sourceTypes[step.source.type] then
                 if MRP_CharacterSettings.filter.factions[self:GetStepFaction(step)] then
-                    for _, mount in ipairs(step.mounts) do
-                        local _, _, collected = MRP.Util.GetMountInfoSafe(mount)
-                        if MRP_CharacterSettings.filter.collectedStates[collected] then
-                            table.insert(self.filteredSteps, step)
-                            break
+                    if MRP_CharacterSettings.filter.holidays[self:GetStepHoliday(step)] then
+                        for _, mount in ipairs(step.mounts) do
+                            local _, _, collected = MRP.Util.GetMountInfoSafe(mount)
+                            if MRP_CharacterSettings.filter.collectedStates[collected] then
+                                table.insert(self.filteredSteps, step)
+                                break
+                            end
                         end
                     end
                 end
@@ -132,6 +188,7 @@ end
 ---@param onLoad boolean?
 function Filter:Apply(onLoad)
     if onLoad then
+        self:BuildAvailability()
         self:UpdateFilteredSteps()
         self:EnsureInBounds()
 

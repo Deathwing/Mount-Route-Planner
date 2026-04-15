@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.0
+
+### Fixes
+- Wizard's Sanctum enter/exit edge is no longer incorrectly flagged as a hub transit skip, ensuring the step is visible in routes
+
+### Added
+- Added 7 missing holiday mounts: Love Witch's Sweeper, Spring Butterfly, Brewfest Bomber, Minion of Grumpus, The Headless Horseman's Ghoulish Charger, Illidari Doomhawk, and Azure Worldchiller
+- Added Historian Ma'di (WoW Anniversary vendor) and Izzy Hollyfizzle (Feast of Winter Veil vendor) as new open-world step sources
+- Added source name aliases for Doomwalker and Feast of Winter Veil to resolve mounts through alternative vendors
+
+### Fixes
+- Fixed 5 obtainable mounts being incorrectly filtered out by the legacy Flag 64 check in the export pipeline
+- Corrected the generated Forbidden Reach UI map ID from `2107` to `2151` for the Storykeeper Ashekh vendor data and related step output
+
 ## 1.1.0
 
 ### Changes

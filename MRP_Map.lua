@@ -22,7 +22,7 @@ local routePins = {}
 local routeLines = {}
 local routeArrows = {}
 
-local MAP_OVERLAY_FRAME_STRATA = "HIGH"
+local MAP_OVERLAY_FRAME_STRATA = "MEDIUM"
 local MAP_OVERLAY_LINE_LEVEL_OFFSET = 10
 local MAP_OVERLAY_ARROW_LEVEL_OFFSET = 20
 local MAP_OVERLAY_ARROW_CHILD_LEVEL_OFFSET = 1
@@ -114,7 +114,7 @@ local ROUTE_PIN_WORLD_MIN_SCALE = 0.45
 local ROUTE_PIN_CONTINENT_MIN_SCALE = 0.55
 local ROUTE_PIN_LOCAL_MIN_SCALE = 0.7
 local ROUTE_PIN_MAX_SCALE = 1.0
-local ROUTE_PIN_FRAME_LEVEL_TYPE = "PIN_FRAME_LEVEL_DIG_SITE"
+local ROUTE_PIN_FRAME_LEVEL_TYPE = "PIN_FRAME_LEVEL_MAP_LINK"
 local CURRENT_PATH_PIN_FRAME_LEVEL_BOOST = 100
 local ROUTE_CLUSTER_DISTANCE_LOCAL = 22
 local ROUTE_CLUSTER_DISTANCE_CONTINENT = 38
@@ -574,7 +574,7 @@ local function BuildRoutePinClusters(visibleRoute, canvasW, canvasH, currentStep
             if info.stepIdx >= currentStepIdx then
                 cluster.allPast = false
             end
-            if info.conditionMet then
+            if info.conditionsMet then
                 cluster.allUnavailable = false
             end
             if sameSourceType ~= info.sourceType then
@@ -597,6 +597,15 @@ local function BuildRoutePinClusters(visibleRoute, canvasW, canvasH, currentStep
             table.insert(cluster.tooltipLines, string.format("...and %d more", cluster.count - 5))
         end
 
+        -- Pin a cluster that contains the current step to the current step's
+        -- exact position instead of the member centroid.
+        if cluster.containsCurrent then
+            cluster.x = cluster.primaryInfo.x
+            cluster.y = cluster.primaryInfo.y
+            cluster.pixelX = cluster.x * canvasW
+            cluster.pixelY = cluster.y * canvasH
+        end
+
         cluster.stepIndices = {}
         for _, info in ipairs(cluster.members) do
             table.insert(cluster.stepIndices, info.stepIdx)
@@ -609,7 +618,16 @@ local function BuildRoutePinClusters(visibleRoute, canvasW, canvasH, currentStep
         else
             cluster.tooltipTitle = string.format("%d overlapping route steps", cluster.count)
         end
-        cluster.tooltipWarning = (not cluster.primaryInfo.conditionMet and cluster.primaryInfo.condition) and MRP.Core:GetConditionMessage(cluster.primaryInfo.condition) or cluster.primaryInfo.difficultyWarning or nil
+        local conditionsWarning
+        if cluster.primaryInfo.conditions then
+            for _, cond in ipairs(cluster.primaryInfo.conditions) do
+                if not cond.met then
+                    conditionsWarning = cond.message
+                    break
+                end
+            end
+        end
+        cluster.tooltipWarning = conditionsWarning or cluster.primaryInfo.difficultyWarning or nil
     end
 
     return clusters
@@ -945,16 +963,17 @@ local PLAYER_LINE_START_PADDING_PX = 12
 local CURRENT_PATH_PIN_LINE_END_MARGIN_PX = 2
 
 local function TrimLineStartFromPlayerMarker(px, py, tx, ty, canvasW, canvasH)
-    local dx = tx - px
-    local dy = ty - py
-    local distancePx = math.sqrt((dx * canvasW) ^ 2 + (dy * canvasH) ^ 2)
+    return px, py
+    -- local dx = tx - px
+    -- local dy = ty - py
+    -- local distancePx = math.sqrt((dx * canvasW) ^ 2 + (dy * canvasH) ^ 2)
 
-    if distancePx <= PLAYER_LINE_START_PADDING_PX then
-        return px, py
-    end
+    -- if distancePx <= PLAYER_LINE_START_PADDING_PX then
+    --     return px, py
+    -- end
 
-    local trim = PLAYER_LINE_START_PADDING_PX / distancePx
-    return px + dx * trim, py + dy * trim
+    -- local trim = PLAYER_LINE_START_PADDING_PX / distancePx
+    -- return px + dx * trim, py + dy * trim
 end
 
 local function GetCurrentPathPinLineEndPaddingPx(step)
@@ -971,16 +990,17 @@ local function GetCurrentPathPinLineEndPaddingPx(step)
 end
 
 local function TrimLineEndFromCurrentPathPin(sx, sy, tx, ty, canvasW, canvasH, paddingPx)
-    local dx = tx - sx
-    local dy = ty - sy
-    local distancePx = math.sqrt((dx * canvasW) ^ 2 + (dy * canvasH) ^ 2)
+    return tx, ty
+    -- local dx = tx - sx
+    -- local dy = ty - sy
+    -- local distancePx = math.sqrt((dx * canvasW) ^ 2 + (dy * canvasH) ^ 2)
 
-    if distancePx <= paddingPx then
-        return tx, ty
-    end
+    -- if distancePx <= paddingPx then
+    --     return tx, ty
+    -- end
 
-    local trim = paddingPx / distancePx
-    return tx - dx * trim, ty - dy * trim
+    -- local trim = paddingPx / distancePx
+    -- return tx - dx * trim, ty - dy * trim
 end
 
 -- Resolve a data entry's position onto the currently viewed map.
@@ -1501,8 +1521,8 @@ function Map:UpdateOverlay()
                             y = y,
                             name = step.source.name,
                             sourceType = step.source.type,
-                            conditionMet = MRP.Core:IsStepConditionMet(step),
-                            condition = MRP.Core:GetStepCondition(step),
+                            conditionsMet = MRP.Util.AreStepConditionsMet(step),
+                            conditions = MRP.Util.GetStepConditions(step),
                             mounts = mounts,
                             difficultyWarning = diffWarning,
                         })

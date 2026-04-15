@@ -40,6 +40,7 @@
 			"COLLECTIONS_JOURNAL_TAB_INDEX_MOUNTS",
 			"EncounterJournal_OpenJournal",
 			"SlashCmdList",
+			"GetAddOnMetadata",
 			"Settings",
 			"NUM_TOTAL_EQUIPPED_BAG_SLOTS",
 			"MerchantFrame",
@@ -107,7 +108,9 @@
 			"GAMEOPTIONS_MENU",
 			"UISpecialFrames",
 			"GetMinimapShape",
-			"GetAddOnMetadata"
+			"SPLASH_BATTLEFORAZEROTH_8_2_0_FEATURE2_TITLE",
+			"CALENDAR_WEEKDAY_NAMES",
+			"CALENDAR_FULLDATE_MONTH_NAMES"
 		],
 		"Lua.diagnostics.neededFileStatus": {
 			"undefined-global": "Any"
