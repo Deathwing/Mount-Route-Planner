@@ -9,6 +9,9 @@ MRP.Changelog = Changelog
 local ADDON_NAME = "MountRoutePlanner"
 local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
+-- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
+-- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
+local CHANGELOG_VERSION = "v2.2.0"
 
 local CHANGELOG_CONTENT = [[
 |cffffd200Mount Route Planner 2.2.0|r
@@ -63,6 +66,31 @@ local CHANGELOG_CONTENT = [[
 
 local changelogFrame
 
+local function GetLastSeenChangelogVersion()
+    if not MRP_Settings then
+        return nil
+    end
+
+    return MRP_Settings.lastSeenChangelogVersion or MRP_Settings.lastSeenVersion
+end
+
+local function MarkCurrentVersionsSeen()
+    if not MRP_Settings then
+        return
+    end
+
+    MRP_Settings.lastSeenVersion = CURRENT_VERSION
+    MRP_Settings.lastSeenChangelogVersion = CHANGELOG_VERSION
+end
+
+local function GetVersionLabelText()
+    if CURRENT_VERSION == CHANGELOG_VERSION then
+        return string.format("Version %s", CHANGELOG_VERSION)
+    end
+
+    return string.format("Addon %s - Notes through %s", CURRENT_VERSION, CHANGELOG_VERSION)
+end
+
 local function RefreshContentLayout(frame)
     if not frame or not frame.scrollFrame or not frame.contentText or not frame.scrollChild then
         return
@@ -83,8 +111,8 @@ local function UpdateDismissState(checked)
     end
 
     if checked then
-        MRP_Settings.lastChangelogVersion = CURRENT_VERSION
-    elseif MRP_Settings.lastChangelogVersion == CURRENT_VERSION then
+        MRP_Settings.lastChangelogVersion = CHANGELOG_VERSION
+    elseif MRP_Settings.lastChangelogVersion == CHANGELOG_VERSION then
         MRP_Settings.lastChangelogVersion = nil
     end
 end
@@ -126,7 +154,7 @@ local function CreateChangelogFrame()
 
     local versionText = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     versionText:SetPoint("TOPLEFT", title, "BOTTOMLEFT", 0, -4)
-    versionText:SetText(string.format("Version %s", CURRENT_VERSION))
+    versionText:SetText(GetVersionLabelText())
 
     local closeBtn = CreateFrame("Button", nil, frame, "UIPanelCloseButton")
     closeBtn:SetPoint("TOPRIGHT", -10, -10)
@@ -163,7 +191,7 @@ local function CreateChangelogFrame()
     frame.dismissCheckbox = dismissCheckbox
 
     frame:SetScript("OnShow", function(self)
-        self.dismissCheckbox:SetChecked(MRP_Settings and MRP_Settings.lastChangelogVersion == CURRENT_VERSION or false)
+        self.dismissCheckbox:SetChecked(MRP_Settings and MRP_Settings.lastChangelogVersion == CHANGELOG_VERSION or false)
         RefreshContentLayout(self)
         self:Raise()
         C_Timer.After(0, function()
@@ -198,16 +226,16 @@ function Changelog:CheckShowOnLogin()
         return
     end
 
-    local lastSeenVersion = MRP_Settings.lastSeenVersion
+    local lastSeenChangelogVersion = GetLastSeenChangelogVersion()
     local lastChangelogVersion = MRP_Settings.lastChangelogVersion
 
-    MRP_Settings.lastSeenVersion = CURRENT_VERSION
+    MarkCurrentVersionsSeen()
 
-    if lastChangelogVersion == CURRENT_VERSION then
+    if lastChangelogVersion == CHANGELOG_VERSION then
         return
     end
 
-    if lastSeenVersion == CURRENT_VERSION then
+    if lastSeenChangelogVersion == CHANGELOG_VERSION then
         return
     end
 

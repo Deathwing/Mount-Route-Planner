@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v2.2.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.2.1) (2026-04-20)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.2.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Changes
+- Added explicit in-game changelog versioning so patch-only releases can reuse the previous popup notes without showing a new changelog automatically
+
 ## [v2.2.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.2.0) (2026-04-14)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.2.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

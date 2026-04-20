@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.3.0
+
+### Changes
+- Updated for build 12.0.5
+
 ## 1.2.0
 
 ### Fixes

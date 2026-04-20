@@ -19,7 +19,8 @@
 ---@field maxStepsBehind number Maximum steps behind current to show on map.
 ---@field unlimitedStepsBehind boolean Whether to show all steps behind (ignores maxStepsBehind).
 ---@field lastSeenVersion string? The last addon version observed during login.
----@field lastChangelogVersion string? The last addon version whose changelog was dismissed.
+---@field lastSeenChangelogVersion string? The last changelog content version observed during login.
+---@field lastChangelogVersion string? The last changelog content version whose popup was dismissed.
 MRP_Settings = {
     useTomTom = true,
     showDifficultyWarning = true,

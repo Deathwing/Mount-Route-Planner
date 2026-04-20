@@ -28,6 +28,7 @@ if not MRPData.Internal then return end
 ---@class OpenWorld : BaseEntry
 ---@field questID number the questID for lockout tracking (0 = always farmable)
 ---@field mechanic string the mechanic type ("kill", "click", "interact")
+---@field sourceType string? the source type ("Treasure", "Quest", "Vendor", etc.)
 ---@field npcID number? the NPC ID for targeting (nil or 0 for non-NPC sources)
 ---@field note string? an optional note about the source
 ---@field waypoints OpenWorldWaypoint[]? additional map locations to highlight
@@ -88,7 +89,7 @@ if not MRPData.Internal then return end
 ---@class Mount
 ---@field id number the mountID
 ---@field name string the name of the mount
----@field icon string the icon texture path of the mount
+---@field icon number the icon texture ID of the mount
 ---@field itemId number the itemID of the mount
 ---@field spellId number the spellID of the mount
 ---@field source MountSource the source details of the mount
