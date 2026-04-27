@@ -1,5 +1,18 @@
 # Mount Route Planner
 
+## [v2.3.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.0) (2026-04-26)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added Timewalking filter: steps tied to specific Timewalking events (Classic, TBC, Wrath, Cata, MoP, WoD, Legion, BfA, Shadowlands) are automatically shown or hidden based on the currently active event
+- Added Shadowlands Timewalking detection
+- Added `MRP_API.Frames` exposing references to key addon frames (main frame, alert frame, warning frame, changelog frame, and options frames) for external addon use
+
+### Changes
+- Timewalking detection result is now cached and refreshed at the top of each hour to reduce redundant polling
+- Changelog window now closes with the Escape key
+- Changelog frame is no longer a named global; frame references are exposed through `MRP.Frames` instead
+
 ## [v2.2.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.2.1) (2026-04-20)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.2.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

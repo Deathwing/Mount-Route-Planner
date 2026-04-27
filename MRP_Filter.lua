@@ -130,6 +130,33 @@ function Filter:GetStepHoliday(step)
     return MRP.FilterHoliday.None
 end
 
+---@param step Step
+---@return string? timewalking
+function Filter:GetStepTimewalking(step)
+    local entry = MRP.Util.GetStepEntry(step)
+    if entry and entry.conditions then
+        for _, key in ipairs(entry.conditions) do
+            if key == "timewalking_any" or key:find("^timewalking_") then return key end
+        end
+    end
+    return nil
+end
+
+---@param timewalking string?
+---@return boolean
+function Filter:FilterTimewalking(timewalking)
+    if not timewalking then
+        return true
+    end
+
+    if timewalking == "timewalking_any" then
+        return next(MRP.Core:GetActiveTimewalkingMap()) ~= nil
+    end
+
+    local expansion = tonumber(timewalking:match("^timewalking_(%d+)$"))
+    return expansion ~= nil and MRP.Core:GetActiveTimewalkingMap()[expansion] or false
+end
+
 function Filter:BuildAvailability()
     self.availableExpansions = {}
     self.availableSourceTypes = {}
@@ -158,11 +185,13 @@ function Filter:UpdateFilteredSteps()
             if step.source.type and MRP_CharacterSettings.filter.sourceTypes[step.source.type] then
                 if MRP_CharacterSettings.filter.factions[self:GetStepFaction(step)] then
                     if MRP_CharacterSettings.filter.holidays[self:GetStepHoliday(step)] then
-                        for _, mount in ipairs(step.mounts) do
-                            local _, _, collected = MRP.Util.GetMountInfoSafe(mount)
-                            if MRP_CharacterSettings.filter.collectedStates[collected] then
-                                table.insert(self.filteredSteps, step)
-                                break
+                        if self:FilterTimewalking(self:GetStepTimewalking(step)) then
+                            for _, mount in ipairs(step.mounts) do
+                                local _, _, collected = MRP.Util.GetMountInfoSafe(mount)
+                                if MRP_CharacterSettings.filter.collectedStates[collected] then
+                                    table.insert(self.filteredSteps, step)
+                                    break
+                                end
                             end
                         end
                     end

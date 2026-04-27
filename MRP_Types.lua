@@ -5,3 +5,4 @@
 ---@field DATA MRPDataAPI the main data API, containing all route and step information
 ---@field FARSTRIDER FarstriderLibAPI the API for accessing FarstriderLib's pathfinding features
 ---@field Rebuild fun() Clears all cached pathfinding data and forces a full rebuild on the next pathfinding request. Call this after updating any data.
+---@field Frames table<string, Frame | table<string, Frame> | nil> a table containing references to important frames used by the addon, such as the main frame, changelog frame, and alert frame

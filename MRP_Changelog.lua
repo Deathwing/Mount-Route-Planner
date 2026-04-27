@@ -11,9 +11,20 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.2.0"
+local CHANGELOG_VERSION = "v2.3.0"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.3.0|r
+
+|cff00ff00What's New|r
+- Timewalking filter: steps tied to specific Timewalking events are now automatically shown or hidden based on the currently active event, including Shadowlands Timewalking.
+- Other addons can now access key MRP frames through the public API (`MRP_API.Frames`).
+
+|cff00ff00Changes|r
+- Timewalking vendor availability is now detected hourly and cached, reducing redundant polling.
+- The changelog window now closes with the Escape key.
+
+
 |cffffd200Mount Route Planner 2.2.0|r
 
 |cff00ff00What's New|r
@@ -122,7 +133,7 @@ local function CreateChangelogFrame()
         return changelogFrame
     end
 
-    local frame = CreateFrame("Frame", "MRPChangelogFrame", UIParent, "BackdropTemplate")
+    local frame = CreateFrame("Frame", nil, UIParent, "BackdropTemplate")
     frame:SetSize(620, 520)
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
@@ -147,6 +158,8 @@ local function CreateChangelogFrame()
         },
     })
     frame:Hide()
+
+    MRP.Frames.ChangelogFrame = frame
 
     local title = frame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     title:SetPoint("TOPLEFT", 18, -16)
@@ -194,6 +207,7 @@ local function CreateChangelogFrame()
         self.dismissCheckbox:SetChecked(MRP_Settings and MRP_Settings.lastChangelogVersion == CHANGELOG_VERSION or false)
         RefreshContentLayout(self)
         self:Raise()
+        self:EnableKeyboard(true)
         C_Timer.After(0, function()
             if changelogFrame == self and self:IsShown() then
                 RefreshContentLayout(self)
@@ -201,11 +215,19 @@ local function CreateChangelogFrame()
         end)
     end)
 
+    frame:SetScript("OnHide", function(self)
+        self:EnableKeyboard(false)
+    end)
+
+    frame:SetScript("OnKeyDown", function(self, key)
+        if key == "ESCAPE" then
+            self:Hide()
+        end
+    end)
+
     frame:SetScript("OnSizeChanged", function(self)
         RefreshContentLayout(self)
     end)
-
-    table.insert(UISpecialFrames, "MRPChangelogFrame")
 
     changelogFrame = frame
     return frame

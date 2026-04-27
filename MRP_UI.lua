@@ -77,6 +77,8 @@ frame:SetScript("OnDragStart", frame.StartMoving)
 frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 frame:Hide()
 
+MRP.Frames.MainFrame = frame
+
 local closeBtn = CreateIconButton(frame, "Frame_Close")
 closeBtn:SetPoint("TOPRIGHT", -14, -14)
 
@@ -1614,6 +1616,8 @@ warningFrame.subText:SetWordWrap(true)
 warningFrame.subText:SetPoint("BOTTOM", warningFrame, "BOTTOM", 0, 10)
 warningFrame.subText:SetTextColor(1, 1, 1)
 warningFrame.subText:SetText(L["Please switch to '%s' as not all mounts are collectable on this difficulty."])
+
+MRP.Frames.WarningFrame = warningFrame
 
 function UI:ShowDifficultyWarning(difficultyIds)
     warningFrame.title:SetPoint("TOP", warningFrame, "TOP", 0, #difficultyIds > 1 and 0 or -5)

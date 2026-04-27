@@ -400,6 +400,8 @@ alertFrame:SetScript("OnDragStop", function(self)
     Alert:SavePosition()
 end)
 
+MRP.Frames.AlertFrame = alertFrame
+
 -- Icon
 local alertIcon = alertFrame:CreateTexture(nil, "ARTWORK")
 alertIcon:SetSize(40, 40)

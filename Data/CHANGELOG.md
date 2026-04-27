@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0
+
+### Fixes
+- Fixed issues with timewalking steps
+- Fixed issues with some alliance / horde specific steps showing for the wrong faction
+
 ## 1.3.0
 
 ### Changes

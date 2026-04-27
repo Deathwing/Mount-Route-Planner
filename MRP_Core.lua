@@ -283,6 +283,17 @@ end
 ---@param condition string
 ---@return string
 function Core:GetConditionMessage(condition)
+    if condition == "timewalking_any" then
+        return L["Requires an active Timewalking event."]
+    end
+
+    local timewalkingExpansion = condition:match("^timewalking_(%d+)$")
+    if timewalkingExpansion then
+        local expansion = tonumber(timewalkingExpansion)
+        local expansionName = _G["EXPANSION_NAME" .. expansion] or MRP.FilterExpansionOrder[expansion + 1] or timewalkingExpansion
+        return format(L["Requires active %s Timewalking event."], expansionName)
+    end
+
     -- Reputation conditions: rep_<factionId>_<standing>
     local factionId, requiredStanding = condition:match("^rep_(%d+)_(%d+)$")
     if factionId then
@@ -592,7 +603,7 @@ function Core:CheckDifficultyWarning(event)
     end
 end
 
----@type { [number]: { expansion: FilterExpansion, spellId: number }[] }
+---@type { expansion: FilterExpansion, spellId: number }[]
 local timewalkingSpellIds = {
     { expansion = MRP.FilterExpansion.Classic,            spellId = 452307 },
     { expansion = MRP.FilterExpansion.TheBurningCrusade,  spellId = 335148 },
@@ -602,10 +613,20 @@ local timewalkingSpellIds = {
     { expansion = MRP.FilterExpansion.WarlordsOfDraenor,  spellId = 335152 },
     { expansion = MRP.FilterExpansion.Legion,             spellId = 359082 },
     { expansion = MRP.FilterExpansion.BattleForAzeroth,   spellId = 1223878 },
+    { expansion = MRP.FilterExpansion.Shadowlands,        spellId = 1256534 },
 }
+
+---@type { [number]: boolean }?
+local activeTimewalkingMapCache = nil
+local activeTimewalkingMapCacheExpires = 0
 
 ---@return { [number]: boolean} activeTimewalkingMap
 function Core:GetActiveTimewalkingMap()
+    local now = time()
+    if activeTimewalkingMapCache and now < activeTimewalkingMapCacheExpires then
+        return activeTimewalkingMapCache
+    end
+
     local activeTimewalkingMap = {}
 
     for _, data in ipairs(timewalkingSpellIds) do
@@ -614,7 +635,10 @@ function Core:GetActiveTimewalkingMap()
         end
     end
 
-    return activeTimewalkingMap
+    activeTimewalkingMapCache = activeTimewalkingMap
+    activeTimewalkingMapCacheExpires = now - (now % 3600) + 3600
+
+    return activeTimewalkingMapCache
 end
 
 function Core:FilterTimewalkingSteps()

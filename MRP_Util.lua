@@ -138,7 +138,7 @@ end
 -- =====================================================================
 
 --- Condition types returned by GetStepConditions.
----@alias ConditionType "faction"|"warfront"|"reputation"|"holiday"
+---@alias ConditionType "faction"|"warfront"|"reputation"|"holiday"|"timewalking"
 
 ---@class StepCondition
 ---@field type ConditionType
@@ -211,6 +211,13 @@ function Util.GetStepConditions(step)
         elseif key:find("^event_") then
             condType = "holiday"
             met = MRP.Holidays:IsHolidayEventActive(key)
+        elseif key == "timewalking_any" then
+            condType = "timewalking"
+            met = next(MRP.Core:GetActiveTimewalkingMap()) ~= nil
+        elseif key:find("^timewalking_") then
+            condType = "timewalking"
+            local expansion = tonumber(key:match("^timewalking_(%d+)$"))
+            met = expansion ~= nil and MRP.Core:GetActiveTimewalkingMap()[expansion] or false
         else
             condType = "faction"
             met = true

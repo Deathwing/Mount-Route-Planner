@@ -6,4 +6,5 @@ MRP_API = {
     DATA = MRP.Data,
     FARSTRIDER = MRP.Farstrider,
     Rebuild = MRP.Core.Rebuild,
+    Frames = MRP.Frames,
 }

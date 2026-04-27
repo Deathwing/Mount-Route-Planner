@@ -560,3 +560,10 @@ function Options:Show()
 
     Settings.OpenToCategory(settingsCategory:GetID())
 end
+
+MRP.Frames.Settings = {
+    MainFrame = optionsFrame,
+    AlertFrame = alertFrame,
+    HelpfulItemsFrame = helpfulItemsFrame,
+    WorldMapFrame = worldMapFrame,
+}

@@ -10,9 +10,9 @@ local defaults = {
         CONFIG = {
             ElevationOverrides = {},
             MapTypeOverrides = {},
+            ContinentMapOverrides = {},
             IsolatedAreas = {},
-            IgnoredMaps = {},
-            IsolatedZones = {},
+            IsolatedContinents = {},
         },
         GetLocalizedString = function() return nil end,
         IsBindLocationSupported = function() return false end,
