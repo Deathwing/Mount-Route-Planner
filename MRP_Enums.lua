@@ -133,3 +133,16 @@ MRP.RequiredAddon = {
     FarstriderLib = "FarstriderLib",
     FarstriderLibData = "FarstriderLib Data",
 }
+
+---@enum WaypointSystem
+MRP.WaypointSystem = {
+    None = "none",
+    Waypoint = "waypoint",
+    TomTom = "tomtom",
+}
+
+MRP.WaypointSystemOrder = {
+    "None",
+    "Waypoint",
+    "TomTom",
+}

@@ -1,5 +1,14 @@
 # Mount Route Planner
 
+## [v2.3.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.1) (2026-04-30)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Changes
+- Replaced the "Use TomTom for waypoints" checkbox with a Waypoint System dropdown offering three options: None, Waypoint (Blizzard's built-in map pin), and TomTom
+- Existing settings are migrated automatically: previously enabled maps to TomTom, previously disabled maps to Waypoint
+- `/mrp tomtom on|off` is now deprecated and prints a warning; use `/mrp waypoint none|waypoint|tomtom` instead
+- Updated Russian (ruRU) localization (thanks ZamestoTV)
+
 ## [v2.3.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.0) (2026-04-26)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

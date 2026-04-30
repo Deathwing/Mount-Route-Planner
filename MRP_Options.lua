@@ -35,31 +35,80 @@ local helpfulItemsCategorySubtitle = helpfulItemsFrame:CreateFontString(nil, "OV
 helpfulItemsCategorySubtitle:SetPoint("TOPLEFT", helpfulItemsCategoryTitle, "BOTTOMLEFT", 0, -12)
 helpfulItemsCategorySubtitle:SetText(L["Ignored Helpful Items (Owned items only)"])
 
-local tomtomToggle = CreateFrame("CheckButton", nil, optionsFrame, "InterfaceOptionsCheckButtonTemplate")
-tomtomToggle:SetPoint("TOPLEFT", optionsTitle, "BOTTOMLEFT", 0, -12)
-tomtomToggle.Text:SetText(L["Use TomTom for waypoints"])
+local waypointSystemLabel = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+waypointSystemLabel:SetPoint("TOPLEFT", optionsTitle, "BOTTOMLEFT", 16, -16)
+waypointSystemLabel:SetText(L["Waypoint System"])
 
-tomtomToggle:SetScript("OnEnter", function(self)
+local waypointSystemDropdown = CreateFrame("Frame", "MRPWaypointSystemDropdown", optionsFrame, "UIDropDownMenuTemplate")
+waypointSystemDropdown:SetPoint("TOPLEFT", waypointSystemLabel, "BOTTOMLEFT", -16, -4)
+UIDropDownMenu_SetWidth(waypointSystemDropdown, 160)
+
+local function GetWaypointSystemLabel(value)
+    if value == MRP.WaypointSystem.None then
+        return L["WaypointSystem_None"]
+    elseif value == MRP.WaypointSystem.TomTom then
+        return L["WaypointSystem_TomTom"]
+    end
+    return L["WaypointSystem_Waypoint"]
+end
+
+local waypointSystemWarning
+
+local function UpdateWaypointWarning()
+    local system = MRP_Settings.waypointSystem
+    if system == MRP.WaypointSystem.TomTom and not MRP.Util.IsTomTomNavigationSupported() then
+        waypointSystemWarning:SetText("|cffff4444" .. L["Requires TomTom to be installed."] .. "|r")
+    elseif system == MRP.WaypointSystem.Waypoint and not MRP.Util.IsWaypointNavigationSupported() then
+        waypointSystemWarning:SetText("|cffff4444" .. L["Requires Shadowlands or later."] .. "|r")
+    else
+        waypointSystemWarning:SetText("")
+    end
+end
+
+local function SetWaypointSystem(value)
+    MRP_Settings.waypointSystem = value
+    UIDropDownMenu_SetText(waypointSystemDropdown, GetWaypointSystemLabel(value))
+    UpdateWaypointWarning()
+    MRP.UI:UpdateDisplay()
+end
+
+UIDropDownMenu_Initialize(waypointSystemDropdown, function(self, level)
+    for _, key in ipairs(MRP.WaypointSystemOrder) do
+        local value = MRP.WaypointSystem[key]
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = L["WaypointSystem_" .. key]
+        info.value = value
+        info.checked = (MRP_Settings.waypointSystem == value)
+        info.func = function()
+            SetWaypointSystem(value)
+            CloseDropDownMenus()
+        end
+        UIDropDownMenu_AddButton(info, level)
+    end
+end)
+
+waypointSystemDropdown:SetScript("OnEnter", function(self)
     GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-    GameTooltip:SetText(L["Use TomTom for waypoints"], 1, 1, 1)
-    GameTooltip:AddLine(L["Enable this to use TomTom for waypoint navigation."], 1, 1, 1)
-    GameTooltip:AddLine(L["This will create waypoints for each step in your route."], 1, 1, 1)
-    GameTooltip:AddLine(L["You must have TomTom installed for this to work."], 1, 0.5, 0.5)
-    GameTooltip:AddLine(L["You can toggle this setting at any time."], 0.5, 1, 0.5)
+    GameTooltip:SetText(L["Waypoint System"], 1, 1, 1)
+    GameTooltip:AddLine(L["Choose how Mount Route Planner places waypoints for the current step."], 1, 1, 1, true)
+    GameTooltip:AddLine(L["WaypointSystem_None"] .. ": " .. L["Do not create any waypoints."], 0.8, 0.8, 0.8, true)
+    GameTooltip:AddLine(L["WaypointSystem_Waypoint"] .. ": " .. L["Use Blizzard's built-in map pin."] .. (MRP.Util.IsWaypointNavigationSupported() and "" or " " .. L["Requires Shadowlands or later."]), 0.8, 0.8, 0.8, true)
+    GameTooltip:AddLine(L["WaypointSystem_TomTom"] .. ": " .. L["Use TomTom for waypoint navigation."] .. (MRP.Util.IsTomTomNavigationSupported() and "" or " " .. L["Requires TomTom to be installed."]), 0.8, 0.8, 0.8, true)
     GameTooltip:Show()
 end)
 
-tomtomToggle:SetScript("OnLeave", function()
+waypointSystemDropdown:SetScript("OnLeave", function()
     GameTooltip:Hide()
 end)
 
-tomtomToggle:SetScript("OnClick", function(self)
-    MRP_Settings.useTomTom = self:GetChecked()
-    MRP.UI:UpdateDisplay()
-end)
+waypointSystemWarning = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+waypointSystemWarning:SetPoint("TOPLEFT", waypointSystemDropdown, "BOTTOMLEFT", 16, -2)
+waypointSystemWarning:SetWidth(280)
+waypointSystemWarning:SetJustifyH("LEFT")
+waypointSystemWarning:SetText("")
 
 local showDifficultyWarningToggle = CreateFrame("CheckButton", nil, optionsFrame, "InterfaceOptionsCheckButtonTemplate")
-showDifficultyWarningToggle:SetPoint("TOPLEFT", tomtomToggle, "BOTTOMLEFT", 0, -12)
+showDifficultyWarningToggle:SetPoint("TOPLEFT", waypointSystemDropdown, "BOTTOMLEFT", 16, -30)
 showDifficultyWarningToggle.Text:SetText(L["Show Difficulty Warning"])
 
 showDifficultyWarningToggle:SetScript("OnEnter", function(self)
@@ -525,6 +574,13 @@ alertFrame:SetScript("OnShow", function()
     showRareAlertToggle:SetChecked(MRP_Settings.showRareAlert)
 end)
 
+optionsFrame:SetScript("OnShow", function()
+    UIDropDownMenu_SetText(waypointSystemDropdown, GetWaypointSystemLabel(MRP_Settings.waypointSystem))
+    UpdateWaypointWarning()
+    showDifficultyWarningToggle:SetChecked(MRP_Settings.showDifficultyWarning)
+    ignoreLFRDifficultyToggle:SetChecked(MRP_Settings.ignoreLFRDifficulty)
+end)
+
 helpfulItemsFrame:SetScript("OnShow", function()
     Options:InitializeIgnoredHelpfulItems()
     for itemId, toggle in pairs(ignoredHelpfulItemToggles) do
@@ -539,7 +595,7 @@ local worldMapCategory = Settings.RegisterCanvasLayoutSubcategory(settingsCatego
 Settings.RegisterAddOnCategory(settingsCategory)
 
 function Options:Show()
-    tomtomToggle:SetChecked(MRP_Settings.useTomTom)
+    UIDropDownMenu_SetText(waypointSystemDropdown, GetWaypointSystemLabel(MRP_Settings.waypointSystem))
     showDifficultyWarningToggle:SetChecked(MRP_Settings.showDifficultyWarning)
     ignoreLFRDifficultyToggle:SetChecked(MRP_Settings.ignoreLFRDifficulty)
     showRareAlertToggle:SetChecked(MRP_Settings.showRareAlert)

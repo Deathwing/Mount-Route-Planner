@@ -1378,10 +1378,6 @@ function UI:AddTomTomWaypoint(loc, loca, key)
 end
 
 function UI:AddUserWaypoint(loc, loca, key)
-    if GetExpansionLevel() < 8 then
-        return
-    end
-
     local coords = loc.pos.z and loc.pos.z > 0 and UiMapPoint.CreateFromCoordinates(loc.mapId, loc.pos.x, loc.pos.y, loc.pos.z) or UiMapPoint.CreateFromCoordinates(loc.mapId, loc.pos.x, loc.pos.y)
     if not coords then
         print("|cffffcc00[MRP]|r " .. format(L["Invalid coordinates for: '%s', please report it."], key))
@@ -1533,7 +1529,7 @@ function UI:ShowCurrentPathfindingStep()
     frame.stepPathfindingText:SetTextColor(1, 1, 1)
     frame.stepPathfindingText:SetText(loca)
 
-    if MRP_Settings.useTomTom and TomTom and TomTom.AddWaypoint then
+    if MRP_Settings.waypointSystem == MRP.WaypointSystem.TomTom and MRP.Util.IsTomTomNavigationSupported() then
         self:AddTomTomWaypoint(loc, loca, key)
 
         -- Add extra TomTom waypoints for open world route/spawn points
@@ -1553,7 +1549,7 @@ function UI:ShowCurrentPathfindingStep()
                 end
             end
         end
-    else
+    elseif MRP_Settings.waypointSystem == MRP.WaypointSystem.Waypoint and MRP.Util.IsWaypointNavigationSupported() then
         self:AddUserWaypoint(loc, loca, key)
     end
 

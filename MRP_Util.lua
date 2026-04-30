@@ -243,3 +243,14 @@ function Util.AreStepConditionsMet(step)
     end
     return true
 end
+
+--- Returns true if the Blizzard's waypoint system can be used for navigation
+--- @return boolean
+function Util.IsWaypointNavigationSupported()
+    return GetExpansionLevel() >= 8
+end
+
+--- Returns true if TomTom can be used for navigation
+function Util.IsTomTomNavigationSupported()
+    return TomTom and TomTom.AddWaypoint
+end

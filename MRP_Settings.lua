@@ -2,7 +2,7 @@
 -- local _, MRP = ...
 
 ---@class Settings
----@field useTomTom boolean Whether to use TomTom for waypoint navigation.
+---@field waypointSystem WaypointSystem Which waypoint system to use ("none", "waypoint", "tomtom").
 ---@field showDifficultyWarning boolean Whether to show a warning for incorrect difficulty settings.
 ---@field ignoreLFRDifficulty boolean Whether to ignore LFR difficulty on steps.
 ---@field showRareAlert boolean Whether to show nearby rare/source alerts.
@@ -22,7 +22,7 @@
 ---@field lastSeenChangelogVersion string? The last changelog content version observed during login.
 ---@field lastChangelogVersion string? The last changelog content version whose popup was dismissed.
 MRP_Settings = {
-    useTomTom = true,
+    waypointSystem = "tomtom",
     showDifficultyWarning = true,
     ignoreLFRDifficulty = false,
     showRareAlert = true,

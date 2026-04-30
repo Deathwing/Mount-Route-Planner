@@ -11,9 +11,18 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.3.0"
+local CHANGELOG_VERSION = "v2.3.1"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.3.1|r
+
+|cff00ff00Changes|r
+- The "Use TomTom for waypoints" checkbox has been replaced by a Waypoint System dropdown with three options: None, Waypoint (Blizzard's built-in map pin), and TomTom.
+- Existing settings are migrated automatically: TomTom-enabled users keep TomTom; disabled users switch to Waypoint.
+- The |cffffd200/mrp tomtom|r slash command is deprecated; use |cffffd200/mrp waypoint none||waypoint||tomtom|r instead.
+- Updated Russian localization (thanks |cff6fd3ffZamestoTV|r).
+
+
 |cffffd200Mount Route Planner 2.3.0|r
 
 |cff00ff00What's New|r

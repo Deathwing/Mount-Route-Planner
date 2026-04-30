@@ -688,9 +688,21 @@ function Core:InitializeSettings()
         MRP_Settings = {}
     end
 
-    if MRP_Settings.useTomTom == nil then
-        MRP_Settings.useTomTom = true
+    if MRP_Settings.waypointSystem == nil then
+        -- Migrate from legacy useTomTom boolean.
+        if MRP_Settings.useTomTom == true then
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.TomTom
+        elseif MRP_Settings.useTomTom == false then
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.Waypoint
+        elseif MRP.Util.IsTomTomNavigationSupported() then
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.TomTom
+        elseif MRP.Util.IsWaypointNavigationSupported() then
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.Waypoint
+        else
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.None
+        end
     end
+    MRP_Settings.useTomTom = nil
 
     if MRP_Settings.showDifficultyWarning == nil then
         MRP_Settings.showDifficultyWarning = true
@@ -923,8 +935,19 @@ function Core:HandleSlashCommand(msg)
         end
         MRP.Options:Show()
     elseif cmd == "tomtom" and (arg1 == "on" or arg1 == "off") then
-        MRP_Settings.useTomTom = (arg1 == "on")
-        print(string.format(L["|cff00ff00[MRP]|r TomTom usage is now: %s"], (MRP_Settings.useTomTom and L["|cff00ff00ENABLED|r"] or L["|cffff0000DISABLED|r"])))
+        print(L["|cffffcc00[MRP]|r /mrp tomtom is deprecated. Use /mrp waypoint none|waypoint|tomtom instead."])
+        MRP_Settings.waypointSystem = (arg1 == "on") and MRP.WaypointSystem.TomTom or MRP.WaypointSystem.Waypoint
+        print(string.format(L["|cff00ff00[MRP]|r Waypoint system is now: %s"], L["WaypointSystem_" .. (arg1 == "on" and "TomTom" or "Waypoint")]))
+    elseif cmd == "waypoint" and (arg1 == "none" or arg1 == "waypoint" or arg1 == "tomtom") then
+        if arg1 == "none" then
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.None
+        elseif arg1 == "waypoint" then
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.Waypoint
+        else
+            MRP_Settings.waypointSystem = MRP.WaypointSystem.TomTom
+        end
+        local key = arg1:sub(1, 1):upper() .. arg1:sub(2)
+        print(string.format(L["|cff00ff00[MRP]|r Waypoint system is now: %s"], L["WaypointSystem_" .. key]))
     elseif cmd == "changelog" then
         if MRP.Changelog then
             MRP.Changelog:Show()
@@ -941,7 +964,8 @@ function Core:HandleSlashCommand(msg)
         print(L[" - /mrp → Toggle Mount Route Planner UI"])
         print(L[" - /mrp reset → Clears current progress and steps"])
         print(L[" - /mrp settings → Open addon settings"])
-        print(L[" - /mrp tomtom on|off → Enable or disable TomTom integration"])
+        print(L[" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"])
+        print(L[" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"])
         print(L[" - /mrp changelog → Open the latest changelog popup"])
         print(L[" - /mrp route → Recalculate the optimized route"])
         print(L[" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"])

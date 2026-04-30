@@ -110,7 +110,10 @@
 			"GetMinimapShape",
 			"SPLASH_BATTLEFORAZEROTH_8_2_0_FEATURE2_TITLE",
 			"CALENDAR_WEEKDAY_NAMES",
-			"CALENDAR_FULLDATE_MONTH_NAMES"
+			"CALENDAR_FULLDATE_MONTH_NAMES",
+			"UIDropDownMenu_SetWidth",
+			"UIDropDownMenu_SetText",
+			"CloseDropDownMenus"
 		],
 		"Lua.diagnostics.neededFileStatus": {
 			"undefined-global": "Any"
