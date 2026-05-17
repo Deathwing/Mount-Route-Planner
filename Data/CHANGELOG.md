@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.1
+
+### Changes
+- Updated for TBC Phase 2
+
 ## 1.4.0
 
 ### Fixes

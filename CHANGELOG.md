@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v2.3.2](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.2) (2026-05-17)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.2) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Changes
+- Updated for TBC Phase 2
+
 ## [v2.3.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.1) (2026-04-30)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 
