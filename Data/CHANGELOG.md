@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.4.2
+
+### Changes
+- Added support for Interface 50504
+
 ## 1.4.1
 
 ### Changes
