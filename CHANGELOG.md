@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v2.3.4](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.4) (2026-06-12)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.4) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Changes
+- Added support for Interface 120007
+
 ## [v2.3.3](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.3) (2026-05-24)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.3) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

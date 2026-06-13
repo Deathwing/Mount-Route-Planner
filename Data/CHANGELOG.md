@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.3
+
+### Changes
+- Added support for Interface 120007
+
+### Added
+- Added Mists of Pandaria Phase 5 (Siege of Orgrimmar) mounts: Heavenly Onyx Cloud Serpent, Vicious Warsaber, Vicious Skeletal Warhorse, Ashhide Mushan Beast, and Thundering Onyx Cloud Serpent
+
 ## 1.4.2
 
 ### Changes
