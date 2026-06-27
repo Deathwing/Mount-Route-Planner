@@ -17,11 +17,15 @@ local holidayCacheTime = 0
 local HOLIDAY_CACHE_TTL = 1800
 
 --- Build a unix timestamp from a CalendarTime table.
+--- The fields read from a CalendarTime can be "secret" values while execution is
+--- tainted (WoW 11.x+). Reading them is fine, but performing arithmetic/comparison
+--- on a secret value raises an error and would spread taint into Blizzard code, so
+--- the conversion is wrapped in a pcall and any failure yields a neutral timestamp.
 ---@param ct table A CalendarTime-like table with year/month/monthDay/hour/minute
 ---@return number timestamp
 local function CalendarTimeToTimestamp(ct)
     if not ct or not ct.year then return 0 end
-    return time({
+    local ok, ts = pcall(time, {
         year = ct.year,
         month = ct.month,
         day = ct.monthDay,
@@ -29,6 +33,21 @@ local function CalendarTimeToTimestamp(ct)
         min = ct.minute or 0,
         sec = 0,
     })
+    if ok and type(ts) == "number" then
+        return ts
+    end
+    return 0
+end
+
+--- Safely compare the (potentially secret) calendarType of an event against the
+--- "HOLIDAY" constant. Comparing a secret string value with `==` raises an error
+--- while tainted, so the comparison is contained in a pcall; a failure is treated
+--- as "not a holiday" instead of letting the error propagate into Blizzard code.
+---@param calendarType any
+---@return boolean
+local function IsHolidayCalendarType(calendarType)
+    local ok, isHoliday = pcall(function() return calendarType == "HOLIDAY" end)
+    return ok and isHoliday == true
 end
 
 --- Scan the C_Calendar API for active and upcoming holiday events.
@@ -70,7 +89,7 @@ local function ScanCalendarHolidays()
             local numEvents = C_Calendar.GetNumDayEvents(0, day)
             for i = 1, numEvents do
                 local event = C_Calendar.GetDayEvent(0, day, i)
-                if event and event.calendarType == "HOLIDAY" and event.eventID then
+                if event and event.eventID and IsHolidayCalendarType(event.calendarType) then
                     local startTS = CalendarTimeToTimestamp(event.startTime)
                     local endTS = CalendarTimeToTimestamp(event.endTime)
                     -- Keep the widest window if we see the same event multiple times

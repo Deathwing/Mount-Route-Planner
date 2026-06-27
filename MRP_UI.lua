@@ -1437,9 +1437,22 @@ end
 
 ---@param itemId number
 ---@return boolean
+local function HasUsableToy(itemId)
+    if not PlayerHasToy(itemId) then return false end
+    -- PlayerHasToy only reports ownership; defer to the game's own usability check
+    -- so engineering-gated toys (wormhole generators, etc.) aren't offered to
+    -- characters lacking the required profession/specialization.
+    if C_ToyBox and C_ToyBox.IsToyUsable then
+        if C_ToyBox.IsToyUsable(itemId) == false then return false end
+    end
+    return true
+end
+
+---@param itemId number
+---@return boolean
 function UI:CanUseItem(itemId)
     if not itemId then return false end
-    if not (PlayerHasToy(itemId) or (C_Item.GetItemCount(itemId) > 0 and C_Item.IsUsableItem(itemId))) then return false end
+    if not (HasUsableToy(itemId) or (C_Item.GetItemCount(itemId) > 0 and C_Item.IsUsableItem(itemId))) then return false end
 
     if C_Item.GetItemCooldown then
         if select(2, C_Item.GetItemCooldown(itemId)) <= 0 then return true end

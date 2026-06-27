@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.5.0
+
+### Fixes
+- The Confiscated Cultist's Bag (Void-Scarred Lynx) now resolves to the Nightfall daily turn-in in Hallowfall instead of Voidstorm
+- Void-Scarred Gryphon, Void-Forged Stallion, Void-Scarred Pack Mother, and Void-Scarred Windrider now point to the correct Horrific Visions of Stormwind/Orgrimmar instead of Voidstorm
+- Zul'Aman mounts and treasures (Magovu, Honored Warrior's Cache, Abandoned Ritual Skull) now use the Zul'Aman map instead of Harandar
+- The Sun Festival's Painted Roc is now flagged as a Midnight mount so it respects the expansion filter
+
+### Added
+- Added how-to-obtain notes for the Vicious Saddle and Mark of Honor vendor mounts
+
+### Changes
+- Removed Brawler's Burly Basilisk and Bruce, which are no longer obtainable
+- Updated data sources
+
 ## 1.4.3
 
 ### Changes

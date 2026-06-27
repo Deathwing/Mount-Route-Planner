@@ -764,6 +764,10 @@ function Core:InitializeSettings()
         MRP_Settings.unlimitedStepsBehind = false
     end
 
+    if MRP_Settings.hideMinimapButton == nil then
+        MRP_Settings.hideMinimapButton = false
+    end
+
     if not MRP_CharacterSettings then
         MRP_CharacterSettings = {}
     end
@@ -885,6 +889,10 @@ f:SetScript("OnEvent", function()
     Core:InitializeSettings()
     Core:FilterTimewalkingSteps()
     MRP.Filter:Apply(true)
+
+    if MRP.Minimap then
+        MRP.Minimap:Refresh()
+    end
 
     if not MRP.Route:IsRouteValid() then
         MRP.Route:Calculate()

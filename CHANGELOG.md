@@ -1,5 +1,27 @@
 # Mount Route Planner
 
+## [v2.4.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.0) (2026-06-27)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Added
+- Added an option to hide the minimap button (Settings → Mount Route Planner); the panel can still be opened with `/mrp`
+- Travel routing now suggests the Silvermoon City portal to Stormwind for Alliance characters
+
+### Fixes
+- Engineering-only travel toys (Wormhole Generators, Dimensional Rippers, Ultrasafe Transporters) are no longer suggested to characters who cannot use them, by deferring to the game's own toy usability check
+- The Confiscated Cultist's Bag (Void-Scarred Lynx) now points to the Nightfall daily turn-in in Hallowfall instead of Voidstorm
+- The Void-Scarred Gryphon, Void-Forged Stallion, Void-Scarred Pack Mother, and Void-Scarred Windrider now point to the correct Horrific Visions of Stormwind/Orgrimmar instead of Voidstorm
+- Zul'Aman mounts and treasures (Magovu, Honored Warrior's Cache, Abandoned Ritual Skull) now use the Zul'Aman map instead of Harandar
+- The Sun Festival's Painted Roc is now flagged as a Midnight mount so it respects the expansion filter
+- Fixed a taint error in holiday detection where comparing the calendar event type could spread taint into Blizzard's map and tooltip code (#18, #17)
+- The Mobile Telemancy Beacon is no longer suggested outside Suramar, where it cannot be used (#15)
+
+### Changes
+- Added how-to-obtain notes for the Vicious Saddle and Mark of Honor vendor mounts
+- Removed Brawler's Burly Basilisk and Bruce, which are no longer obtainable
+- Added 12.0.7 entries and updated data sources
+- Updated Russian (ruRU) localization (thanks ZamestoTV) (#16)
+
 ## [v2.3.4](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.3.4) (2026-06-12)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.3.4) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

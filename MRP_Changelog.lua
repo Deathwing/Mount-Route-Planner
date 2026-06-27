@@ -11,9 +11,31 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.3.1"
+local CHANGELOG_VERSION = "v2.4.0"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.4.0|r
+
+|cff00ff00What's New|r
+- Added an option to hide the minimap button (Settings → Mount Route Planner). You can still open the panel with |cffffd200/mrp|r.
+- Travel routing now suggests the Silvermoon City portal to Stormwind for Alliance characters.
+
+|cff00ff00Fixes|r
+- Engineering-only travel toys (Wormhole Generators, Dimensional Rippers, Ultrasafe Transporters) are no longer suggested to characters who can't actually use them.
+- The Confiscated Cultist's Bag (Void-Scarred Lynx) now points to the Nightfall daily turn-in in Hallowfall instead of Voidstorm.
+- The Void-Scarred Gryphon, Void-Forged Stallion, Void-Scarred Pack Mother, and Void-Scarred Windrider now point to the correct Horrific Visions of Stormwind/Orgrimmar.
+- Zul'Aman mounts and treasures (including Magovu) now use the correct Zul'Aman map instead of Harandar.
+- The Sun Festival's Painted Roc is now correctly flagged as a Midnight mount so it respects the expansion filter.
+- Fixed a taint error in holiday detection that could spill over into Blizzard's map and tooltip code.
+- The Mobile Telemancy Beacon is no longer suggested outside Suramar, where it can't be used.
+
+|cff00ff00Changes|r
+- Added how-to-obtain notes for Vicious Saddle and Mark of Honor vendor mounts.
+- Removed Brawler's Burly Basilisk and Bruce, which are no longer obtainable.
+- Added 12.0.7 entries and updated data sources.
+- Updated Russian localization (thanks |cff6fd3ffZamestoTV|r).
+
+
 |cffffd200Mount Route Planner 2.3.1|r
 
 |cff00ff00Changes|r

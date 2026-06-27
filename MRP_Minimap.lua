@@ -3,6 +3,8 @@
 
 local L = MRP.L
 
+MRP.Minimap = {}
+
 local minimapButton = CreateFrame("Button", nil, Minimap)
 minimapButton:SetSize(28, 28)
 minimapButton:SetFrameStrata("HIGH")
@@ -49,3 +51,11 @@ minimapButton:SetScript("OnUpdate", function()
         MRP.UI:CheckCurrentPathfindingStep()
     end
 end)
+
+function MRP.Minimap:Refresh()
+    if MRP_Settings and MRP_Settings.hideMinimapButton then
+        minimapButton:Hide()
+    else
+        minimapButton:Show()
+    end
+end

@@ -18,6 +18,7 @@
 ---@field unlimitedStepsAhead boolean Whether to show all steps ahead (ignores maxStepsAhead).
 ---@field maxStepsBehind number Maximum steps behind current to show on map.
 ---@field unlimitedStepsBehind boolean Whether to show all steps behind (ignores maxStepsBehind).
+---@field hideMinimapButton boolean Whether to hide the minimap button.
 ---@field lastSeenVersion string? The last addon version observed during login.
 ---@field lastSeenChangelogVersion string? The last changelog content version observed during login.
 ---@field lastChangelogVersion string? The last changelog content version whose popup was dismissed.
@@ -37,5 +38,6 @@ MRP_Settings = {
     maxStepsAhead = 5,
     unlimitedStepsAhead = false,
     maxStepsBehind = 1,
-    unlimitedStepsBehind = false
+    unlimitedStepsBehind = false,
+    hideMinimapButton = false
 }
