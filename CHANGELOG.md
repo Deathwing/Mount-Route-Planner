@@ -1,5 +1,21 @@
 # Mount Route Planner
 
+## [v2.4.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.1) (2026-07-16)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Fixes
+- Travel routing no longer sends Alliance characters through Horde-only transports (Grom'gol/Undercity zeppelins, Ruins of Lordaeron portals); a 12.0.7 data format change had silently dropped all faction restrictions from the travel graph (FarstriderLib #1)
+- Fixed a taint issue in the world map route overlay that could block Blizzard's own map pins (`ADDON_ACTION_BLOCKED` on `SetPassThroughButtons` when targeting rares) and cause "secret number value" errors when hovering points of interest
+- The "Hide Minimap Button" checkbox and the "Recalculate Route" button no longer overlap in the settings panel
+- Route pins are now visible on the fullscreen world map on classic clients (TBC Anniversary, Mists); they were previously rendered behind the map because those clients move the maximized map to a higher frame strata
+- The Waypoint System dropdown and checkboxes now show their current values the first time the settings panel is opened after login
+- Midnight open-world, treasure, vendor, and quest steps (Ritual Sites, Zul'Aman/Eversong/Harandar/Voidstorm rares, Silvermoon vendors, and more) are now correctly tagged as Midnight content, so they respect the expansion filter instead of showing as The War Within
+
+### Changes
+- Added support for Interface 20506
+- Updated data sources
+- Updated Russian (ruRU) localization (thanks ZamestoTV) (#19)
+
 ## [v2.4.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.0) (2026-06-27)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

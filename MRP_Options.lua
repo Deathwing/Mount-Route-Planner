@@ -6,7 +6,12 @@ local L = MRP.L
 local Options = {}
 MRP.Options = Options
 
+-- Settings canvas frames must start hidden: the Settings panel only fires
+-- OnShow on a Hide->Show transition, and frames are shown by default on
+-- creation — otherwise the first-ever display skips OnShow and controls
+-- (e.g. the Waypoint System dropdown) appear uninitialized.
 local optionsFrame = CreateFrame("Frame", nil, UIParent)
+optionsFrame:Hide()
 optionsFrame.name = L["Mount Route Planner"]
 
 local optionsTitle = optionsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
@@ -14,6 +19,7 @@ optionsTitle:SetPoint("TOPLEFT", 16, -16)
 optionsTitle:SetText(L["Mount Route Planner - Settings"])
 
 local alertFrame = CreateFrame("Frame", nil, UIParent)
+alertFrame:Hide()
 
 local alertTitle = alertFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 alertTitle:SetPoint("TOPLEFT", 16, -16)
@@ -26,6 +32,7 @@ alertDisclaimer:SetJustifyH("LEFT")
 alertDisclaimer:SetWidth(500)
 
 local helpfulItemsFrame = CreateFrame("Frame", nil, UIParent)
+helpfulItemsFrame:Hide()
 
 local helpfulItemsCategoryTitle = helpfulItemsFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 helpfulItemsCategoryTitle:SetPoint("TOPLEFT", 16, -16)
@@ -227,7 +234,7 @@ end)
 
 local recalculateRouteBtn = CreateFrame("Button", nil, optionsFrame, "UIPanelButtonTemplate")
 recalculateRouteBtn:SetSize(160, 24)
-recalculateRouteBtn:SetPoint("TOPLEFT", ignoreLFRDifficultyToggle, "BOTTOMLEFT", 0, -16)
+recalculateRouteBtn:SetPoint("TOPLEFT", hideMinimapButtonToggle, "BOTTOMLEFT", 0, -16)
 recalculateRouteBtn:SetText(L["Recalculate Route"])
 
 recalculateRouteBtn:SetScript("OnEnter", function(self)
@@ -358,6 +365,7 @@ end
 
 -- World Map subcategory
 local worldMapFrame = CreateFrame("Frame", nil, UIParent)
+worldMapFrame:Hide()
 local worldMapInitialized = false
 
 local worldMapTitle = worldMapFrame:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")

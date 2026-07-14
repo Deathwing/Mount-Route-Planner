@@ -22,19 +22,20 @@ local routePins = {}
 local routeLines = {}
 local routeArrows = {}
 
-local MAP_OVERLAY_FRAME_STRATA = "MEDIUM"
 local MAP_OVERLAY_LINE_LEVEL_OFFSET = 10
 local MAP_OVERLAY_ARROW_LEVEL_OFFSET = 20
 local MAP_OVERLAY_ARROW_CHILD_LEVEL_OFFSET = 1
 local ROUTE_PIN_FRAME_LEVEL_OFFSET = 30
 
--- High-strata overlay frame so pins/lines render above the fog of war.
--- Pins use a higher frame level so they stay in front of connector art.
+-- Overlay frames use elevated frame LEVELS so pins/lines render above the fog
+-- of war, but must NEVER set an explicit frame strata: classic clients
+-- (TBC/Mists) switch WorldMapFrame to the FULLSCREEN strata when maximized,
+-- and an explicitly-MEDIUM child would render below the fullscreen map art.
+-- Inheriting the canvas strata keeps us in the right strata in both modes.
 local overlayLineFrame = nil
 local overlayArrowFrame = nil
 
 local function SetOverlayFrameRenderOrder(frame, canvas, levelOffset)
-    frame:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
     frame:SetFrameLevel((canvas:GetFrameLevel() or 0) + levelOffset)
 end
 
@@ -344,7 +345,6 @@ local function ConfigureRoutePinLayout(pin, pinType)
     pin.label:ClearAllPoints()
     pin:UseFrameLevelType(ROUTE_PIN_FRAME_LEVEL_TYPE)
     ApplyRoutePinScalingLimits(pin)
-    pin:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
     pin:SetFrameLevel(math.max(pin:GetFrameLevel() or 0, GetRoutePinBaseFrameLevel())
         + (pinType == RoutePinType.CurrentPath and CURRENT_PATH_PIN_FRAME_LEVEL_BOOST or 0))
     pin.highlightGroup = pinType == RoutePinType.OpenWorld and "openWorldOverlay" or nil
@@ -662,7 +662,6 @@ local function ResetRoutePinVisuals(pin)
 end
 
 function RouteWorldMapPinMixin:OnLoad()
-    self:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
     self:UseFrameLevelType(ROUTE_PIN_FRAME_LEVEL_TYPE)
     ApplyRoutePinScalingLimits(self)
     InitializeRoutePinVisuals(self)
@@ -671,7 +670,6 @@ end
 
 function RouteWorldMapPinMixin:OnAcquired(x, y)
     InitializeRoutePinVisuals(self)
-    self:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
     self:UseFrameLevelType(ROUTE_PIN_FRAME_LEVEL_TYPE)
     ApplyRoutePinScalingLimits(self)
     self:SetParent(WorldMapFrame:GetCanvas())
@@ -693,15 +691,25 @@ local function EnsureRouteWorldMapPinPool(canvas)
         return false
     end
 
-    WorldMapFrame.pinPools = WorldMapFrame.pinPools or {}
+    -- TAINT: never assign WorldMapFrame.pinPools itself. Writing the field from
+    -- addon code taints it, and Blizzard's MapCanvasMixin:AcquirePin reads
+    -- self.pinPools on every secure pin acquisition (quest/POI pins), which
+    -- taints those executions — manifesting as ADDON_ACTION_BLOCKED on
+    -- SetPassThroughButtons in combat and "secret value" errors in widget
+    -- tooltips. Only ever write a single key into the existing table (like
+    -- HereBeDragons does).
+    local pinPools = WorldMapFrame.pinPools
+    if not pinPools then
+        return false
+    end
 
     if routeWorldMapPinPool then
         routeWorldMapPinPool.parent = canvas
         return true
     end
 
-    if WorldMapFrame.pinPools[ROUTE_PIN_TEMPLATE] then
-        routeWorldMapPinPool = WorldMapFrame.pinPools[ROUTE_PIN_TEMPLATE]
+    if pinPools[ROUTE_PIN_TEMPLATE] then
+        routeWorldMapPinPool = pinPools[ROUTE_PIN_TEMPLATE]
         routeWorldMapPinPool.parent = canvas
         return true
     end
@@ -722,7 +730,6 @@ local function EnsureRouteWorldMapPinPool(canvas)
         local pinCanvas = WorldMapFrame:GetCanvas() or canvas
         local frame = CreateFrame("Frame", nil, pinCanvas)
         frame:SetSize(1, 1)
-        frame:SetFrameStrata(MAP_OVERLAY_FRAME_STRATA)
         return Mixin(frame, RouteWorldMapPinMixin)
     end
     pool.resetFunc = function(pinPool, pin)
@@ -737,7 +744,7 @@ local function EnsureRouteWorldMapPinPool(canvas)
     pool.creationFunc = pool.createFunc
     pool.resetterFunc = pool.resetFunc
 
-    WorldMapFrame.pinPools[ROUTE_PIN_TEMPLATE] = pool
+    pinPools[ROUTE_PIN_TEMPLATE] = pool
 
     return true
 end

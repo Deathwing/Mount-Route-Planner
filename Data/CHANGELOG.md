@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.1
+
+### Fixes
+- Midnight open-world, treasure, vendor, and quest steps are now tagged with the Midnight expansion instead of The War Within, so they respect the expansion filter
+
+### Changes
+- Added support for Interface 20506
+- Updated data sources
+
 ## 1.5.0
 
 ### Fixes

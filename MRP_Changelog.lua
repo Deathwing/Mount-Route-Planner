@@ -11,9 +11,25 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.4.0"
+local CHANGELOG_VERSION = "v2.4.1"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.4.1|r
+
+|cff00ff00Fixes|r
+- Travel routing no longer sends Alliance characters through Horde-only transports (Grom'gol/Undercity zeppelins, Ruins of Lordaeron portals). A 12.0.7 data format change had silently dropped all faction restrictions from the travel graph.
+- Route pins are now visible on the fullscreen world map on classic clients (TBC Anniversary, Mists of Pandaria).
+- Fixed a taint issue in the world map route overlay that could block Blizzard's own map pins and cause "secret number value" errors when hovering points of interest.
+- Midnight open-world, treasure, vendor, and quest steps (Ritual Sites, rares, Silvermoon vendors, and more) are now correctly tagged as Midnight content, so they respect the expansion filter.
+- The "Hide Minimap Button" checkbox and the "Recalculate Route" button no longer overlap in the settings panel.
+- The Waypoint System dropdown and checkboxes now show their current values the first time the settings panel is opened after login.
+
+|cff00ff00Changes|r
+- Added support for TBC Anniversary 2.5.6 clients.
+- Updated data sources.
+- Updated Russian localization (thanks |cff6fd3ffZamestoTV|r).
+
+
 |cffffd200Mount Route Planner 2.4.0|r
 
 |cff00ff00What's New|r
