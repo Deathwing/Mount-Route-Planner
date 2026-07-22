@@ -12,6 +12,7 @@ MRP.L = {
   [" - /mrp route → Recalculate the optimized route"] = " - /mrp route → Berechnet die optimierte Route neu",
   [" - /mrp settings → Open addon settings"] = " - /mrp settings → Öffnet die Addon-Einstellungen",
   [" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"] = " - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  [" - /mrp update → Show official download sources"] = " - /mrp update → Show official download sources", -- MISSING TRANSLATION / SAME AS ENGLISH,
   [" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"] = " - /mrp updatedisplaydelayed <number> → Erzwingt die Aktualisierung der Anzeige nach einer Verzögerung (Standard: 0,25 Sekunden)",
   [" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"] = " - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["*Normal difficulty dungeons can be run up to 10 times per hour"] = "*Dungeons in normaler Schwierigkeit können bis zu 10 Mal pro Stunde durchlaufen werden",

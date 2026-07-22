@@ -17,6 +17,7 @@ MRP.L = {
   [" - /mrp route → Recalculate the optimized route"] = " - /mrp route → 重新計算最佳路線",
   [" - /mrp settings → Open addon settings"] = " - /mrp settings → 開啟插件設定",
   [" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"] = " - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead", -- MISSING TRANSLATION / SAME AS ENGLISH,
+  [" - /mrp update → Show official download sources"] = " - /mrp update → Show official download sources", -- MISSING TRANSLATION / SAME AS ENGLISH,
   [" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"] = " - /mrp updatedisplaydelayed <number> → 在一定的延遲後強制執行顯示更新 (預設: 0.25秒)",
   [" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"] = " - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["*Normal difficulty dungeons can be run up to 10 times per hour"] = "*普通難度地城每小時最多可運行10次",

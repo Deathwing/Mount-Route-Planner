@@ -8,6 +8,7 @@ MRP.L = {
   [" - /mrp route → Recalculate the optimized route"] = " - /mrp route → Recalculate the optimized route",
   [" - /mrp settings → Open addon settings"] = " - /mrp settings → Open addon settings",
   [" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"] = " - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead",
+  [" - /mrp update → Show official download sources"] = " - /mrp update → Show official download sources",
   [" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"] = " - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)",
   [" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"] = " - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system",
   ["*Normal difficulty dungeons can be run up to 10 times per hour"] = "*Normal difficulty dungeons can be run up to 10 times per hour",

@@ -17,6 +17,7 @@ MRP.L = {
   [" - /mrp route → Recalculate the optimized route"] = " - /mrp route → Пересчитать оптимальный маршрут",
   [" - /mrp settings → Open addon settings"] = " - /mrp settings → Настройки аддона",
   [" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"] = " - /mrp tomtom on|off → (Устарело) Используйте /mrp waypoint",
+  [" - /mrp update → Show official download sources"] = " - /mrp update → Show official download sources", -- MISSING TRANSLATION / SAME AS ENGLISH,
   [" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"] = " - /mrp updatedisplaydelayed <число> → Принудительное обновление экрана с задержкой (по умолчанию 0.25 сек)",
   [" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"] = " - /mrp waypoint none|waypoint|tomtom → Выбор системы путевых точек",
   ["*Normal difficulty dungeons can be run up to 10 times per hour"] = "*Подземелья обычной сложности можно проходить до 10 раз в час",
