@@ -11,9 +11,17 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.4.1"
+local CHANGELOG_VERSION = "v2.4.2"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.4.2|r
+
+|cff00ff00Changes|r
+- Added low-volume guild and group version discovery.
+- Added |cffffd200/mrp update|r with official GitHub, CurseForge, and Wago download sources.
+- Release tags now produce installable GitHub assets and publish the bundled addon family to Wago.
+
+
 |cffffd200Mount Route Planner 2.4.1|r
 
 |cff00ff00Fixes|r

@@ -22,6 +22,8 @@
 ---@field lastSeenVersion string? The last addon version observed during login.
 ---@field lastSeenChangelogVersion string? The last changelog content version observed during login.
 ---@field lastChangelogVersion string? The last changelog content version whose popup was dismissed.
+---@field lastUpdatePopupVersion string? The newest addon version whose update-source popup was shown.
+---@field newestDetectedUpdateVersion string? The newest remote addon version detected from peers.
 MRP_Settings = {
     waypointSystem = "tomtom",
     showDifficultyWarning = true,

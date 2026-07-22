@@ -4,7 +4,7 @@
 
 MRP automatically generates optimized farming routes based on your character's current collection, available travel options, and location. No more manually copying data from external websites—just open the addon and start farming.
 
-![Mount Route Planner](Screenshots/Gallery_8.png)
+![Mount Route Planner](https://raw.githubusercontent.com/Deathwing/Mount-Route-Planner/main/Screenshots/Gallery_8.png)
 
 ### Features
 
@@ -17,7 +17,7 @@ Uses a built-in pathfinding system to determine the most efficient next objectiv
 **World Map Route Overview**
 Shows your filtered route directly on the world map with numbered pins, directional connectors, and current-step context.
 
-![World Map Routes](Screenshots/Gallery_7.png)
+![World Map Routes](https://raw.githubusercontent.com/Deathwing/Mount-Route-Planner/main/Screenshots/Gallery_7.png)
 
 **In-Game Update Notes**
 Displays a changelog popup after addon updates so new features are visible immediately in-game.
@@ -25,7 +25,7 @@ Displays a changelog popup after addon updates so new features are visible immed
 **Helpful Item Tracking**
 Tracks important items like teleportation stones, hearthstones, and other travel abilities. It will notify you if you are missing any required items for optimizing your route.
 
-![Helpful Items Warning](Screenshots/Gallery_6.png)
+![Helpful Items Warning](https://raw.githubusercontent.com/Deathwing/Mount-Route-Planner/main/Screenshots/Gallery_6.png)
     
 **Step-by-Step Tracking**  
 Follow a clean interface that tracks your progress and shows upcoming rewards. Optional waypoint visualization is available via TomTom.

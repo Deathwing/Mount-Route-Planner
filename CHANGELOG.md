@@ -1,5 +1,12 @@
 # Mount Route Planner
 
+## [v2.4.2](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.2) (2026-07-22)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.2) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Changes
+- Added low-volume guild/group version discovery and an `/mrp update` source chooser with official GitHub, CurseForge, and Wago download links.
+- Release tags now produce installable GitHub assets and publish the bundled addon family to Wago while retaining split dependency packages on CurseForge.
+
 ## [v2.4.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.1) (2026-07-16)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

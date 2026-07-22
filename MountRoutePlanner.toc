@@ -3,7 +3,11 @@
 ## Title-zhCN: 坐骑路线规划助手 (MRP)
 ## Title-zhTW: 坐騎路線規劃助手 (MRP)
 ## Author: Deathwing
-## Version: v2.4.1
+## Version: v2.4.2
+## X-Website: https://github.com/Deathwing/Mount-Route-Planner
+## X-Repository: https://github.com/Deathwing/Mount-Route-Planner
+## X-Curse-Project-ID: 1301132
+## X-Wago-ID: nGv7vvNx
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
 ## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
@@ -57,6 +61,7 @@ MRP_Data.lua
 MRP_Farstrider.lua
 
 MRP_Util.lua
+MRP_Update.lua
 
 MRP_Filter.lua
 MRP_Route.lua
