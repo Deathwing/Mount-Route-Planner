@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.2
+
+### Changes
+- Added support for Interface 11509
+
 ## 1.5.1
 
 ### Fixes
