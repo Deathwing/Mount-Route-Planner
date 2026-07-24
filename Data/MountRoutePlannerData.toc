@@ -3,6 +3,9 @@
 ## Notes: Optional standalone data package for Mount Route Planner, providing generated mount source and route-step data.
 ## IconTexture: Interface\AddOns\MountRoutePlannerData\Media\logo.png
 ## Author: Deathwing
+## X-Website: https://github.com/Deathwing/Mount-Route-Planner
+## X-Repository: https://github.com/Deathwing/Mount-Route-Planner
+## X-Curse-Project-ID: 1507842
 ## X-License: All Rights Reserved
 ## X-Category: Library
 ## Category-enUS: Libraries
