@@ -129,6 +129,12 @@ tryShowPendingUpdate = function()
         return
     end
     if InCombatLockdown() then return end
+    -- Only surface the update popup in rested areas (inns/cities). Popping it up
+    -- mid-world is too intrusive, so defer and retry until the player is resting.
+    if not IsResting() then
+        scheduleRetry(5)
+        return
+    end
     if MRP.Changelog and MRP.Changelog:IsVisible() then
         scheduleRetry(2)
         return
@@ -157,6 +163,63 @@ function Update:Notify(newVersion)
     if warnedVersions[newVersion] then return end
     warnedVersions[newVersion] = true
     print("|cffffff00[MRP]|r A newer version (" .. newVersion .. ") is available; you are running " .. getVersion() .. ". Type |cffffffff/mrp update|r for official GitHub, CurseForge, and Wago downloads.")
+end
+
+--- Returns true when `candidate` is a strictly newer version than `current`.
+function Update:IsVersionNewer(candidate, current)
+    return compareVersions(candidate, current) > 0
+end
+
+--- Print the versions of Mount Route Planner and its bundled sub-addons/libraries
+--- to chat, noting if a newer version has been detected from other players.
+function Update:PrintVersions()
+    local getMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
+    local isLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
+
+    -- Print a separately-shipped companion AddOn line. GetAddOnMetadata reads the
+    -- on-disk TOC, so it returns a version even when the AddOn is installed but
+    -- DISABLED (unchecked in the AddOns list) — which is misleading because a
+    -- disabled companion contributes nothing at runtime. So report the loaded
+    -- state: skip entirely when not installed, and mark it (disabled) when it is
+    -- installed but not loaded.
+    local function printCompanion(label, addonName)
+        local version = getMetadata(addonName, "Version")
+        if not version then return end -- not installed
+        if isLoaded and isLoaded(addonName) then
+            print("  " .. label .. ": |cffffffff" .. tostring(version) .. "|r")
+        else
+            print("  " .. label .. ": |cffffffff" .. tostring(version) .. "|r |cff999999(installed, disabled)|r")
+        end
+    end
+
+    print("|cffffd200Mount Route Planner versions|r")
+
+    local mainVersion = getVersion()
+    print("  Mount Route Planner: |cffffffff" .. mainVersion .. "|r")
+
+    -- FarstriderLib is a hard dependency embedded into MRP, so its runtime value
+    -- is always the active one. Prefer the separately-shipped TOC version when
+    -- present, else fall back to the runtime revision (embedded dev structure).
+    local fs = MRP.Farstrider
+    local fsVersion = getMetadata("FarstriderLib", "Version")
+        or (fs and fs.VERSION and fs.VERSION ~= 0 and fs.VERSION or nil)
+    if fsVersion then
+        print("  FarstriderLib: |cffffffff" .. tostring(fsVersion) .. "|r")
+    end
+
+    -- FarstriderLib Data and Mount Route Planner Data are optional companions;
+    -- only report them as active when actually loaded.
+    printCompanion("FarstriderLib Data", "FarstriderLibData")
+    printCompanion("Mount Route Planner Data", "MountRoutePlannerData")
+
+    -- Note a known newer version, if one has been detected from other players.
+    local detected = MRP_Settings and MRP_Settings.newestDetectedUpdateVersion
+    if detected and compareVersions(detected, mainVersion) > 0 then
+        print("|cffff5555Update available:|r Mount Route Planner |cffffffff" .. tostring(detected)
+            .. "|r has been seen from other players. Type |cffffffff/mrp update|r for download sources.")
+    else
+        print("|cff55ff55You're up to date|r as far as Mount Route Planner can tell.")
+    end
 end
 
 -- Dedicated alias, mirroring Achievements (/ach-update) and Deathlog (/dl-update).

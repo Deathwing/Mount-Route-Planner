@@ -962,6 +962,8 @@ function Core:HandleSlashCommand(msg)
         end
     elseif cmd == "update" or cmd == "updates" then
         MRP.Update:Show()
+    elseif cmd == "version" or cmd == "versions" then
+        MRP.Update:PrintVersions()
     elseif cmd == "trashit" then -- MRP_REMOVE_LINE
         Core:TrashIt()           -- MRP_REMOVE_LINE
     elseif cmd == "route" then
@@ -978,6 +980,7 @@ function Core:HandleSlashCommand(msg)
         print(L[" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"])
         print(L[" - /mrp changelog → Open the latest changelog popup"])
         print(L[" - /mrp update → Show official download sources"])
+        print(L[" - /mrp versions → Print addon and library versions"])
         print(L[" - /mrp route → Recalculate the optimized route"])
         print(L[" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"])
     end

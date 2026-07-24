@@ -1,5 +1,12 @@
 # Mount Route Planner
 
+## [v2.4.4](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.4) (2026-07-24)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.4) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Changes
+- The update-available and changelog popups now only appear while you are resting (in an inn or city) instead of anywhere out of combat, so they no longer interrupt you in the open world.
+- Added a `/mrp versions` command that prints the versions of Mount Route Planner and its bundled components (FarstriderLib and, if installed, the data packages), and notes when a newer version has been seen from other players.
+
 ## [v2.4.3](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.3) (2026-07-23)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.3) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

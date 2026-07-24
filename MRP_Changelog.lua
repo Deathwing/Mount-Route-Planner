@@ -11,9 +11,16 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.4.2"
+local CHANGELOG_VERSION = "v2.4.4"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.4.4|r
+
+|cff00ff00Changes|r
+- The update-available and changelog popups now only appear while resting (inn/city) instead of anywhere out of combat, so they no longer interrupt you in the open world.
+- Added a /mrp versions command that prints the versions of Mount Route Planner and its bundled components (FarstriderLib, data packages) and notes when a newer version has been seen from other players.
+
+
 |cffffd200Mount Route Planner 2.4.2|r
 
 |cff00ff00Changes|r
@@ -316,9 +323,16 @@ function Changelog:CheckShowOnLogin()
         return
     end
 
-    C_Timer.After(3, function()
+    -- Only show the changelog while resting (inn/city). Showing it out in the
+    -- open world is intrusive, so defer and retry until the player is resting.
+    local function showWhenResting()
+        if InCombatLockdown() or not IsResting() then
+            C_Timer.After(5, showWhenResting)
+            return
+        end
         if MRP.Changelog then
             MRP.Changelog:Show()
         end
-    end)
+    end
+    C_Timer.After(3, showWhenResting)
 end
