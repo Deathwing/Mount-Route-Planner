@@ -8,6 +8,7 @@
 ## X-Repository: https://github.com/Deathwing/Mount-Route-Planner
 ## X-Curse-Project-ID: 1301132
 ## X-Wago-ID: nGv7vvNx
+## X-WoWI-ID: 27171
 ## LoadOnDemand: 0
 ## License: All Rights Reserved
 ## IconTexture: Interface\AddOns\MountRoutePlanner\Assets\Icon.tga
