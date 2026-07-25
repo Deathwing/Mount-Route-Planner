@@ -11,6 +11,7 @@ local SOURCES = {
     { name = "GitHub", url = "https://github.com/Deathwing/Mount-Route-Planner/releases/latest" },
     { name = "CurseForge", url = "https://www.curseforge.com/wow/addons/mount-route-planner" },
     { name = "Wago", url = "https://addons.wago.io/addons/mount-route-planner" },
+    { name = "WoWInterface", url = "https://www.wowinterface.com/downloads/info27171-MountRoutePlanner.html" },
 }
 
 local warnedVersions = {}
