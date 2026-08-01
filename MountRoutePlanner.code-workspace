@@ -149,7 +149,8 @@
 			"MapCanvasPinFrameLevelsManagerMixin",
 			"CreateTexturePool",
 			"CallErrorHandler",
-			"Clamp"
+			"Clamp",
+			"LE_PARTY_CATEGORY_INSTANCE"
 		],
 		"Lua.diagnostics.neededFileStatus": {
 			"undefined-global": "Any"
