@@ -1,12 +1,12 @@
-## Interface: 120007, 120005, 120001, 50504, 50503, 40402, 30405, 20506, 11509
+## Interface: 120100, 120007, 120005, 50504, 50503, 40402, 30405, 20506, 11509
 ## Title: Mount Route Planner (MRP)
 ## Title-zhCN: 坐骑路线规划助手 (MRP)
 ## Title-zhTW: 坐騎路線規劃助手 (MRP)
 ## Author: Deathwing
-## Version: v2.4.4
+## Version: v2.4.5
 ## X-Website: https://github.com/Deathwing/Mount-Route-Planner
 ## X-Repository: https://github.com/Deathwing/Mount-Route-Planner
-## X-Curse-Project-ID: 1301132
+## X-Curse-Project-ID: 1644659
 ## X-Wago-ID: nGv7vvNx
 ## X-WoWI-ID: 27171
 ## LoadOnDemand: 0
@@ -15,15 +15,15 @@
 ## Notes: Plan and track your mount farming route with automatic collection scans, smart skipping, filters, waypoints, and travel-based routing.
 ## Notes-zhCN: 规划和跟踪您的坐骑收集路线，支持自动扫描、智能跳过、过滤器、导航点和基于旅行的路线规划。
 ## Notes-zhTW: 規劃和追蹤您的坐騎收集路線，支援自動掃描、智能跳過、過濾器、導航點和基於旅行的路線規劃。
-# MRP_UNCOMMENT_NEXT_LINE
+# UNCOMMENT_NEXT_LINE
 # ## OptionalDeps: FarstriderLib, MountRoutePlannerData
 ## SavedVariables: MRP_Settings
 ## SavedVariablesPerCharacter: MRP_CharacterSettings
-# MRP_REMOVE_NEXT_LINE
+# REMOVE_NEXT_LINE
 Libs\FarstriderLib\Data\FarstriderLibData_[Game].xml
-# MRP_REMOVE_NEXT_LINE
+# REMOVE_NEXT_LINE
 Libs\FarstriderLib\FarstriderLib.xml
-# MRP_REMOVE_NEXT_LINE
+# REMOVE_NEXT_LINE
 Data\MRPData_[Game].xml
 
 ## Category-enUS: Collections
@@ -42,7 +42,7 @@ Data\MRPData_[Game].xml
 ## X-Localizations: enUS, enGB, deDE, ruRU, zhCN, zhTW
 ## X-CompatibleLocales: enUS, enGB, deDE, frFR, esES, esMX, itIT, ptBR, ruRU, koKR, zhCN, zhTW
 
-# MRP_REMOVE_NEXT_LINE
+# REMOVE_NEXT_LINE
 MRP.d.lua
 
 embeds.xml

@@ -1,7 +1,7 @@
 <Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
 
     <!-- Bootstrap -->
-    <Script file="MRPData.d.lua" /> <!-- MRP_REMOVE_LINE -->
+    <Script file="MRPData.d.lua" /> <!-- REMOVE_LINE -->
     <Script file="MRPData~Init.lua" />
 
     <!-- Data: Steps (Wrath) -->

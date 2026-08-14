@@ -19,6 +19,7 @@ MRP.L = {
   [" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"] = " - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead", -- MISSING TRANSLATION / SAME AS ENGLISH,
   [" - /mrp update → Show official download sources"] = " - /mrp update → Show official download sources", -- MISSING TRANSLATION / SAME AS ENGLISH,
   [" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"] = " - /mrp updatedisplaydelayed <number> → 在一定的延迟后强制执行显示更新 (默认: 0.25秒)",
+  [" - /mrp versions → Print addon and library versions"] = " - /mrp versions → Print addon and library versions", -- MISSING TRANSLATION / SAME AS ENGLISH,
   [" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"] = " - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system", -- MISSING TRANSLATION / SAME AS ENGLISH,
   ["*Normal difficulty dungeons can be run up to 10 times per hour"] = "*普通难度地下城每小时最多可运行10次",
   ["%s: This boss is dead"] = "%s: 此首领已死亡",

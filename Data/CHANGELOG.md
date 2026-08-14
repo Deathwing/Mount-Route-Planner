@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.5.3
+
+### Changes
+- Added support for Interface 120100 (Patch 12.1.0) and updated all data to the 12.1.0 game build
+- Added steps for the new 12.1 mounts: The Coiled Isle rares, Ral'kala (Prey), the Gnarldor Isle delve treasure, Zul'jarra's Forces and Captain Tokka vendors, the Spirit of Tok'jara questline, Altar of Fangs, and The Venomous Abyss
+- Removed mounts that are no longer obtainable: Carcinized Zerethsteed, Spectral Hawkstrider, and Lucent Hawkstrider
+
 ## 1.5.2
 
 ### Changes

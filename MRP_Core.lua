@@ -874,7 +874,7 @@ watcher:SetScript("OnEvent", function(_, event)
     Core:CheckForPathfindingWarnings(event)
     Core:CheckRaidInfo(event)
     Core:CheckForDisplayUpdate(event)
-    Core:CheckForTrashItInfo(event) -- MRP_REMOVE_LINE
+    Core:CheckForTrashItInfo(event) -- REMOVE_LINE
     Core:CheckDifficultyWarning(event)
     Core:CheckCurrentStepComplete(false)
 
@@ -916,11 +916,11 @@ f:SetScript("OnEvent", function()
         MRP.Changelog:CheckShowOnLogin()
     end
 
-    if DevTool then                                                     -- MRP_REMOVE_LINE
-        DevTool:AddData(MRP, "MRP")                                     -- MRP_REMOVE_LINE
-        DevTool:AddData(MRP_Settings, "MRP_Settings")                   -- MRP_REMOVE_LINE
-        DevTool:AddData(MRP_CharacterSettings, "MRP_CharacterSettings") -- MRP_REMOVE_LINE
-    end                                                                 -- MRP_REMOVE_LINE
+    if DevTool then                                                     -- REMOVE_LINE
+        DevTool:AddData(MRP, "MRP")                                     -- REMOVE_LINE
+        DevTool:AddData(MRP_Settings, "MRP_Settings")                   -- REMOVE_LINE
+        DevTool:AddData(MRP_CharacterSettings, "MRP_CharacterSettings") -- REMOVE_LINE
+    end                                                                 -- REMOVE_LINE
 end)
 
 function Core:HandleSlashCommand(msg)
@@ -964,8 +964,8 @@ function Core:HandleSlashCommand(msg)
         MRP.Update:Show()
     elseif cmd == "version" or cmd == "versions" then
         MRP.Update:PrintVersions()
-    elseif cmd == "trashit" then -- MRP_REMOVE_LINE
-        Core:TrashIt()           -- MRP_REMOVE_LINE
+    elseif cmd == "trashit" then -- REMOVE_LINE
+        Core:TrashIt()           -- REMOVE_LINE
     elseif cmd == "route" then
         MRP.Route:Calculate()
         print(L["|cff00ff00[MRP]|r Route recalculated."])

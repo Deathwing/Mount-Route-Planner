@@ -36,6 +36,23 @@ local overlayLineFrame = nil
 local overlayArrowFrame = nil
 
 local function SetOverlayFrameRenderOrder(frame, canvas, levelOffset)
+    -- Retail: map exploration (fog-clearing) textures are pins whose frame
+    -- levels sit far above canvas+offset, hiding overlays in explored areas.
+    -- Anchor just below the MAP_LINK pin level (route pins use MAP_LINK) so
+    -- lines/arrows render above exploration textures but below our pins.
+    local manager = WorldMapFrame
+        and WorldMapFrame.GetPinFrameLevelsManager
+        and WorldMapFrame:GetPinFrameLevelsManager()
+    if manager and manager.GetValidFrameLevel then
+        local ok, mapLinkLevel = pcall(manager.GetValidFrameLevel, manager, "PIN_FRAME_LEVEL_MAP_LINK")
+        if ok and type(mapLinkLevel) == "number" then
+            local below = (levelOffset == MAP_OVERLAY_ARROW_LEVEL_OFFSET) and 2 or 3
+            frame:SetFrameLevel(math.max(mapLinkLevel - below, 1))
+            return
+        end
+    end
+
+    -- Classic clients without a pin frame-levels manager
     frame:SetFrameLevel((canvas:GetFrameLevel() or 0) + levelOffset)
 end
 

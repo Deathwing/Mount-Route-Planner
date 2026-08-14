@@ -1185,9 +1185,9 @@ function UI:UpdateDisplay()
     MRP.Map:SetOpenWorldOverlay(entry, step.source.name, step.mounts)
     MRP.Map:UpdateOverlay()
 
-    if (MRP.Core:CanPossiblyTrashIt()) then -- MRP_REMOVE_LINE
-        self:ShowActionTrashIt()            -- MRP_REMOVE_LINE
-    end                                     -- MRP_REMOVE_LINE
+    if (MRP.Core:CanPossiblyTrashIt()) then -- REMOVE_LINE
+        self:ShowActionTrashIt()            -- REMOVE_LINE
+    end                                     -- REMOVE_LINE
 
     frame.progress:SetText(L["Step %d of %d"]:format(idx, #steps))
     frame.progressBar:SetWidth(frame.progressBarBG:GetWidth() * (idx / #steps))
@@ -1228,11 +1228,11 @@ function UI:ClearCurrentPathfindingData()
 end
 
 function UI:UpdateCurrentPathfinding(entry)
-    ---@diagnostic disable-next-line: undefined-global -- MRP_REMOVE_LINE
-    if ClearLogs then -- MRP_REMOVE_LINE
-        ---@diagnostic disable-next-line: undefined-global -- MRP_REMOVE_LINE
-        ClearLogs()   -- MRP_REMOVE_LINE
-    end               -- MRP_REMOVE_LINE
+    ---@diagnostic disable-next-line: undefined-global -- REMOVE_LINE
+    if ClearLogs then -- REMOVE_LINE
+        ---@diagnostic disable-next-line: undefined-global -- REMOVE_LINE
+        ClearLogs()   -- REMOVE_LINE
+    end               -- REMOVE_LINE
     ---@diagnostic disable-next-line: undefined-global
     local optimizedPath = MRP.Farstrider.FindTrailTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
 
@@ -1253,9 +1253,9 @@ function UI:UpdateCurrentPathfinding(entry)
         MRP.Map.pathPos = 1
         MRP.Map.pathStep = MRP.Map.path and MRP.Map.pathPos <= #MRP.Map.path and MRP.Map.path[MRP.Map.pathPos] or nil
 
-        if DevTool then                                                                                                                             -- MRP_REMOVE_LINE
-            DevTool:AddData({ pathKey = MRP.Map.pathKey, path = MRP.Map.path, pathPos = MRP.Map.pathPos, pathStep = MRP.Map.pathStep }, "MRP_Path") -- MRP_REMOVE_LINE
-        end                                                                                                                                         -- MRP_REMOVE_LINE
+        if DevTool then                                                                                                                             -- REMOVE_LINE
+            DevTool:AddData({ pathKey = MRP.Map.pathKey, path = MRP.Map.path, pathPos = MRP.Map.pathPos, pathStep = MRP.Map.pathStep }, "MRP_Path") -- REMOVE_LINE
+        end                                                                                                                                         -- REMOVE_LINE
     end
 
     if MRP.Map.pathStep then

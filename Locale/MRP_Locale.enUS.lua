@@ -10,6 +10,7 @@ MRP.L = {
   [" - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead"] = " - /mrp tomtom on|off → (Deprecated) Use /mrp waypoint instead",
   [" - /mrp update → Show official download sources"] = " - /mrp update → Show official download sources",
   [" - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)"] = " - /mrp updatedisplaydelayed <number> → Force update of the display after a delay (default: 0.25 seconds)",
+  [" - /mrp versions → Print addon and library versions"] = " - /mrp versions → Print addon and library versions",
   [" - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system"] = " - /mrp waypoint none|waypoint|tomtom → Choose the waypoint system",
   ["*Normal difficulty dungeons can be run up to 10 times per hour"] = "*Normal difficulty dungeons can be run up to 10 times per hour",
   ["%s: This boss is dead"] = "%s: This boss is dead",

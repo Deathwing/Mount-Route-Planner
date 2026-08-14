@@ -11,9 +11,21 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.4.4"
+local CHANGELOG_VERSION = "v2.4.5"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.4.5|r
+
+|cffff2020Fixes|r
+- Route lines and direction arrows are no longer hidden by explored map areas on retail.
+
+|cff00ff00Changes|r
+- Added support for Patch 12.1.0 and updated all data to the 12.1.0 game build.
+- Added the new 12.1 mounts with routes and steps: Coiled Isle rares, Ral'kala, Gnarldor Isle delve, the new renown and reputation vendors, the Spirit of Tok'jara questline, Altar of Fangs, and The Venomous Abyss.
+- Removed mounts that are no longer obtainable: Carcinized Zerethsteed, Spectral Hawkstrider, and Lucent Hawkstrider.
+- Version discovery now works across the open world, not just within your guild or group, so update reminders reach more players.
+
+
 |cffffd200Mount Route Planner 2.4.4|r
 
 |cff00ff00Changes|r

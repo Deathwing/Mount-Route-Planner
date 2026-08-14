@@ -7,6 +7,20 @@ MRP.Update = Update
 local PREFIX = "MRPVER1"
 local ANNOUNCE_COOLDOWN = 120
 local RESPONSE_COOLDOWN = 30
+-- Shared hidden discovery channel: lets MRP detect peers (and version updates)
+-- across the open world, not just within a guild/group. Variant suffixes are
+-- tried in order so players spill into an overflow channel when one fills up.
+local CHANNEL_BASE = "mrproutes"
+local CHANNEL_PASSWORD = nil
+local CHANNEL_JOIN_DELAY = 3
+local CHANNEL_RETRY_DELAY = 4
+local channelCandidates = {
+    "mrproutes",
+    "mrproutesb",
+    "mrproutesc",
+    "mrproutesd",
+    "mrproutese",
+}
 local SOURCES = {
     { name = "GitHub", url = "https://github.com/Deathwing/Mount-Route-Planner/releases/latest" },
     { name = "CurseForge", url = "https://www.curseforge.com/wow/addons/mount-route-planner" },
@@ -19,6 +33,10 @@ local lastSent = {}
 local sourceFrame
 local pendingVersion
 local retryScheduled
+local activeChannelName
+local joiningChannel
+local channelFiltersInstalled
+local channelStaticPopupHooked
 
 local function getVersion()
     local getMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
@@ -234,12 +252,118 @@ local function isLocalSender(sender)
     return shortSender == UnitName("player")
 end
 
-local function sendVersion(distribution, cooldown)
+---------------------------------------------------------------------------
+-- Shared discovery channel
+---------------------------------------------------------------------------
+local function cleanChannelName(channelName)
+    if type(channelName) ~= "string" then return nil end
+    local cleaned = channelName:match("^%d+%.%s*(.+)$") or channelName
+    return string.lower(cleaned or "")
+end
+
+local function isDiscoveryChannelName(channelName)
+    local cleaned = cleanChannelName(channelName)
+    return cleaned and cleaned:sub(1, #CHANNEL_BASE) == CHANNEL_BASE
+end
+
+local function extractChannelName(...)
+    local explicitName = select(9, ...)
+    if type(explicitName) == "string" and explicitName ~= "" then
+        return cleanChannelName(explicitName)
+    end
+    local channelText = select(4, ...)
+    if type(channelText) == "string" and channelText ~= "" then
+        return cleanChannelName(channelText)
+    end
+    return nil
+end
+
+local function hideChannelFromChatFrames(channelName)
+    if not channelName then return end
+    for frameIndex = 1, 10 do
+        local chatFrame = _G["ChatFrame" .. frameIndex]
+        if chatFrame then
+            pcall(ChatFrame_RemoveChannel, chatFrame, channelName)
+        end
+    end
+end
+
+local function getJoinedChannelID(channelName)
+    if type(channelName) ~= "string" then return nil end
+    local ok, channelID = pcall(GetChannelName, channelName)
+    channelID = ok and tonumber(channelID) or nil
+    if channelID and channelID ~= 0 then return channelID end
+    return nil
+end
+
+local function installChannelFilters()
+    if channelFiltersInstalled then return end
+    channelFiltersInstalled = true
+    local function channelFilter(_, _, ...)
+        return isDiscoveryChannelName(extractChannelName(...)) and true or false
+    end
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", channelFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_NOTICE", channelFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_NOTICE_USER", channelFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_JOIN", channelFilter)
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL_LEAVE", channelFilter)
+    if not channelStaticPopupHooked then
+        channelStaticPopupHooked = true
+        hooksecurefunc("StaticPopup_Show", function(which, _, _, data)
+            if data and isDiscoveryChannelName(data) then
+                StaticPopup_Hide(which)
+            end
+        end)
+    end
+end
+
+local function tryJoinDiscoveryChannel(candidateIndex)
+    candidateIndex = candidateIndex or 1
+    local channelName = channelCandidates[candidateIndex]
+    if not channelName then
+        joiningChannel = nil
+        return
+    end
+    activeChannelName = channelName
+    joiningChannel = true
+    pcall(JoinChannelByName, channelName, CHANNEL_PASSWORD, nil, false)
+    hideChannelFromChatFrames(channelName)
+    C_Timer.After(CHANNEL_RETRY_DELAY, function()
+        if getJoinedChannelID(channelName) then
+            activeChannelName = channelName
+            joiningChannel = nil
+            hideChannelFromChatFrames(channelName)
+            return
+        end
+        tryJoinDiscoveryChannel(candidateIndex + 1)
+    end)
+end
+
+local function joinDiscoveryChannel()
+    installChannelFilters()
+    if activeChannelName and getJoinedChannelID(activeChannelName) then
+        hideChannelFromChatFrames(activeChannelName)
+        return
+    end
+    if joiningChannel then return end
+    C_Timer.After(CHANNEL_JOIN_DELAY, function()
+        tryJoinDiscoveryChannel(1)
+    end)
+end
+
+local function sendVersion(distribution, cooldown, target)
     local now = GetTime()
-    local previousSend = lastSent[distribution]
+    local key = target and (distribution .. ":" .. target) or distribution
+    local previousSend = lastSent[key]
     if previousSend and now - previousSend < cooldown then return end
-    lastSent[distribution] = now
-    pcall(C_ChatInfo.SendAddonMessage, PREFIX, "V\t" .. getVersion(), distribution)
+    lastSent[key] = now
+    pcall(C_ChatInfo.SendAddonMessage, PREFIX, "V\t" .. getVersion(), distribution, target)
+end
+
+local function announceOnChannel(cooldown)
+    local channelID = activeChannelName and getJoinedChannelID(activeChannelName)
+    if not channelID then return end
+    sendVersion("CHANNEL", cooldown or ANNOUNCE_COOLDOWN, tostring(channelID))
 end
 
 local function announceVersion()
@@ -251,14 +375,17 @@ local function announceVersion()
     elseif IsInGroup() then
         sendVersion("PARTY", ANNOUNCE_COOLDOWN)
     end
+    announceOnChannel(ANNOUNCE_COOLDOWN)
 end
 
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
 eventFrame:RegisterEvent("CHAT_MSG_ADDON")
 eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 eventFrame:RegisterEvent("GUILD_ROSTER_UPDATE")
+eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 eventFrame:SetScript("OnEvent", function(_, event, prefix, message, distribution, sender)
     if event == "PLAYER_LOGIN" then
         pcall(C_ChatInfo.RegisterAddonMessagePrefix, PREFIX)
@@ -271,13 +398,30 @@ eventFrame:SetScript("OnEvent", function(_, event, prefix, message, distribution
         C_Timer.After(8, announceVersion)
         return
     end
+    if event == "PLAYER_ENTERING_WORLD" then
+        joinDiscoveryChannel()
+        return
+    end
+    if event == "ZONE_CHANGED_NEW_AREA" then
+        joinDiscoveryChannel()
+        return
+    end
     if event == "PLAYER_REGEN_ENABLED" then
         tryShowPendingUpdate()
         return
     end
     if event == "CHAT_MSG_ADDON" then
         if prefix ~= PREFIX or isLocalSender(sender) then return end
-        local remoteVersion = type(message) == "string" and message:match("^V\t(.+)$") or nil
+        if type(message) ~= "string" then return end
+        -- A peer explicitly asks for our version -> whisper it straight back.
+        if message:match("^VER_REQ") then
+            local target = Ambiguate and Ambiguate(sender, "short") or sender
+            if target and target ~= "" then
+                sendVersion("WHISPER", RESPONSE_COOLDOWN, target)
+            end
+            return
+        end
+        local remoteVersion = message:match("^V\t(.+)$")
         if not remoteVersion then return end
         local comparison = compareVersions(remoteVersion, getVersion())
         if comparison > 0 then

@@ -1,11 +1,11 @@
-## Interface: 120007, 120005, 120001, 50504, 50503, 40402, 30405, 20506, 11509
+## Interface: 120100, 120007, 120005, 50504, 50503, 40402, 30405, 20506, 11509
 ## Title: Mount Route Planner Data
 ## Notes: Optional standalone data package for Mount Route Planner, providing generated mount source and route-step data.
 ## IconTexture: Interface\AddOns\MountRoutePlannerData\Media\logo.png
 ## Author: Deathwing
 ## X-Website: https://github.com/Deathwing/Mount-Route-Planner
 ## X-Repository: https://github.com/Deathwing/Mount-Route-Planner
-## X-Curse-Project-ID: 1507842
+## X-Curse-Project-ID: 1644673
 ## X-License: All Rights Reserved
 ## X-Category: Library
 ## Category-enUS: Libraries
@@ -19,6 +19,6 @@
 ## Category-ruRU: Библиотеки
 ## Category-zhCN: 函数库
 ## Category-zhTW: 函式庫
-## Version: 1.5.2
+## Version: 1.5.3
 
 MRPData_[Game].xml

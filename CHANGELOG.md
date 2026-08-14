@@ -1,5 +1,17 @@
 # Mount Route Planner
 
+## [v2.4.5](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.5) (2026-08-12)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.5) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Fixes
+- Route lines and direction arrows are no longer hidden by explored map areas on retail; they now render above the map exploration textures but below the route pins (thanks Neko-Chan for the report and suggested fix!)
+
+### Changes
+- Added support for Patch 12.1.0 (Interface 120100) and updated all data to the 12.1.0 game build
+- Added the new 12.1 mounts with routes and steps: The Coiled Isle rares (Ruby Writhe, Topaz Skyfang), Ral'kala prey boss (Hexflame Reaver), Gnarldor Isle delve treasure (Delver's Arcane Golem), Zul'jarra's Forces and Captain Tokka vendors (Indigo Coiled Horror, Violet-Backed Skyfang, Sea-Dwelling Isle Serpent, Caustic Venomfang), the Spirit of Tok'jara questline, Altar of Fangs (The Writhing Brood, Mythic) and The Venomous Abyss (Primeval Skyfriend, Mythic)
+- Removed mounts that are no longer obtainable: Carcinized Zerethsteed (Leading Motives quest removed), Spectral Hawkstrider and Lucent Hawkstrider (Windrunner Spire and Magisters' Terrace rotated out of the Season 2 Mythic+ pool)
+- Version discovery now works across the open world, not just within your guild or group, so update reminders reach more players.
+
 ## [v2.4.4](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.4) (2026-07-24)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.4) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 
