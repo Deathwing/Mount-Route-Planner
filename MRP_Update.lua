@@ -232,7 +232,9 @@ function Update:PrintVersions()
             if isStandalone then
                 note = " |cff999999(standalone)|r"
             elseif standaloneLoaded then
-                note = " |cff999999(embedded in Mount Route Planner; standalone " .. formatVersion(tonumber(version) or version) .. " superseded)|r"
+                note = " |cff999999(" .. (embedded and "embedded in Mount Route Planner" or "another addon's copy") .. "; standalone " .. formatVersion(tonumber(version) or version) .. " superseded)|r"
+            elseif type(api) == "table" and not api.Shutdown then
+                note = " |cff999999(another addon's older copy)|r"
             elseif embedded then
                 note = " |cff999999(embedded in Mount Route Planner)|r"
             end

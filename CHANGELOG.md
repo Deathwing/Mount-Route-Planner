@@ -4,6 +4,7 @@
 
 ### Fixes
 - Travel routing on Cataclysm Classic now knows the guild cloaks (Wrap of Unity, Shroud of Cooperation, Cloak of Coordination); they were written with retail map IDs and were silently ignored there.
+- `/mrp versions` no longer says "embedded in Mount Route Planner" when the active FarstriderLib or data copy comes from another addon.
 
 ## [v2.5.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.5.0) (2026-11-10)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.5.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
