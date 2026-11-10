@@ -1,5 +1,10 @@
 # Mount Route Planner
 
+## Unreleased
+
+### Fixes
+- Travel routing on Cataclysm Classic now knows the guild cloaks (Wrap of Unity, Shroud of Cooperation, Cloak of Coordination); they were written with retail map IDs and were silently ignored there.
+
 ## [v2.5.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.5.0) (2026-11-10)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.5.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 
