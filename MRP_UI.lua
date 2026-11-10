@@ -200,7 +200,7 @@ UIDropDownMenu_Initialize(dropdown, function(_, level, menuList)
             end
         elseif menuList == "EXPANSION_MENU" then
             for _, k in ipairs(MRP.FilterExpansionOrder) do
-                if GetExpansionLevel() >= MRP.FilterExpansion[k] and MRP.Filter.availableExpansions and MRP.Filter.availableExpansions[MRP.FilterExpansion[k]] then
+                if MRP.EXPANSION_LEVEL >= MRP.FilterExpansion[k] and MRP.Filter.availableExpansions and MRP.Filter.availableExpansions[MRP.FilterExpansion[k]] then
                     AddDropdownCheckboxButton_FilterExpansion(level, k)
                 end
             end
@@ -289,7 +289,7 @@ actionBtn:GetPushedTexture():SetVertexColor(0.6, 0.6, 0.6, 1)
 actionBtn:SetHighlightTexture("Interface\\Icons\\INV_Misc_QuestionMark")
 actionBtn:SetAttribute("type", "macro")
 actionBtn:RegisterForClicks("AnyUp", "AnyDown")
-if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
+if not MRP.MAINLINE_API then
     actionBtn:RegisterForClicks("AnyUp")
 end
 actionBtn:Hide()
@@ -443,7 +443,7 @@ local difficultyConfig = {
     {
         check = function(difficultyId) return MRP.Core:IsLegacyRaidDifficulty(difficultyId) end,
         texture = "interface/icons/inv_helmet_06",
-        api = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and "SetLegacyRaidDifficultyID" or "SetRaidDifficultyID",
+        api = MRP.MAINLINE_API and "SetLegacyRaidDifficultyID" or "SetRaidDifficultyID",
         name = L["legacy raid"]
     },
     {
@@ -474,7 +474,7 @@ function UI:ShowActionSwitchDifficulty(difficultyId)
     end
 
     local macro = "/script " .. config.api .. "(" .. difficultyId .. ")"
-    if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
+    if not MRP.MAINLINE_API then
         macro = macro .. "\n/mrp updatedisplaydelayed"
     end
 
@@ -844,8 +844,8 @@ function UI:UpdateDisplay()
             --   Dungeon maps: available from Mists of Pandaria (expansion 4+)
             -- On older Classic clients, fall back to the entrance zone map from MRP.Data.
             local sType = step.source.type
-            if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
-                local expLevel = GetExpansionLevel()
+            if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE or MRP.IS_FOREVER then
+                local expLevel = MRP.EXPANSION_LEVEL
                 local needsFallback = not navMapId
                     or (sType == MRP.FilterSourceType.Raid and expLevel < 3)
                     or (sType == MRP.FilterSourceType.Dungeon and expLevel < 4)
@@ -860,8 +860,8 @@ function UI:UpdateDisplay()
                 end
             end
             local allowLeftClick = navMapId and C_Map.GetMapInfo(navMapId) ~= nil
-            local allowRightClick = (mount.source.journalEncounter and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)) ~= nil
-                or ((sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid or sType == MRP.FilterSourceType.WorldBoss) and mount.source.uiMapIds[1] and (EJ_GetInstanceForMap(mount.source.uiMapIds[1]) or 0) > 0)
+            local allowRightClick = EncounterJournal_OpenJournal ~= nil and ((mount.source.journalEncounter and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)) ~= nil
+                or ((sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid or sType == MRP.FilterSourceType.WorldBoss) and mount.source.uiMapIds[1] and (EJ_GetInstanceForMap(mount.source.uiMapIds[1]) or 0) > 0))
             local allowShiftLeftClick = SetCollectionsJournalShown and MountJournal_SetSelected
 
             mountBtn:SetScript("OnEnter", function()
@@ -1042,7 +1042,7 @@ function UI:UpdateDisplay()
                         SetCollectionsJournalShown(true, COLLECTIONS_JOURNAL_TAB_INDEX_MOUNTS)
                         MountJournal_SetSelected(mount.id, mount.spellId)
                     else
-                        if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+                        if MRP.MAINLINE_API then
                             OpenWorldMap(navMapId)
                         else
                             WorldMapFrame:SetShown(true)
@@ -1052,7 +1052,7 @@ function UI:UpdateDisplay()
                             end
                         end
                     end
-                elseif button == "RightButton" and allowRightClick then
+                elseif button == "RightButton" and allowRightClick and EncounterJournal_OpenJournal then
                     if mount.source.journalEncounter then
                         EncounterJournal_OpenJournal(relevantDifficultyIds[1], mount.source.journalEncounter.instanceId, mount.source.journalEncounter.id, nil, nil, mount.itemId)
                     else
@@ -1085,7 +1085,7 @@ function UI:UpdateDisplay()
         local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIds(step)
         isInstanceRelevant = #bestDifficulties > 0
         isRepeatable = #bestDifficulties > 0 and tContains(bestDifficulties, 1)
-        if #bestDifficulties > 0 and not tContains(bestDifficulties, GetDungeonDifficultyID()) and not tContains(bestDifficulties, WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and GetLegacyRaidDifficultyID() or GetRaidDifficultyID()) and not tContains(bestDifficulties, GetRaidDifficultyID()) then
+        if #bestDifficulties > 0 and not tContains(bestDifficulties, GetDungeonDifficultyID()) and not tContains(bestDifficulties, MRP.MAINLINE_API and GetLegacyRaidDifficultyID() or GetRaidDifficultyID()) and not tContains(bestDifficulties, GetRaidDifficultyID()) then
             if #bestDifficulties == #instance.availableDifficultyIds then
             elseif #bestDifficulties > 1 then
                 warningText = format(L["Run the instance on any of the following difficulties to collect all mounts:\n%s"], table.concat(MRP.Util.Map(bestDifficulties, GetDifficultyInfo), ", "))
@@ -1423,7 +1423,7 @@ end
 function UI:CanUseSpell(spellId)
     if not spellId then return false end
 
-    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+    if MRP.MAINLINE_API then
         if InCombatLockdown() then return false end
     end
 

@@ -1,6 +1,10 @@
 -- MRP_Enums.lua
 -- local _, MRP = ...
 
+MRP.IS_FOREVER = WOW_PROJECT_ID == WOW_PROJECT_CAMELOT
+MRP.MAINLINE_API = MRP.IS_FOREVER or WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+MRP.EXPANSION_LEVEL = MRP.IS_FOREVER and 0 or GetExpansionLevel()
+
 ---@enum FilterExpansion
 MRP.FilterExpansion = {
     Classic = 0,

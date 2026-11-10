@@ -364,7 +364,7 @@ end
 
 ---@return TrashItItem[] itemsToSell
 function Core:GatherTrashItData()
-    local expansionLevel = GetExpansionLevel()
+    local expansionLevel = MRP.EXPANSION_LEVEL
     local itemsToSell = {}
 
     for bag = 0, NUM_TOTAL_EQUIPPED_BAG_SLOTS do

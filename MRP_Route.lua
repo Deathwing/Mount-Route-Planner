@@ -102,14 +102,16 @@ function Route:GetPlayerLocation()
         if parentMapId then
             uiMapId = parentMapId
 
-            local instanceId = EJ_GetInstanceForMap(uiMapId)
-            local dungeonEntrances = C_EncounterJournal.GetDungeonEntrancesForMap(parentMapId)
+            local instanceId = EJ_GetInstanceForMap and EJ_GetInstanceForMap(uiMapId)
+            local dungeonEntrances = C_EncounterJournal and C_EncounterJournal.GetDungeonEntrancesForMap and C_EncounterJournal.GetDungeonEntrancesForMap(parentMapId)
 
-            for _, entrance in ipairs(dungeonEntrances) do
-                if entrance.journalInstanceID == instanceId then
-                    uiMapId = parentMapId
-                    uiMapCoords = entrance.position
-                    break
+            if instanceId and dungeonEntrances then
+                for _, entrance in ipairs(dungeonEntrances) do
+                    if entrance.journalInstanceID == instanceId then
+                        uiMapId = parentMapId
+                        uiMapCoords = entrance.position
+                        break
+                    end
                 end
             end
         end

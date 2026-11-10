@@ -1,4 +1,4 @@
-## Interface: 120100, 120007, 120005, 50504, 50503, 40402, 30405, 20506, 11509
+## Interface: 120105, 120100, 120007, 120005, 50504, 50503, 40402, 30405, 20506, 16001, 11509
 ## Title: Mount Route Planner Data
 ## Notes: Optional standalone data package for Mount Route Planner, providing generated mount source and route-step data.
 ## IconTexture: Interface\AddOns\MountRoutePlannerData\Media\logo.png
@@ -19,6 +19,6 @@
 ## Category-ruRU: Библиотеки
 ## Category-zhCN: 函数库
 ## Category-zhTW: 函式庫
-## Version: 1.5.3
+## Version: 1.5.4
 
 MRPData_[Game].xml

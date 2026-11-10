@@ -1,5 +1,22 @@
 # Mount Route Planner
 
+## [v2.5.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.5.0) (2026-11-10)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.5.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### New Features
+- **World of Warcraft: Forever support.** Mount Route Planner loads on Forever (Interface 16001) with mount, step, zone and waypoint data generated from Forever's own game build. Routes know Forever's new travel links: the Powderfuse Port boat to Steamwheedle Port and the faction skycutters to Zephras Isle (Alliance via the Dalaran ruins, Horde via Mulgore). Route steps cover the Galestrider vendor Genn Fairweather on Zephras Isle and the Pack Kodo quartermasters (Okamache in the Barrens, Huey Sunnydale in Redridge Mountains). As on retail, the Waypoint option uses the game's own map pin, and teleport spells are not suggested while you are in combat. Forever has no Encounter Journal, so the "Right-click to view in Encounter Journal" hint is not shown there, and the bundled HereBeDragons library is updated so world map pins land in the right place.
+- **One download on CurseForge.** The CurseForge file now carries FarstriderLib and the data packages inside the Mount Route Planner folder. When a copy from this release or later is also installed separately, the newest one is used. Separately installed copies released before this one (FarstriderLib 1.4.3 or earlier, data packages dated before 2026-11-10) still take precedence, so update or remove them. `/mrp versions` shows which copy is active, with FarstriderLib as 1.x.y and the data packages by release date.
+
+### Fixes
+- Route directions ("Take the portal to …", "Take the boat from … to …") are now in French on French clients. The translation existed but was never loaded. ([FarstriderLib#3](https://github.com/Deathwing/FarstriderLib/pull/3), thanks @Neogeekmo)
+- Classic versions now point Pinto and Timber Wolf at the Pinto Bridle and Horn of the Timber Wolf sold by the vendors instead of old unobtainable items.
+- Travel routing on Classic Era, TBC, Wrath and Cataclysm Classic now knows connections that were written with retail map IDs and were silently ignored on those clients. On all four: the Deeprun Tram, mage teleports, the Everlook and Gadgetzan Dimensional Ripper and Ultrasafe Transporter, Atiesh, Teleport: Moonglade, the Lunar Festival Invitation and the Menethil Harbor–Theramore boat. From TBC on: the Blasted Lands, Shattrath and Exodar–Darnassus portals, the Orb of Translocation to Silvermoon, the Blessed Medallion of Karabor and the Area 52 and Toshley's Station Ripper and Transporter. On Wrath and Cataclysm Classic: Death Gate, the Dalaran portals, the Menethil Harbor–Valgarde and Stormwind–Borean Tundra boats, the Shattered Sun Staging Area flight paths and the Sholazar Basin–Un'Goro Crater portal, plus Boots of the Bay on Wrath. On Cataclysm Classic: the Booty Bay–Ratchet boat and the Orgrimmar zeppelins.
+- Chat channels stay in order. The addon could re-join its discovery channel although the game had already restored it at login, which hands the channel number back and can push General and Trade down. It now waits until the game has restored your cached channels and only joins when it is not already a member of any of its channels, so it never sits in two of them.
+- Fixed the WoWInterface button sticking out of the "update available" window. The download-source buttons now sit in a two-per-row grid, and the window is sized to fit them. CurseForge is now listed first and preselected, and the update chat message mentions WoWInterface too.
+
+### Changes
+- Added support for Interface 120105 (Patch 12.1.5)
+
 ## [v2.4.5](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.4.5) (2026-08-12)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.4.5) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 

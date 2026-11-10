@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.5.4
+
+### Fixes
+- Classic versions now point Pinto and Timber Wolf at the Pinto Bridle and Horn of the Timber Wolf sold by the vendors instead of old unobtainable items
+
+### Changes
+- Added support for Interface 120105 (Patch 12.1.5)
+- Added support for World of Warcraft: Forever (Interface 16001) with Forever mount and step data, including the Galestrider vendor on Zephras Isle and the Pack Kodo quartermasters
+- When more than one copy from this release or later is installed, the newest one is used; copies from before this release still take precedence
+
 ## 1.5.3
 
 ### Changes

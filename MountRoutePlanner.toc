@@ -1,9 +1,9 @@
-## Interface: 120100, 120007, 120005, 50504, 50503, 40402, 30405, 20506, 11509
+## Interface: 120105, 120100, 120007, 120005, 50504, 50503, 40402, 30405, 20506, 16001, 11509
 ## Title: Mount Route Planner (MRP)
 ## Title-zhCN: 坐骑路线规划助手 (MRP)
 ## Title-zhTW: 坐騎路線規劃助手 (MRP)
 ## Author: Deathwing
-## Version: v2.4.5
+## Version: v2.5.0
 ## X-Website: https://github.com/Deathwing/Mount-Route-Planner
 ## X-Repository: https://github.com/Deathwing/Mount-Route-Planner
 ## X-Curse-Project-ID: 1644659
@@ -19,10 +19,13 @@
 # ## OptionalDeps: FarstriderLib, MountRoutePlannerData
 ## SavedVariables: MRP_Settings
 ## SavedVariablesPerCharacter: MRP_CharacterSettings
+# EMBED_PACKAGE FarstriderLibData
 # REMOVE_NEXT_LINE
 Libs\FarstriderLib\Data\FarstriderLibData_[Game].xml
+# EMBED_PACKAGE FarstriderLib
 # REMOVE_NEXT_LINE
 Libs\FarstriderLib\FarstriderLib.xml
+# EMBED_PACKAGE MountRoutePlannerData
 # REMOVE_NEXT_LINE
 Data\MRPData_[Game].xml
 

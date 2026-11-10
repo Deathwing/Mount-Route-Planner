@@ -247,7 +247,7 @@ end
 --- Returns true if the Blizzard's waypoint system can be used for navigation
 --- @return boolean
 function Util.IsWaypointNavigationSupported()
-    return GetExpansionLevel() >= 8
+    return MRP.IS_FOREVER or GetExpansionLevel() >= 8
 end
 
 --- Returns true if TomTom can be used for navigation

@@ -14,6 +14,7 @@ local CHANNEL_BASE = "mrproutes"
 local CHANNEL_PASSWORD = nil
 local CHANNEL_JOIN_DELAY = 3
 local CHANNEL_RETRY_DELAY = 4
+local CHANNEL_RESTORE_TIMEOUT = 10
 local channelCandidates = {
     "mrproutes",
     "mrproutesb",
@@ -22,8 +23,8 @@ local channelCandidates = {
     "mrproutese",
 }
 local SOURCES = {
-    { name = "GitHub", url = "https://github.com/Deathwing/Mount-Route-Planner/releases/latest" },
     { name = "CurseForge", url = "https://www.curseforge.com/wow/addons/mount-route-planner" },
+    { name = "GitHub", url = "https://github.com/Deathwing/Mount-Route-Planner/releases/latest" },
     { name = "Wago", url = "https://addons.wago.io/addons/mount-route-planner" },
     { name = "WoWInterface", url = "https://www.wowinterface.com/downloads/info27171-MountRoutePlanner.html" },
 }
@@ -35,12 +36,21 @@ local pendingVersion
 local retryScheduled
 local activeChannelName
 local joiningChannel
+local channelsRestored
 local channelFiltersInstalled
 local channelStaticPopupHooked
 
 local function getVersion()
     local getMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
     return tostring(getMetadata("MountRoutePlanner", "Version") or "unknown")
+end
+
+local function formatVersion(v)
+    if type(v) == "number" and v >= 1e9 then return date("!%Y-%m-%d", v) end
+    if type(v) == "number" and v >= 10000 then
+        return string.format("%d.%d.%d", math.floor(v / 10000), math.floor(v / 100) % 100, v % 100)
+    end
+    return tostring(v)
 end
 
 local function compareVersions(left, right)
@@ -61,7 +71,13 @@ end
 
 local function createSourceFrame()
     local frame = CreateFrame("Frame", "MRPUpdateSourcesFrame", UIParent, "BackdropTemplate")
-    frame:SetSize(460, 190)
+    local BUTTONS_PER_ROW, BUTTON_WIDTH, BUTTON_HEIGHT = 2, 170, 28
+    local COL_GAP, ROW_GAP = 10, 6
+    local rows = math.ceil(#SOURCES / BUTTONS_PER_ROW)
+    local grid_width = BUTTONS_PER_ROW * BUTTON_WIDTH + (BUTTONS_PER_ROW - 1) * COL_GAP
+    local grid_height = rows * BUTTON_HEIGHT + (rows - 1) * ROW_GAP
+    local frame_width = grid_width + 100
+    frame:SetSize(frame_width, 200) -- height is set below once the text is measured
     frame:SetPoint("CENTER")
     frame:SetFrameStrata("DIALOG")
     frame:SetClampedToScreen(true)
@@ -89,31 +105,38 @@ local function createSourceFrame()
 
     local description = frame:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
     description:SetPoint("TOP", title, "BOTTOM", 0, -10)
+    description:SetWidth(frame_width - 50)
+    description:SetJustifyH("CENTER")
     description:SetText("Choose an official download source, then copy the selected address.")
 
+    -- top margin + title + gap + description + gap + grid + gap + address box + bottom margin
+    frame:SetHeight(22 + title:GetStringHeight() + 10 + description:GetStringHeight() + 20
+        + grid_height + 24 + 28 + 24)
+
     local editBox = CreateFrame("EditBox", nil, frame, "InputBoxTemplate")
-    editBox:SetSize(400, 28)
+    editBox:SetSize(grid_width + 20, 28)
     editBox:SetPoint("BOTTOM", 0, 24)
     editBox:SetAutoFocus(false)
     editBox:SetScript("OnEscapePressed", editBox.ClearFocus)
     frame.editBox = editBox
 
-    local previousButton
-    for _, source in ipairs(SOURCES) do
-        local button = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-        button:SetSize(120, 28)
-        if previousButton then
-            button:SetPoint("LEFT", previousButton, "RIGHT", 10, 0)
-        else
-            button:SetPoint("TOPLEFT", 35, -82)
-        end
+    local grid = CreateFrame("Frame", nil, frame)
+    grid:SetSize(grid_width, grid_height)
+    grid:SetPoint("TOP", description, "BOTTOM", 0, -20)
+
+    for index, source in ipairs(SOURCES) do
+        local col = (index - 1) % BUTTONS_PER_ROW
+        local row = math.floor((index - 1) / BUTTONS_PER_ROW)
+        local button = CreateFrame("Button", nil, grid, "UIPanelButtonTemplate")
+        button:SetSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+        button:SetPoint("TOPLEFT", grid, "TOPLEFT",
+            col * (BUTTON_WIDTH + COL_GAP), -row * (BUTTON_HEIGHT + ROW_GAP))
         button:SetText(source.name)
         button:SetScript("OnClick", function()
             editBox:SetText(source.url)
             editBox:SetFocus()
             editBox:HighlightText()
         end)
-        previousButton = button
     end
 
     editBox:SetText(SOURCES[1].url)
@@ -181,7 +204,7 @@ function Update:Notify(newVersion)
     scheduleUpdatePopup(newVersion)
     if warnedVersions[newVersion] then return end
     warnedVersions[newVersion] = true
-    print("|cffffff00[MRP]|r A newer version (" .. newVersion .. ") is available; you are running " .. getVersion() .. ". Type |cffffffff/mrp update|r for official GitHub, CurseForge, and Wago downloads.")
+    print("|cffffff00[MRP]|r A newer version (" .. newVersion .. ") is available; you are running " .. getVersion() .. ". Type |cffffffff/mrp update|r for official CurseForge, GitHub, Wago and WoWInterface downloads.")
 end
 
 --- Returns true when `candidate` is a strictly newer version than `current`.
@@ -195,19 +218,28 @@ function Update:PrintVersions()
     local getMetadata = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
     local isLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
 
-    -- Print a separately-shipped companion AddOn line. GetAddOnMetadata reads the
-    -- on-disk TOC, so it returns a version even when the AddOn is installed but
-    -- DISABLED (unchecked in the AddOns list) — which is misleading because a
-    -- disabled companion contributes nothing at runtime. So report the loaded
-    -- state: skip entirely when not installed, and mark it (disabled) when it is
-    -- installed but not loaded.
-    local function printCompanion(label, addonName)
+    local embeds = ", " .. (getMetadata("MountRoutePlanner", "X-Embeds") or "") .. ","
+    local function printCompanion(label, addonName, api, runtimeVersion)
         local version = getMetadata(addonName, "Version")
-        if not version then return end -- not installed
-        if isLoaded and isLoaded(addonName) then
-            print("  " .. label .. ": |cffffffff" .. tostring(version) .. "|r")
-        else
-            print("  " .. label .. ": |cffffffff" .. tostring(version) .. "|r |cff999999(installed, disabled)|r")
+        local standaloneLoaded = version and isLoaded and isLoaded(addonName)
+        local embedded = embeds:find(", " .. addonName .. ",", 1, true) ~= nil
+        if runtimeVersion then
+            local tocVersion = tostring(version or ""):gsub("^v", "")
+            -- Copies from before the handover have no Shutdown and always stay active.
+            local legacy = standaloneLoaded and type(api) == "table" and not api.Shutdown
+            local isStandalone = legacy or (standaloneLoaded and (tostring(runtimeVersion) == tocVersion or formatVersion(runtimeVersion) == tocVersion))
+            local note = ""
+            if isStandalone then
+                note = " |cff999999(standalone)|r"
+            elseif standaloneLoaded then
+                note = " |cff999999(embedded in Mount Route Planner; standalone " .. formatVersion(tonumber(version) or version) .. " superseded)|r"
+            elseif embedded then
+                note = " |cff999999(embedded in Mount Route Planner)|r"
+            end
+            local shown = legacy and formatVersion(tonumber(version) or version) or formatVersion(runtimeVersion)
+            print("  " .. label .. ": |cffffffff" .. shown .. "|r" .. note)
+        elseif version then
+            print("  " .. label .. ": |cffffffff" .. formatVersion(tonumber(version) or version) .. "|r |cff999999(installed, disabled)|r")
         end
     end
 
@@ -216,20 +248,10 @@ function Update:PrintVersions()
     local mainVersion = getVersion()
     print("  Mount Route Planner: |cffffffff" .. mainVersion .. "|r")
 
-    -- FarstriderLib is a hard dependency embedded into MRP, so its runtime value
-    -- is always the active one. Prefer the separately-shipped TOC version when
-    -- present, else fall back to the runtime revision (embedded dev structure).
     local fs = MRP.Farstrider
-    local fsVersion = getMetadata("FarstriderLib", "Version")
-        or (fs and fs.VERSION and fs.VERSION ~= 0 and fs.VERSION or nil)
-    if fsVersion then
-        print("  FarstriderLib: |cffffffff" .. tostring(fsVersion) .. "|r")
-    end
-
-    -- FarstriderLib Data and Mount Route Planner Data are optional companions;
-    -- only report them as active when actually loaded.
-    printCompanion("FarstriderLib Data", "FarstriderLibData")
-    printCompanion("Mount Route Planner Data", "MountRoutePlannerData")
+    printCompanion("FarstriderLib", "FarstriderLib", FarstriderLib_API, fs and fs.VERSION and fs.VERSION ~= 0 and fs.VERSION or nil)
+    printCompanion("FarstriderLib Data", "FarstriderLibData", FarstriderLibData_API, FarstriderLibData_API and FarstriderLibData_API.VERSION)
+    printCompanion("Mount Route Planner Data", "MountRoutePlannerData", MRPData_API, MRPData_API and MRPData_API.VERSION)
 
     -- Note a known newer version, if one has been detected from other players.
     local detected = MRP_Settings and MRP_Settings.newestDetectedUpdateVersion
@@ -317,7 +339,26 @@ local function installChannelFilters()
     end
 end
 
+local function findJoinedDiscoveryChannel()
+    for _, channelName in ipairs(channelCandidates) do
+        if getJoinedChannelID(channelName) then
+            return channelName
+        end
+    end
+    return nil
+end
+
+local announceOnChannel
+
 local function tryJoinDiscoveryChannel(candidateIndex)
+    local joinedChannelName = findJoinedDiscoveryChannel()
+    if joinedChannelName then
+        activeChannelName = joinedChannelName
+        joiningChannel = nil
+        hideChannelFromChatFrames(joinedChannelName)
+        announceOnChannel(ANNOUNCE_COOLDOWN)
+        return
+    end
     candidateIndex = candidateIndex or 1
     local channelName = channelCandidates[candidateIndex]
     if not channelName then
@@ -333,9 +374,17 @@ local function tryJoinDiscoveryChannel(candidateIndex)
             activeChannelName = channelName
             joiningChannel = nil
             hideChannelFromChatFrames(channelName)
+            announceOnChannel(ANNOUNCE_COOLDOWN)
             return
         end
         tryJoinDiscoveryChannel(candidateIndex + 1)
+    end)
+end
+
+local function startDiscoveryJoin()
+    if not channelsRestored then return end
+    C_Timer.After(CHANNEL_JOIN_DELAY, function()
+        tryJoinDiscoveryChannel(1)
     end)
 end
 
@@ -346,8 +395,16 @@ local function joinDiscoveryChannel()
         return
     end
     if joiningChannel then return end
-    C_Timer.After(CHANNEL_JOIN_DELAY, function()
-        tryJoinDiscoveryChannel(1)
+    joiningChannel = true
+    -- Cached channels are restored (CHANNEL_UI_UPDATE) after PLAYER_ENTERING_WORLD; joining earlier reshuffles channel numbers.
+    if channelsRestored then
+        startDiscoveryJoin()
+        return
+    end
+    C_Timer.After(CHANNEL_RESTORE_TIMEOUT, function()
+        if channelsRestored then return end
+        channelsRestored = true
+        startDiscoveryJoin()
     end)
 end
 
@@ -360,7 +417,7 @@ local function sendVersion(distribution, cooldown, target)
     pcall(C_ChatInfo.SendAddonMessage, PREFIX, "V\t" .. getVersion(), distribution, target)
 end
 
-local function announceOnChannel(cooldown)
+function announceOnChannel(cooldown)
     local channelID = activeChannelName and getJoinedChannelID(activeChannelName)
     if not channelID then return end
     sendVersion("CHANNEL", cooldown or ANNOUNCE_COOLDOWN, tostring(channelID))
@@ -386,7 +443,14 @@ eventFrame:RegisterEvent("CHAT_MSG_ADDON")
 eventFrame:RegisterEvent("GROUP_ROSTER_UPDATE")
 eventFrame:RegisterEvent("GUILD_ROSTER_UPDATE")
 eventFrame:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+pcall(eventFrame.RegisterEvent, eventFrame, "CHANNEL_UI_UPDATE")
 eventFrame:SetScript("OnEvent", function(_, event, prefix, message, distribution, sender)
+    if event == "CHANNEL_UI_UPDATE" then
+        if channelsRestored then return end
+        channelsRestored = true
+        if joiningChannel then startDiscoveryJoin() end
+        return
+    end
     if event == "PLAYER_LOGIN" then
         pcall(C_ChatInfo.RegisterAddonMessagePrefix, PREFIX)
         local detectedVersion = MRP_Settings.newestDetectedUpdateVersion

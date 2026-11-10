@@ -1528,7 +1528,7 @@ function Map:UpdateOverlay()
                             local bestDifficulties = MRP.Core:GetMostSuitableDifficultyIds(step)
                             if #bestDifficulties > 0
                                 and not tContains(bestDifficulties, GetDungeonDifficultyID())
-                                and not tContains(bestDifficulties, WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and GetLegacyRaidDifficultyID() or GetRaidDifficultyID())
+                                and not tContains(bestDifficulties, MRP.MAINLINE_API and GetLegacyRaidDifficultyID() or GetRaidDifficultyID())
                                 and not tContains(bestDifficulties, GetRaidDifficultyID()) then
                                 if entry.availableDifficultyIds and #bestDifficulties ~= #entry.availableDifficultyIds then
                                     if #bestDifficulties > 1 then

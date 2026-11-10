@@ -11,9 +11,26 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.4.5"
+local CHANGELOG_VERSION = "v2.5.0"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.5.0|r
+
+|cff00ff00What's New|r
+- Added support for World of Warcraft: Forever, with mount, step, zone and travel data from Forever's own game build, including the Powderfuse Port boat, the skycutters to Zephras Isle, the Galestrider vendor and the Pack Kodo quartermasters.
+- The CurseForge download now carries FarstriderLib and the data packages inside the Mount Route Planner folder. Separately installed copies from this release on are handled automatically (the newest is used); update or remove older ones. |cffffd200/mrp versions|r shows which copy is active.
+
+|cffff2020Fixes|r
+- Route directions are now shown in French on French clients (thanks |cff6fd3ffNeogeekmo|r).
+- Classic versions now point Pinto and Timber Wolf at the Pinto Bridle and Horn of the Timber Wolf sold by the vendors.
+- Travel routing on Classic Era, TBC, Wrath and Cataclysm Classic now knows many connections it used to ignore there, such as the Deeprun Tram, mage teleports, Atiesh, Moonglade, the Lunar Festival Invitation, the Blasted Lands and Shattrath portals and, on Wrath and Cataclysm Classic, Death Gate and the Stormwind–Borean Tundra boat.
+- Chat channels stay in order: the addon no longer re-joins its discovery channel before the game has restored your channels.
+- The download-source buttons in the "update available" window now fit, with CurseForge listed first.
+
+|cff00ff00Changes|r
+- Added support for Patch 12.1.5.
+
+
 |cffffd200Mount Route Planner 2.4.5|r
 
 |cffff2020Fixes|r

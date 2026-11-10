@@ -442,7 +442,7 @@ alertActionBtn:SetPushedTexture("Interface\\Icons\\Ability_Hunter_SniperShot")
 alertActionBtn:GetPushedTexture():SetVertexColor(0.6, 0.6, 0.6, 1)
 alertActionBtn:SetAttribute("type", "macro")
 alertActionBtn:RegisterForClicks("AnyUp", "AnyDown")
-if WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE then
+if not MRP.MAINLINE_API then
     alertActionBtn:RegisterForClicks("AnyUp")
 end
 alertActionBtn:Hide()
@@ -929,7 +929,7 @@ function Alert:Enable()
     vignetteWatcher:RegisterEvent("NAME_PLATE_UNIT_ADDED")
     vignetteWatcher:RegisterEvent("PLAYER_TARGET_CHANGED")
     vignetteWatcher:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
-    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+    if MRP.MAINLINE_API then
         vignetteWatcher:RegisterEvent("VIGNETTE_MINIMAP_UPDATED")
         vignetteWatcher:RegisterEvent("VIGNETTES_UPDATED")
     end
