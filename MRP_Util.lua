@@ -30,6 +30,12 @@ function Util.ShallowCopy(t)
     return copy
 end
 
+---@param value any
+---@return boolean
+function Util.IsSecret(value)
+    return issecretvalue ~= nil and issecretvalue(value)
+end
+
 ---@type table<number, ItemMixin>
 local itemCache = {}
 
@@ -163,6 +169,20 @@ function Util.GetStepEntry(step)
     end
 end
 
+---@param factionId number
+---@return string? name
+---@return number? standing
+function Util.GetFactionStanding(factionId)
+    local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
+    if factionData then
+        return factionData.name, factionData.reaction
+    end
+    if GetFactionInfoByID then
+        local name, _, standing = GetFactionInfoByID(factionId)
+        return name, standing
+    end
+end
+
 --- Build the list of ALL conditions that apply to a step.
 --- Each entry is { type, key, met, message }.
 ---@param step Step
@@ -203,8 +223,13 @@ function Util.GetStepConditions(step)
             if factionId then
                 factionId = tonumber(factionId)
                 requiredStanding = tonumber(requiredStanding)
-                local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
-                met = factionData and factionData.currentStanding >= requiredStanding or false
+                if C_Reputation and C_Reputation.IsMajorFaction and C_Reputation.IsMajorFaction(factionId) then
+                    -- Renown factions have no standing to compare.
+                    met = true
+                else
+                    local _, standing = Util.GetFactionStanding(factionId)
+                    met = standing ~= nil and standing >= requiredStanding
+                end
             else
                 met = true
             end

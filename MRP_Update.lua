@@ -280,7 +280,7 @@ end
 -- Shared discovery channel
 ---------------------------------------------------------------------------
 local function cleanChannelName(channelName)
-    if type(channelName) ~= "string" then return nil end
+    if MRP.Util.IsSecret(channelName) or type(channelName) ~= "string" then return nil end
     local cleaned = channelName:match("^%d+%.%s*(.+)$") or channelName
     return string.lower(cleaned or "")
 end

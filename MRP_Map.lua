@@ -8,6 +8,8 @@ MRP.Map = Map
 
 -- Path state (shared with MRP_UI pathfinding logic via MRP.Map)
 Map.pathKey = nil
+Map.pathTarget = nil
+Map.replanAfterFlight = false
 Map.path = nil
 Map.pathPos = 1
 Map.pathStep = nil

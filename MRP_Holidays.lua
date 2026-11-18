@@ -17,41 +17,53 @@ local holidayCacheTime = 0
 local HOLIDAY_CACHE_TTL = 1800
 
 --- Build a unix timestamp from a CalendarTime table.
---- The fields read from a CalendarTime can be "secret" values while execution is
---- tainted (WoW 11.x+). Reading them is fine, but performing arithmetic/comparison
---- on a secret value raises an error and would spread taint into Blizzard code, so
---- the conversion is wrapped in a pcall and any failure yields a neutral timestamp.
 ---@param ct table A CalendarTime-like table with year/month/monthDay/hour/minute
 ---@return number timestamp
 local function CalendarTimeToTimestamp(ct)
     if not ct or not ct.year then return 0 end
-    local ok, ts = pcall(time, {
+    return time({
         year = ct.year,
         month = ct.month,
         day = ct.monthDay,
         hour = ct.hour or 0,
         min = ct.minute or 0,
         sec = 0,
-    })
-    if ok and type(ts) == "number" then
-        return ts
-    end
-    return 0
+    }) or 0
 end
 
---- Safely compare the (potentially secret) calendarType of an event against the
---- "HOLIDAY" constant. Comparing a secret string value with `==` raises an error
---- while tainted, so the comparison is contained in a pcall; a failure is treated
---- as "not a holiday" instead of letting the error propagate into Blizzard code.
----@param calendarType any
----@return boolean
-local function IsHolidayCalendarType(calendarType)
-    local ok, isHoliday = pcall(function() return calendarType == "HOLIDAY" end)
-    return ok and isHoliday == true
+--- Collect the holiday events of the calendar month currently shown by C_Calendar.
+---@param holidays table<number, { startTime: number, endTime: number }>
+---@return boolean complete false when the calendar returned secret values
+local function ScanCalendarMonth(holidays)
+    local numDays = C_Calendar.GetMonthInfo().numDays or 31
+
+    for day = 1, numDays do
+        local numEvents = C_Calendar.GetNumDayEvents(0, day)
+        for i = 1, numEvents do
+            local event = C_Calendar.GetDayEvent(0, day, i)
+            if event and (MRP.Util.IsSecret(event.eventID) or MRP.Util.IsSecret(event.calendarType)) then
+                return false
+            end
+            if event and event.eventID and event.calendarType == "HOLIDAY" then
+                local startTS = CalendarTimeToTimestamp(event.startTime)
+                local endTS = CalendarTimeToTimestamp(event.endTime)
+                -- Keep the widest window if we see the same event multiple times
+                local existing = holidays[event.eventID]
+                if existing then
+                    if startTS < existing.startTime then existing.startTime = startTS end
+                    if endTS > existing.endTime then existing.endTime = endTS end
+                else
+                    holidays[event.eventID] = { startTime = startTS, endTime = endTS }
+                end
+            end
+        end
+    end
+
+    return true
 end
 
 --- Scan the C_Calendar API for active and upcoming holiday events.
---- Populates `activeHolidays` keyed by eventID.
+--- Populates `activeHolidays` keyed by eventID; keeps the last scan while calendar data is secret.
 local function ScanCalendarHolidays()
     if not C_Calendar then return end
 
@@ -61,14 +73,23 @@ local function ScanCalendarHolidays()
         return
     end
 
-    activeHolidays = {}
-    holidayCacheTime = now
+    -- Calendar events are secret during chat messaging lockdown (dungeons, raids, encounters, PvP).
+    if C_ChatInfo and C_ChatInfo.InChatMessagingLockdown and C_ChatInfo.InChatMessagingLockdown() then
+        return
+    end
+
+    local holidays = {}
 
     local currentDate = C_DateAndTime.GetCurrentCalendarTime()
-    if not currentDate then return end
+    if not currentDate then
+        activeHolidays = holidays
+        holidayCacheTime = now
+        return
+    end
 
     local currentMonth = currentDate.month
     local currentYear = currentDate.year
+    local complete = true
 
     -- Scan current month ±1 to catch events that span month boundaries
     for monthOffset = -1, 1 do
@@ -83,30 +104,19 @@ local function ScanCalendarHolidays()
         end
 
         C_Calendar.SetAbsMonth(m, y)
-        local numDays = C_Calendar.GetMonthInfo().numDays or 31
-
-        for day = 1, numDays do
-            local numEvents = C_Calendar.GetNumDayEvents(0, day)
-            for i = 1, numEvents do
-                local event = C_Calendar.GetDayEvent(0, day, i)
-                if event and event.eventID and IsHolidayCalendarType(event.calendarType) then
-                    local startTS = CalendarTimeToTimestamp(event.startTime)
-                    local endTS = CalendarTimeToTimestamp(event.endTime)
-                    -- Keep the widest window if we see the same event multiple times
-                    local existing = activeHolidays[event.eventID]
-                    if existing then
-                        if startTS < existing.startTime then existing.startTime = startTS end
-                        if endTS > existing.endTime then existing.endTime = endTS end
-                    else
-                        activeHolidays[event.eventID] = { startTime = startTS, endTime = endTS }
-                    end
-                end
-            end
+        complete = ScanCalendarMonth(holidays)
+        if not complete then
+            break
         end
     end
 
     -- Reset calendar view back to current month
     C_Calendar.SetAbsMonth(currentMonth, currentYear)
+
+    if complete then
+        activeHolidays = holidays
+        holidayCacheTime = now
+    end
 end
 
 --- Check if a holiday event identified by its condition string is currently active.

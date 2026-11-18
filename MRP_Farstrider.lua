@@ -21,6 +21,7 @@ local defaults = {
         GetHelpfulItems = function() return {} end,
     },
     Rebuild = function() end,
+    RegisterRebuildCallback = function() end,
     FindTrail = function() return nil, nil, nil end,
     FindTrailTo = function() return nil, nil, nil end,
 }

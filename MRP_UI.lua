@@ -861,7 +861,7 @@ function UI:UpdateDisplay()
             end
             local allowLeftClick = navMapId and C_Map.GetMapInfo(navMapId) ~= nil
             local allowRightClick = EncounterJournal_OpenJournal ~= nil and ((mount.source.journalEncounter and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)) ~= nil
-                or ((sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid or sType == MRP.FilterSourceType.WorldBoss) and mount.source.uiMapIds[1] and (EJ_GetInstanceForMap(mount.source.uiMapIds[1]) or 0) > 0))
+                or ((sType == MRP.FilterSourceType.Dungeon or sType == MRP.FilterSourceType.Raid or sType == MRP.FilterSourceType.WorldBoss) and mount.source.uiMapIds[1] and EJ_GetInstanceForMap and (EJ_GetInstanceForMap(mount.source.uiMapIds[1]) or 0) > 0))
             local allowShiftLeftClick = SetCollectionsJournalShown and MountJournal_SetSelected
 
             mountBtn:SetScript("OnEnter", function()
@@ -1125,8 +1125,10 @@ function UI:UpdateDisplay()
 
     -- Show warnings for any unmet conditions (faction, warfront, reputation, holiday, …)
     local conditions = MRP.Util.GetStepConditions(step)
+    local conditionsMet = true
     for _, cond in ipairs(conditions) do
         if not cond.met then
+            conditionsMet = false
             frame.noteText:SetText((frame.noteText:GetText() or "") .. "\n\n|cffff9900" .. cond.message .. "|r")
         end
     end
@@ -1162,7 +1164,7 @@ function UI:UpdateDisplay()
     if isInPvP then
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
         frame.stepPathfindingText:SetText(L["Pathfinding not available in PvP instances."])
-    elseif entry and not alreadyInInstance then
+    elseif entry and conditionsMet and not alreadyInInstance then
         if entry.instanceId and entry.instanceId == 2070 and isHorde then
             self:UpdateCurrentPathfinding(MRP.Data.RAIDS["Battle of Dazar'alor (H)"])
         elseif entry.instanceId and entry.instanceId == 2217 and MRP.Core:IsEntranceOnMap(MRP.Data.RAIDS["Ny'alotha, the Waking City (VoEB)"].mapID, entry.instanceId) then
@@ -1228,13 +1230,32 @@ function UI:ClearCurrentPathfindingData()
 end
 
 function UI:UpdateCurrentPathfinding(entry)
+    -- Keep the current route during a flight; PLAYER_CONTROL_GAINED re-plans it after landing
+    local pathTarget = format("%s:%s:%s", entry.mapID, entry.x, entry.y)
+    local onTaxi = UnitOnTaxi("player")
+    if onTaxi then
+        MRP.Map.replanAfterFlight = true
+    end
+    local keepPath = onTaxi and MRP.Map.path and MRP.Map.pathTarget == pathTarget
+    MRP.Map.pathTarget = pathTarget
+
+    if not keepPath and IsInInstance() then
+        local playerLocation, estimated = MRP.Route:GetPlayerLocation()
+        if not playerLocation or estimated then
+            self:ClearCurrentPathfindingData()
+            frame.stepPathfindingText:SetTextColor(1, 1, 1)
+            frame.stepPathfindingText:SetText(L["Leave the instance to see your route."])
+            return
+        end
+    end
+
     ---@diagnostic disable-next-line: undefined-global -- REMOVE_LINE
     if ClearLogs then -- REMOVE_LINE
         ---@diagnostic disable-next-line: undefined-global -- REMOVE_LINE
         ClearLogs()   -- REMOVE_LINE
     end               -- REMOVE_LINE
     ---@diagnostic disable-next-line: undefined-global
-    local optimizedPath = MRP.Farstrider.FindTrailTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
+    local optimizedPath = keepPath and MRP.Map.path or MRP.Farstrider.FindTrailTo(entry.mapID, entry.x / 100, entry.y / 100, 0)
 
     local newPathKey = nil
     if optimizedPath then
@@ -1264,6 +1285,8 @@ function UI:UpdateCurrentPathfinding(entry)
         frame.stepPathfindingText:SetTextColor(1, 0.6, 0.6)
         frame.stepPathfindingText:SetText(MRP.Core:GetNoOptimizedPathMessage())
     end
+
+    MRP.Core:QueueFlightDataHint(entry.mapID)
 end
 
 ---@param mount Mount
@@ -1293,12 +1316,12 @@ function UI:GetLocalizedStepName(step)
     for _, mount in ipairs(step.mounts) do
         if mount.source.journalEncounter then
             if step.source.type == MRP.FilterSourceType.WorldBoss then
-                local encounterName = EJ_GetEncounterInfo(mount.source.journalEncounter.id)
+                local encounterName = EJ_GetEncounterInfo and EJ_GetEncounterInfo(mount.source.journalEncounter.id)
                 if encounterName then
                     return encounterName
                 end
             else
-                local instanceName = EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)
+                local instanceName = EJ_GetInstanceInfo and EJ_GetInstanceInfo(mount.source.journalEncounter.instanceId)
                 if instanceName then
                     return instanceName
                 end
@@ -1310,16 +1333,23 @@ function UI:GetLocalizedStepName(step)
         end
 
         local uiMapId = mount.source.uiMapIds and #mount.source.uiMapIds > 0 and mount.source.uiMapIds[#mount.source.uiMapIds] or nil
-        if uiMapId then
-            local instanceId = EJ_GetInstanceForMap(uiMapId)
-            if instanceId > 0 then
-                return select(1, EJ_GetInstanceInfo(instanceId))
+        if uiMapId and EJ_GetInstanceForMap then
+            local instanceId = EJ_GetInstanceForMap(uiMapId) or 0
+            local instanceName = instanceId > 0 and EJ_GetInstanceInfo and EJ_GetInstanceInfo(instanceId)
+            if instanceName then
+                return instanceName
             end
         end
     end
 
     if step.source.type == MRP.FilterSourceType.Raid then
         local raid = MRP.Data.RAIDS[step.source.name]
+        if raid and raid.instanceId then
+            local zoneName = GetRealZoneText(raid.instanceId)
+            if zoneName and zoneName ~= "" then
+                return zoneName
+            end
+        end
         if raid and raid.areaId then
             local areaName = C_Map.GetAreaInfo(raid.areaId)
             if areaName then
@@ -1340,7 +1370,7 @@ end
 ---@return string
 function UI:GetLocalizedBossName(mount)
     if mount.source.journalEncounter then
-        local encounterName = EJ_GetEncounterInfo(mount.source.journalEncounter.id)
+        local encounterName = EJ_GetEncounterInfo and EJ_GetEncounterInfo(mount.source.journalEncounter.id)
         if encounterName then
             return encounterName
         end
@@ -1430,9 +1460,11 @@ function UI:CanUseSpell(spellId)
     if not C_SpellBook.IsSpellInSpellBook(spellId) then return false end
 
     local chargeInfo = C_Spell.GetSpellCharges(spellId)
-    if chargeInfo and chargeInfo.currentCharges > 0 then return true end
+    if chargeInfo and not MRP.Util.IsSecret(chargeInfo.currentCharges) and chargeInfo.currentCharges > 0 then return true end
 
-    return C_Spell.GetSpellCooldown(spellId).duration <= 0
+    local cooldown = C_Spell.GetSpellCooldown(spellId)
+    if MRP.Util.IsSecret(cooldown.duration) then return cooldown.isActive == false end
+    return cooldown.duration <= 0
 end
 
 ---@param itemId number
@@ -1454,14 +1486,16 @@ function UI:CanUseItem(itemId)
     if not itemId then return false end
     if not (HasUsableToy(itemId) or (C_Item.GetItemCount(itemId) > 0 and C_Item.IsUsableItem(itemId))) then return false end
 
+    local duration
     if C_Item.GetItemCooldown then
-        if select(2, C_Item.GetItemCooldown(itemId)) <= 0 then return true end
+        duration = select(2, C_Item.GetItemCooldown(itemId))
     elseif C_Container then
-        if select(2, C_Container.GetItemCooldown(itemId)) <= 0 then return true end
+        duration = select(2, C_Container.GetItemCooldown(itemId))
     end
+    if not MRP.Util.IsSecret(duration) and duration and duration <= 0 then return true end
 
     local chargeInfo = C_Spell.GetSpellCharges(C_Item.GetItemSpell(itemId))
-    if chargeInfo and chargeInfo.currentCharges > 0 then return true end
+    if chargeInfo and not MRP.Util.IsSecret(chargeInfo.currentCharges) and chargeInfo.currentCharges > 0 then return true end
 
     return false
 end
@@ -1498,6 +1532,7 @@ function UI:ShowCurrentPathfindingStep()
     end
 
     local validActionOptions = {}
+    local leavesInstance = false
     for _, actionOption in ipairs(actionOptions) do
         if actionOption.type == "spell" and self:CanUseSpell(actionOption.data) then
             table.insert(validActionOptions, actionOption)
@@ -1514,6 +1549,12 @@ function UI:ShowCurrentPathfindingStep()
             break
         elseif actionOption.type == "housing_return" then
             table.insert(validActionOptions, actionOption)
+            break
+        elseif actionOption.type == "leave_instance" then
+            if IsInInstance() then
+                loca = format(L["Leave %s"], (GetInstanceInfo()))
+            end
+            leavesInstance = true
             break
         end
     end
@@ -1535,7 +1576,7 @@ function UI:ShowCurrentPathfindingStep()
         end
     end
 
-    if IsInInstance() and not gotAction then
+    if IsInInstance() and not gotAction and not leavesInstance then
         loca = L["Leave your current instance"]
     end
 

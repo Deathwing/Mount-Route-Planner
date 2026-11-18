@@ -4,6 +4,8 @@
 local Route = {}
 MRP.Route = Route
 
+local MIN_INSTANCE_LIB_VERSION = 10500 -- FarstriderLib 1.5.0 routes out of instances
+
 local continentCache = {}
 
 --- Get the continent mapID for a given uiMapID by walking up the map hierarchy.
@@ -48,11 +50,42 @@ function Route:GetStepEntry(step)
     return nil
 end
 
+---@param hash number
+---@param value number
+---@return number
+local function MixHash(hash, value)
+    return (hash * 31 + value) % 2147483647
+end
+
+--- Signature of the step data a route order is calculated from: data version plus every step location.
+---@return string signature
+function Route:GetSignature()
+    local hash = 0
+    for _, step in ipairs(MRP.Data.STEPS) do
+        local entry = self:GetStepEntry(step)
+        if entry and entry.mapID then
+            hash = MixHash(hash, step.id)
+            hash = MixHash(hash, entry.mapID)
+            hash = MixHash(hash, math.floor((entry.x or 0) * 100 + 0.5))
+            hash = MixHash(hash, math.floor((entry.y or 0) * 100 + 0.5))
+        end
+    end
+    return format("%s:%d", tostring(MRP.Data.VERSION), hash)
+end
+
 --- Check if the saved baseline route order covers all current steps.
---- Returns false if new steps were added (e.g. addon update) requiring recalculation.
+--- Returns false if new steps were added or the step data changed (e.g. addon update) requiring recalculation.
 ---@return boolean isValid
 function Route:IsRouteValid()
     if not MRP_CharacterSettings.routeOrder or #MRP_CharacterSettings.routeOrder == 0 then
+        return false
+    end
+
+    if #MRP.Data.STEPS == 0 then
+        return true
+    end
+
+    if MRP_CharacterSettings.routeSignature ~= self:GetSignature() then
         return false
     end
 
@@ -92,36 +125,60 @@ function Route:ApplyToFilteredSteps()
     end)
 end
 
----@return Location playerLocation
+--- House interiors and neighbourhoods are only left by teleport, so their own map is a good enough start.
+---@return boolean
+local function IsInHousing()
+    local instanceType = select(2, GetInstanceInfo())
+    return instanceType == "interior" or instanceType == "neighborhood"
+end
+
+--- Entrance of the dungeon or raid the player is in, where FarstriderLib starts routes that leave it.
+---@return Location?
+local function GetInstanceEntrance()
+    if (MRP.Farstrider.VERSION or 0) < MIN_INSTANCE_LIB_VERSION then
+        return nil
+    end
+
+    local getEntrance = MRP.Farstrider.DATA.GetInstanceEntrance
+    local entrance = getEntrance and IsInInstance() and getEntrance((select(8, GetInstanceInfo())))
+    if not entrance then
+        return nil
+    end
+
+    local uiMapId, uiMapCoords = C_Map.GetMapPosFromWorldPos(entrance.mapId, CreateVector2D(entrance.pos.x, entrance.pos.y), entrance.uiMapHint)
+    if not (uiMapId and uiMapCoords) then
+        return nil
+    end
+    return { mapId = uiMapId, pos = { x = uiMapCoords.x, y = uiMapCoords.y, z = 0 }, isUI = true }
+end
+
+---@return Location? playerLocation nil inside instances without a UI map or a known entrance (Classic Era, WoW Forever)
+---@return boolean? estimated true when the game gave no position and the location is a guess at the centre of the surrounding map
 function Route:GetPlayerLocation()
     local uiMapId = C_Map.GetBestMapForUnit("player")
-    local uiMapCoords = C_Map.GetPlayerMapPosition(C_Map.GetBestMapForUnit("player"), "player")
-
+    local uiMapCoords = uiMapId and C_Map.GetPlayerMapPosition(uiMapId, "player")
     if not uiMapCoords then
-        local parentMapId = C_Map.GetMapInfo(uiMapId).parentMapID
-        if parentMapId then
-            uiMapId = parentMapId
-
-            local instanceId = EJ_GetInstanceForMap and EJ_GetInstanceForMap(uiMapId)
-            local dungeonEntrances = C_EncounterJournal and C_EncounterJournal.GetDungeonEntrancesForMap and C_EncounterJournal.GetDungeonEntrancesForMap(parentMapId)
-
-            if instanceId and dungeonEntrances then
-                for _, entrance in ipairs(dungeonEntrances) do
-                    if entrance.journalInstanceID == instanceId then
-                        uiMapId = parentMapId
-                        uiMapCoords = entrance.position
-                        break
-                    end
-                end
-            end
+        local entrance = GetInstanceEntrance()
+        if entrance then
+            return entrance, false
         end
     end
 
+    if not uiMapId then
+        return nil
+    end
+
+    local estimated = false
     if not uiMapCoords then
+        if not IsInHousing() then
+            local mapInfo = C_Map.GetMapInfo(uiMapId)
+            uiMapId = mapInfo and mapInfo.parentMapID or uiMapId
+            estimated = true
+        end
         uiMapCoords = { x = 0.5, y = 0.5 }
     end
 
-    return { mapId = uiMapId, pos = { x = uiMapCoords.x, y = uiMapCoords.y, z = 0 }, isUI = true }
+    return { mapId = uiMapId, pos = { x = uiMapCoords.x, y = uiMapCoords.y, z = 0 }, isUI = true }, estimated
 end
 
 --- Calculate optimized baseline route using nearest-neighbor heuristic grouped by continent.
@@ -130,6 +187,7 @@ function Route:Calculate()
     local steps = MRP.Data.STEPS
     if #steps == 0 then
         MRP_CharacterSettings.routeOrder = nil
+        MRP_CharacterSettings.routeSignature = nil
         return
     end
 
@@ -243,6 +301,7 @@ function Route:Calculate()
         routeIds[#routeIds + 1] = step.id
     end
     MRP_CharacterSettings.routeOrder = routeIds
+    MRP_CharacterSettings.routeSignature = self:GetSignature()
 
     -- Apply to current filtered steps and reset position
     self:ApplyToFilteredSteps()

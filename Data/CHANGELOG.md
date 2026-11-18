@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.5.5
+
+### Fixes
+- The Hulking Deathroc (Violet Mistake) pin now sits at the Pool of Mixed Monstrosities in the House of Plagues, Maldraxxus 58.5, 74.2, instead of up by the House of Eyes. The step explains how to summon the rare (add 30 Oozing Ingredients, equal parts Viscous Oil and Mephitic Goo), and rare alerts now match it by its NPC ID
+- Temple of Ahn'Qiraj: on Classic Era and WoW Forever the step is no longer named Ruins of Ahn'Qiraj
+- Stratholme: the pin now marks the Service Entrance on Classic Era and TBC (it was about 200 yards off) and on WoW Forever (about 100 yards off)
+- Classic Era, WoW Forever, TBC and Wrath: the pins for Veron Amberstill and Milli Featherwhistle in Dun Morogh (about 350 yards off) and Lelanai in Darnassus (about 130 yards off) now sit at the vendors. On WoW Forever the same goes for Harb Clawhoof in Mulgore and Lieutenant Karter in Stormwind (150 to 175 yards off), and on Wrath for Lieutenant Karter (about 150 yards off); on TBC and Wrath, Doomwalker and Historian Ma'di moved about 40 yards
+- Wrath and Cataclysm Classic: The Culling of Stratholme, and Dragon Soul on Cataclysm Classic, are pinned on the Tanaris map; they pointed at a map those clients do not have
+
 ## 1.5.4
 
 ### Fixes

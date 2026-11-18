@@ -1,7 +1,7 @@
 -- MRPData~Init.lua
 -- local _, MRPData = ...
 
-local VERSION = 10504
+local VERSION = 10505
 
 local lib = MRPData_API
 if lib and lib.VERSION and (lib.VERSION >= VERSION or not lib.Shutdown) then return end

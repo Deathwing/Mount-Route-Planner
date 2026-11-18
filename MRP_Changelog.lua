@@ -11,9 +11,30 @@ local GetAddOnMetadataCompat = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddO
 local CURRENT_VERSION = GetAddOnMetadataCompat(ADDON_NAME, "Version") or "v0.0.0"
 -- Only advance this when CHANGELOG_CONTENT gains new user-facing notes.
 -- Patch/data-only releases can keep the previous changelog version to suppress a new popup.
-local CHANGELOG_VERSION = "v2.5.0"
+local CHANGELOG_VERSION = "v2.6.0"
 
 local CHANGELOG_CONTENT = [[
+|cffffd200Mount Route Planner 2.6.0|r
+
+|cff00ff00What's New|r
+- On Classic Era, WoW Forever and TBC Classic, routes now use the flight paths your character knows, including connecting flights, with realistic flight times.
+- Because the game does not share which flight paths you know, a flight master counts as known once you have opened its flight map, and when a route crosses a continent where your character has no flight data yet, a chat message asks you to visit a flight master there once.
+
+|cffff2020Fixes|r
+- Inside a dungeon or raid, routes to steps outside it now start with "Leave <instance name>" and continue from the entrance, or start with your Hearthstone or a teleport right inside when that is quicker, instead of starting in the middle of the map or, on Classic Era and WoW Forever, not finding a route at all.
+- On Classic Era, WoW Forever, TBC, Wrath and Cataclysm Classic, travel times now use the mount speed for your level, so boats, zeppelins, portals, flights and your Hearthstone are suggested when they save time, while mage teleports and portals, which cost a rune, need to save about half a minute. On Classic Era, WoW Forever and TBC, towns linked by a known flight are flown between instead of ridden over the mountains.
+- Routes now use your Hearthstone or Astral Recall when it lands close to your destination (for example Cenarion Hold for the Temple of Ahn'Qiraj) and work with many more inns and starting areas, but hearthstones and teleport items with a long cooldown are only used when they save more than about a minute.
+- Routes no longer suggest a teleport, portal, Hearthstone or teleport item that lands in the zone or city you are already in, and mages are told to cast a teleport they know instead of Create a portal to the same city.
+- Classic routes now take the right connections: Horde uses the zeppelin tower outside Orgrimmar, Alliance takes the Auberdine boat and the Rut'theran Village teleporter to Darnassus, Wrath and Cataclysm Classic no longer send you walking up into Dalaran, and portals your game version does not have are no longer suggested.
+- Retail routes from Stormwind use the Wizard's Sanctum portals again when your character can use them, routes back from your house plot start where you return to instead of at your Hearthstone location, and Cataclysm Classic routes now use the guild cloaks.
+- Route steps now say "Take the Deeprun Tram" between Stormwind and Ironforge instead of calling it a portal.
+- The route no longer resets in mid-air on a flight path and is planned again after you land. Your saved route order is planned again when steps move, and once for every character after this update.
+- Route steps now appear on the zone map instead of the continent map, so TomTom arrows and map pins land on the right spot, and pins such as the Hulking Deathroc, the Stratholme Service Entrance and several Classic vendors were moved to where they belong.
+- Steps your character cannot use right now, such as a holiday vendor outside the holiday, now show only their requirement instead of saying you cannot reach them, and reputation requirements are checked correctly.
+- On WoW Forever and retail, Mount Route Planner no longer causes errors in dungeons, raids, delves and Mythic+, where the game hides some information from addons, and holiday, timewalking and teleport steps keep working there.
+- |cffffd200/mrp versions|r no longer says "embedded in Mount Route Planner" when the active copy comes from another addon.
+
+
 |cffffd200Mount Route Planner 2.5.0|r
 
 |cff00ff00What's New|r

@@ -298,8 +298,7 @@ function Core:GetConditionMessage(condition)
     local factionId, requiredStanding = condition:match("^rep_(%d+)_(%d+)$")
     if factionId then
         factionId = tonumber(factionId)
-        local factionData = C_Reputation and C_Reputation.GetFactionDataByID and C_Reputation.GetFactionDataByID(factionId)
-        local factionName = factionData and factionData.name or tostring(factionId)
+        local factionName = MRP.Util.GetFactionStanding(factionId) or tostring(factionId)
         local standingNames = { [4] = FACTION_STANDING_LABEL4, [5] = FACTION_STANDING_LABEL5, [6] = FACTION_STANDING_LABEL6, [7] = FACTION_STANDING_LABEL7, [8] = FACTION_STANDING_LABEL8 }
         local standingName = standingNames[tonumber(requiredStanding)] or requiredStanding
         return format(L["Requires %s reputation with %s."], standingName, factionName)
@@ -529,7 +528,11 @@ function Core:GetNoOptimizedPathMessage()
         return addon_issue_checkers[MRP.RequiredAddon.FarstriderLibData].message
     end
 
-    return L["You can't reach this destination.\nFurther advancement in the Campaign might be required."]
+    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+        return L["You can't reach this destination.\nFurther advancement in the Campaign might be required."]
+    end
+
+    return L["You can't reach this destination."]
 end
 
 local setupWarningsShown = false
@@ -546,13 +549,82 @@ function Core:PrintSetupWarnings()
     end
 end
 
+local FLIGHT_DATA_HINT_DELAY = 5
+local flightDataHintsShown = {}
+local flightDataHintTimer = nil
+
+---@param uiMapId number?
+local function PrintFlightDataHint(uiMapId)
+    local continentId = uiMapId and MRP.Route:GetContinentForMap(uiMapId)
+    if not continentId or flightDataHintsShown[continentId] or MRP.Farstrider.DATA.HasFlightData(uiMapId) then
+        return
+    end
+
+    flightDataHintsShown[continentId] = true
+    local mapInfo = C_Map.GetMapInfo(continentId)
+    if mapInfo and mapInfo.name then
+        print("|cffffcc00[MRP]|r " .. format(L["Talk to a flight master in %s once so your routes can use your flight paths."], mapInfo.name))
+    end
+end
+
+-- Deferred and debounced so FarstriderLib's graph rebuild settles first
+---@param stepMapId number?
+function Core:QueueFlightDataHint(stepMapId)
+    if not MRP.Farstrider.DATA.HasFlightData then
+        return
+    end
+
+    if flightDataHintTimer then
+        flightDataHintTimer:Cancel()
+    end
+    flightDataHintTimer = C_Timer.NewTimer(FLIGHT_DATA_HINT_DELAY, function()
+        flightDataHintTimer = nil
+        PrintFlightDataHint(C_Map.GetBestMapForUnit("player"))
+        PrintFlightDataHint(stepMapId)
+    end)
+end
+
 ---@param event string
 function Core:CheckForDisplayUpdate(event)
+    if event == "PLAYER_CONTROL_LOST" then
+        if UnitOnTaxi("player") then
+            MRP.Map.replanAfterFlight = true
+        end
+        return
+    end
+
+    -- Control also returns when fear, charm or possess ends; only a landing needs a new route
+    if event == "PLAYER_CONTROL_GAINED" then
+        if MRP.Map.replanAfterFlight then
+            -- Deferred so UnitOnTaxi has settled after landing
+            C_Timer.After(0.5, function()
+                MRP.Map.replanAfterFlight = false
+                MRP.UI:UpdateDisplay()
+            end)
+        end
+        return
+    end
+
     if not (event == "MERCHANT_CLOSED" or event == "NEW_MOUNT_ADDED" or event == "UPDATE_INSTANCE_INFO" or event == "PLAYER_DIFFICULTY_CHANGED" or event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "ZONE_CHANGED_NEW_AREA") then
         return
     end
 
     MRP.UI:UpdateDisplay()
+end
+
+local replanPending = false
+
+-- FarstriderLib rebuilds its graph when flight paths are learned, on level-ups and after data changes
+function Core:OnTravelGraphRebuilt()
+    if replanPending then
+        return
+    end
+
+    replanPending = true
+    C_Timer.After(0.5, function()
+        replanPending = false
+        MRP.UI:UpdateDisplay()
+    end)
 end
 
 ---@param event string
@@ -620,11 +692,25 @@ local timewalkingSpellIds = {
 local activeTimewalkingMapCache = nil
 local activeTimewalkingMapCacheExpires = 0
 
----@return { [number]: boolean} activeTimewalkingMap
+-- Secret auras are not returned, so a miss would read as "inactive".
+---@return boolean
+local function AreTimewalkingAurasSecret()
+    if not C_Secrets then return false end
+    for _, data in ipairs(timewalkingSpellIds) do
+        if C_Secrets.ShouldSpellAuraBeSecret(data.spellId) then return true end
+    end
+    return false
+end
+
+---@return { [number]: boolean} activeTimewalkingMap the last known map while the auras are secret
 function Core:GetActiveTimewalkingMap()
     local now = time()
     if activeTimewalkingMapCache and now < activeTimewalkingMapCacheExpires then
         return activeTimewalkingMapCache
+    end
+
+    if AreTimewalkingAurasSecret() then
+        return activeTimewalkingMapCache or {}
     end
 
     local activeTimewalkingMap = {}
@@ -641,7 +727,27 @@ function Core:GetActiveTimewalkingMap()
     return activeTimewalkingMapCache
 end
 
+local timewalkingFilterRetry = CreateFrame("Frame")
+timewalkingFilterRetry:SetScript("OnEvent", function()
+    if Core:FilterTimewalkingSteps() then
+        MRP.Filter:Apply()
+    end
+end)
+
+--- Removes timewalking difficulties of inactive events. This cannot be undone, so it waits while the auras are secret.
+---@return boolean filtered
 function Core:FilterTimewalkingSteps()
+    if AreTimewalkingAurasSecret() then
+        timewalkingFilterRetry:RegisterEvent("ENCOUNTER_END")
+        timewalkingFilterRetry:RegisterEvent("PLAYER_REGEN_ENABLED")
+        timewalkingFilterRetry:RegisterEvent("ZONE_CHANGED_NEW_AREA")
+        if C_EventUtils and C_EventUtils.IsEventValid("ADDON_RESTRICTION_STATE_CHANGED") then
+            timewalkingFilterRetry:RegisterEvent("ADDON_RESTRICTION_STATE_CHANGED")
+        end
+        return false
+    end
+    timewalkingFilterRetry:UnregisterAllEvents()
+
     local activeTimewalkingMap = self:GetActiveTimewalkingMap()
 
     for _, step in ipairs(MRP.Data.STEPS) do
@@ -681,6 +787,8 @@ function Core:FilterTimewalkingSteps()
             raid.availableDifficultyIds = newAllowedDifficultyIds
         end
     end
+
+    return true
 end
 
 function Core:InitializeSettings()
@@ -863,6 +971,8 @@ watcher:RegisterEvent("HEARTHSTONE_BOUND")
 watcher:RegisterEvent("MERCHANT_CLOSED")
 watcher:RegisterEvent("MERCHANT_SHOW")
 watcher:RegisterEvent("NEW_MOUNT_ADDED")
+watcher:RegisterEvent("PLAYER_CONTROL_GAINED")
+watcher:RegisterEvent("PLAYER_CONTROL_LOST")
 watcher:RegisterEvent("PLAYER_DIFFICULTY_CHANGED")
 watcher:RegisterEvent("PLAYER_ENTERING_WORLD")
 watcher:RegisterEvent("PLAYER_LEAVE_COMBAT")
@@ -901,6 +1011,7 @@ f:SetScript("OnEvent", function()
     Core:CheckCurrentStepComplete(false)
     MRP.Options:InitializeIgnoredHelpfulItems()
     Core:PrintSetupWarnings()
+    MRP.Farstrider.RegisterRebuildCallback(function() Core:OnTravelGraphRebuilt() end)
 
     if MRP.Alert and MRP_Settings.showRareAlert then
         MRP.Alert:Enable()

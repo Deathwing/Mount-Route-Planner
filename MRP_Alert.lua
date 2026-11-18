@@ -51,16 +51,15 @@ local alertHooksInstalled = false
 local IsStepAlertable
 
 local function FormatDebugValue(value)
+    if MRP.Util.IsSecret(value) then
+        return "<secret>"
+    end
+
     if value == nil then
         return "nil"
     end
 
-    local ok, formattedValue = pcall(tostring, value)
-    if not ok or formattedValue == "" then
-        return "<secret>"
-    end
-
-    return formattedValue
+    return tostring(value)
 end
 
 local function FormatDebugBool(value)
@@ -113,26 +112,19 @@ local function BuildNpcLookup()
 end
 
 local function GetNpcIDFromGUID(guid)
-    if not guid then return nil end
+    if MRP.Util.IsSecret(guid) or not guid then return nil end
 
-    local ok, npcID = pcall(function()
-        return select(6, strsplit("-", guid))
-    end)
-    if not ok or not npcID then
-        return nil
-    end
-
-    local convertOk, numericNpcID = pcall(tonumber, npcID)
-    return convertOk and numericNpcID or nil
+    local npcID = select(6, strsplit("-", guid))
+    return npcID and tonumber(npcID) or nil
 end
 
 local function NormalizeName(name)
-    if name == nil then
+    if MRP.Util.IsSecret(name) or name == nil then
         return nil
     end
 
-    local ok, normalizedName = pcall(strlower, name)
-    if not ok or normalizedName == "" then
+    local normalizedName = strlower(name)
+    if normalizedName == "" then
         return nil
     end
 
