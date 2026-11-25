@@ -17,174 +17,140 @@ local CHANGELOG_CONTENT = [[
 |cffffd200Mount Route Planner 2.6.0|r
 
 |cff00ff00What's New|r
-- On Classic Era, WoW Forever and TBC Classic, routes now use the flight paths your character knows, including connecting flights, with realistic flight times.
-- Because the game does not share which flight paths you know, a flight master counts as known once you have opened its flight map, and when a route crosses a continent where your character has no flight data yet, a chat message asks you to visit a flight master there once.
+- Classic Era, WoW Forever and TBC routes now use the flight paths you know
+- A flight path counts as known once you open that flight master's map
 
 |cffff2020Fixes|r
-- Inside a dungeon or raid, routes to steps outside it now start with "Leave <instance name>" and continue from the entrance, or start with your Hearthstone or a teleport right inside when that is quicker, instead of starting in the middle of the map or, on Classic Era and WoW Forever, not finding a route at all.
-- On Classic Era, WoW Forever, TBC, Wrath and Cataclysm Classic, travel times now use the mount speed for your level, so boats, zeppelins, portals, flights and your Hearthstone are suggested when they save time, while mage teleports and portals, which cost a rune, need to save about half a minute. On Classic Era, WoW Forever and TBC, towns linked by a known flight are flown between instead of ridden over the mountains.
-- Routes now use your Hearthstone or Astral Recall when it lands close to your destination (for example Cenarion Hold for the Temple of Ahn'Qiraj) and work with many more inns and starting areas, but hearthstones and teleport items with a long cooldown are only used when they save more than about a minute.
-- Routes no longer suggest a teleport, portal, Hearthstone or teleport item that lands in the zone or city you are already in, and mages are told to cast a teleport they know instead of Create a portal to the same city.
-- Classic routes now take the right connections: Horde uses the zeppelin tower outside Orgrimmar, Alliance takes the Auberdine boat and the Rut'theran Village teleporter to Darnassus, Wrath and Cataclysm Classic no longer send you walking up into Dalaran, and portals your game version does not have are no longer suggested.
-- Retail routes from Stormwind use the Wizard's Sanctum portals again when your character can use them, routes back from your house plot start where you return to instead of at your Hearthstone location, and Cataclysm Classic routes now use the guild cloaks.
-- Route steps now say "Take the Deeprun Tram" between Stormwind and Ironforge instead of calling it a portal.
-- The route no longer resets in mid-air on a flight path and is planned again after you land. Your saved route order is planned again when steps move, and once for every character after this update.
-- Route steps now appear on the zone map instead of the continent map, so TomTom arrows and map pins land on the right spot, and pins such as the Hulking Deathroc, the Stratholme Service Entrance and several Classic vendors were moved to where they belong.
-- Steps your character cannot use right now, such as a holiday vendor outside the holiday, now show only their requirement instead of saying you cannot reach them, and reputation requirements are checked correctly.
-- On WoW Forever and retail, Mount Route Planner no longer causes errors in dungeons, raids, delves and Mythic+, where the game hides some information from addons, and holiday, timewalking and teleport steps keep working there.
-- |cffffd200/mrp versions|r no longer says "embedded in Mount Route Planner" when the active copy comes from another addon.
+- Routes from inside a dungeon or raid now start by leaving it
+- Better choices of boats, portals, flights, Hearthstone and teleports
+- No more errors in dungeons, raids, delves and Mythic+
+- Map pins and TomTom arrows land on the right spot, plus smaller fixes
 
 
 |cffffd200Mount Route Planner 2.5.0|r
 
 |cff00ff00What's New|r
-- Added support for World of Warcraft: Forever, with mount, step, zone and travel data from Forever's own game build, including the Powderfuse Port boat, the skycutters to Zephras Isle, the Galestrider vendor and the Pack Kodo quartermasters.
-- The CurseForge download now carries FarstriderLib and the data packages inside the Mount Route Planner folder. Separately installed copies from this release on are handled automatically (the newest is used); update or remove older ones. |cffffd200/mrp versions|r shows which copy is active.
+- Added support for World of Warcraft: Forever
+- The CurseForge download now includes the companion addons (update older separate copies)
 
 |cffff2020Fixes|r
-- Route directions are now shown in French on French clients (thanks |cff6fd3ffNeogeekmo|r).
-- Classic versions now point Pinto and Timber Wolf at the Pinto Bridle and Horn of the Timber Wolf sold by the vendors.
-- Travel routing on Classic Era, TBC, Wrath and Cataclysm Classic now knows many connections it used to ignore there, such as the Deeprun Tram, mage teleports, Atiesh, Moonglade, the Lunar Festival Invitation, the Blasted Lands and Shattrath portals and, on Wrath and Cataclysm Classic, Death Gate and the Stormwind–Borean Tundra boat.
-- Chat channels stay in order: the addon no longer re-joins its discovery channel before the game has restored your channels.
-- The download-source buttons in the "update available" window now fit, with CurseForge listed first.
+- Route directions are now in French on French clients (thanks |cff6fd3ffNeogeekmo|r)
+- Classic routes know many more connections, such as the Deeprun Tram and mage teleports
+- Smaller fixes
 
 |cff00ff00Changes|r
-- Added support for Patch 12.1.5.
+- Added support for Patch 12.1.5
 
 
 |cffffd200Mount Route Planner 2.4.5|r
 
 |cffff2020Fixes|r
-- Route lines and direction arrows are no longer hidden by explored map areas on retail.
+- Explored map areas no longer hide route lines and arrows on retail
 
 |cff00ff00Changes|r
-- Added support for Patch 12.1.0 and updated all data to the 12.1.0 game build.
-- Added the new 12.1 mounts with routes and steps: Coiled Isle rares, Ral'kala, Gnarldor Isle delve, the new renown and reputation vendors, the Spirit of Tok'jara questline, Altar of Fangs, and The Venomous Abyss.
-- Removed mounts that are no longer obtainable: Carcinized Zerethsteed, Spectral Hawkstrider, and Lucent Hawkstrider.
-- Version discovery now works across the open world, not just within your guild or group, so update reminders reach more players.
+- Added support for Patch 12.1.0 and its new mounts
+- Removed mounts that are no longer obtainable
+- Update reminders now work outside your guild or group too
 
 
 |cffffd200Mount Route Planner 2.4.4|r
 
 |cff00ff00Changes|r
-- The update-available and changelog popups now only appear while resting (inn/city) instead of anywhere out of combat, so they no longer interrupt you in the open world.
-- Added a /mrp versions command that prints the versions of Mount Route Planner and its bundled components (FarstriderLib, data packages) and notes when a newer version has been seen from other players.
+- Update and changelog popups now only appear while resting in an inn or city
+- New /mrp versions command shows the installed versions
 
 
 |cffffd200Mount Route Planner 2.4.2|r
 
 |cff00ff00Changes|r
-- Added low-volume guild and group version discovery.
-- Added |cffffd200/mrp update|r with official GitHub, CurseForge, and Wago download sources.
-- Release tags now produce installable GitHub assets and publish the bundled addon family to Wago.
+- You are now told when guild or group members have a newer version
+- Added |cffffd200/mrp update|r with GitHub, CurseForge and Wago download links
+- Now also available on GitHub and Wago
 
 
 |cffffd200Mount Route Planner 2.4.1|r
 
 |cff00ff00Fixes|r
-- Travel routing no longer sends Alliance characters through Horde-only transports (Grom'gol/Undercity zeppelins, Ruins of Lordaeron portals). A 12.0.7 data format change had silently dropped all faction restrictions from the travel graph.
-- Route pins are now visible on the fullscreen world map on classic clients (TBC Anniversary, Mists of Pandaria).
-- Fixed a taint issue in the world map route overlay that could block Blizzard's own map pins and cause "secret number value" errors when hovering points of interest.
-- Midnight open-world, treasure, vendor, and quest steps (Ritual Sites, rares, Silvermoon vendors, and more) are now correctly tagged as Midnight content, so they respect the expansion filter.
-- The "Hide Minimap Button" checkbox and the "Recalculate Route" button no longer overlap in the settings panel.
-- The Waypoint System dropdown and checkboxes now show their current values the first time the settings panel is opened after login.
+- Alliance routes no longer use Horde-only zeppelins and portals
+- Route pins now show on the fullscreen world map on Classic clients
+- Fixed world map errors when hovering points of interest
+- Smaller fixes
 
 |cff00ff00Changes|r
-- Added support for TBC Anniversary 2.5.6 clients.
-- Updated data sources.
-- Updated Russian localization (thanks |cff6fd3ffZamestoTV|r).
+- Added support for TBC Anniversary 2.5.6
+- Updated Russian translation (thanks |cff6fd3ffZamestoTV|r)
 
 
 |cffffd200Mount Route Planner 2.4.0|r
 
 |cff00ff00What's New|r
-- Added an option to hide the minimap button (Settings → Mount Route Planner). You can still open the panel with |cffffd200/mrp|r.
-- Travel routing now suggests the Silvermoon City portal to Stormwind for Alliance characters.
+- You can now hide the minimap button, and |cffffd200/mrp|r still opens the panel
+- Alliance routes can now use the Silvermoon City portal to Stormwind
 
 |cff00ff00Fixes|r
-- Engineering-only travel toys (Wormhole Generators, Dimensional Rippers, Ultrasafe Transporters) are no longer suggested to characters who can't actually use them.
-- The Confiscated Cultist's Bag (Void-Scarred Lynx) now points to the Nightfall daily turn-in in Hallowfall instead of Voidstorm.
-- The Void-Scarred Gryphon, Void-Forged Stallion, Void-Scarred Pack Mother, and Void-Scarred Windrider now point to the correct Horrific Visions of Stormwind/Orgrimmar.
-- Zul'Aman mounts and treasures (including Magovu) now use the correct Zul'Aman map instead of Harandar.
-- The Sun Festival's Painted Roc is now correctly flagged as a Midnight mount so it respects the expansion filter.
-- Fixed a taint error in holiday detection that could spill over into Blizzard's map and tooltip code.
-- The Mobile Telemancy Beacon is no longer suggested outside Suramar, where it can't be used.
+- Travel items are only suggested when your character can use them
+- Several mounts now point to the right place
+- Fixed errors in the world map and tooltips
 
 |cff00ff00Changes|r
-- Added how-to-obtain notes for Vicious Saddle and Mark of Honor vendor mounts.
-- Removed Brawler's Burly Basilisk and Bruce, which are no longer obtainable.
-- Added 12.0.7 entries and updated data sources.
-- Updated Russian localization (thanks |cff6fd3ffZamestoTV|r).
+- Updated Russian translation (thanks |cff6fd3ffZamestoTV|r) and mount data for 12.0.7
 
 
 |cffffd200Mount Route Planner 2.3.1|r
 
 |cff00ff00Changes|r
-- The "Use TomTom for waypoints" checkbox has been replaced by a Waypoint System dropdown with three options: None, Waypoint (Blizzard's built-in map pin), and TomTom.
-- Existing settings are migrated automatically: TomTom-enabled users keep TomTom; disabled users switch to Waypoint.
-- The |cffffd200/mrp tomtom|r slash command is deprecated; use |cffffd200/mrp waypoint none||waypoint||tomtom|r instead.
-- Updated Russian localization (thanks |cff6fd3ffZamestoTV|r).
+- The TomTom checkbox is now a Waypoint System dropdown: None, Waypoint or TomTom
+- Your old setting carries over automatically
+- |cffffd200/mrp tomtom|r is replaced by |cffffd200/mrp waypoint none||waypoint||tomtom|r
+- Updated Russian translation (thanks |cff6fd3ffZamestoTV|r)
 
 
 |cffffd200Mount Route Planner 2.3.0|r
 
 |cff00ff00What's New|r
-- Timewalking filter: steps tied to specific Timewalking events are now automatically shown or hidden based on the currently active event, including Shadowlands Timewalking.
-- Other addons can now access key MRP frames through the public API (`MRP_API.Frames`).
+- Timewalking steps now show or hide with the active Timewalking event
 
 |cff00ff00Changes|r
-- Timewalking vendor availability is now detected hourly and cached, reducing redundant polling.
-- The changelog window now closes with the Escape key.
+- The changelog window now closes with Escape
 
 
 |cffffd200Mount Route Planner 2.2.0|r
 
 |cff00ff00What's New|r
-- Holiday and condition-based filters: Love is in the Air, Brewfest, Hallow's End, Feast of Winter Veil, WoW Anniversary, and more.
-- Filter dropdowns now automatically hide options that have no matching steps.
+- New holiday filters, such as Love is in the Air, Brewfest and Hallow's End
+- Filter lists now hide options with no matching steps
 
 |cff00ff00Changes|r
-- Added 7 missing holiday mounts: Love Witch's Sweeper, Spring Butterfly, Brewfest Bomber, Minion of Grumpus, The Headless Horseman's Ghoulish Charger, Illidari Doomhawk, and Azure Worldchiller.
-- Added Historian Ma'di (Anniversary vendor) and Izzy Hollyfizzle (Winter Veil vendor) as new step sources.
+- Added 7 missing holiday mounts and two holiday vendors
 
 |cff00ff00Fixes|r
-- Fixed restricted-identity errors from nearby rare alerts in delves and similar content where unit GUIDs or names can be secret.
+- Fixed errors from nearby rare alerts in delves
 
 
 |cffffd200Mount Route Planner 2.1.0|r
 
 |cff00ff00What's New|r
-- MRP now detects missing or outdated companion addons and shows clear setup warnings so you know exactly what to install.
-- Other addons can now interact with MRP through a public API.
-- MRP handles missing companion addons more gracefully instead of throwing errors.
+- Missing or outdated companion addons now show a clear warning instead of errors
 
 |cff00ff00Improvements|r
-- Unreachable destination warnings are now less alarming ("flight path might be required" instead of "required").
-- Various internal cleanup and stability improvements.
+- Unreachable destinations now say a flight path might be required
 
 |cff00ff00Fixes|r
-- Fixed heavy lag spikes from nearby rare alerts in crowded areas, especially with nameplates enabled.
+- Fixed lag spikes from nearby rare alerts in crowded areas
 
 
 |cffffd200Mount Route Planner 2.0.0|r
 
 |cff00ff00What's New|r
-- Added this changelog popup! Shows after updates and can be reopened with |cffffd200/mrp changelog|r.
-- Brand-new support for Vanilla, TBC, Wrath, and Cataclysm clients. Before 2.0.0, only Mists of Pandaria and Retail were supported.
-- Added a world map route overview with numbered pins, clustering, arrows, and current-step guidance.
-- Added nearby source alerts for world bosses, open-world rares, quests, treasures, and vendors, including a target button and scan macro.
-- Routes now recalculate automatically and remember your preferred step ordering.
-- Added faction-aware filters, condition-gated steps, quest-chain progress tracking, and housing teleport support where available.
-
-|cff00ff00Improvements|r
-- Better Classic and Anniversary compatibility with safer mount collection handling.
-- Improved tooltips and progress info for vendors, treasures, quests, helpful items, and difficulty ratings.
-- Smoother world map rendering with native pin pooling and dedicated route art.
+- Now supports Vanilla, TBC, Wrath and Cataclysm clients too
+- New world map route overview with numbered pins and arrows
+- Alerts for nearby rares, world bosses, quests, treasures and vendors
+- Routes recalculate automatically and remember your step order
+- Faction filters, quest-chain progress and housing teleports
+- Added this changelog (reopen it with |cffffd200/mrp changelog|r)
 
 |cff00ff00Fixes|r
-- Fixed mount collection data not loading on Classic clients, which could hide valid route steps.
-- Fixed missing waypoints and travel data on non-Standard flavors.
-- Fixed stale route orders after data updates by automatically recalculating baselines.
+- Fixed missing route steps and waypoints on Classic clients
 ]]
 
 local changelogFrame

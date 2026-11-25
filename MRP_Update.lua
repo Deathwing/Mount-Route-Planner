@@ -276,6 +276,28 @@ local function isLocalSender(sender)
     return shortSender == UnitName("player")
 end
 
+local function replyTarget(sender)
+    return Ambiguate and Ambiguate(sender, "short") or sender
+end
+
+if MRP.IS_FOREVER then
+    -- Forever has no realms: names are "First Surname", and "First-Surname" is the same player.
+    local function fullName(name)
+        if type(name) ~= "string" then return nil end
+        name = name:gsub("[%s%-]+$", "")
+        if name:find(" ", 1, true) then return (name:gsub("%-.*$", "")) end
+        return (name:gsub("%-", " ", 1))
+    end
+
+    isLocalSender = function(sender)
+        local name, surname = UnitName("player")
+        if surname and surname ~= "" then name = name .. " " .. surname end
+        return fullName(sender) == name
+    end
+
+    replyTarget = fullName
+end
+
 ---------------------------------------------------------------------------
 -- Shared discovery channel
 ---------------------------------------------------------------------------
@@ -481,7 +503,7 @@ eventFrame:SetScript("OnEvent", function(_, event, prefix, message, distribution
         if type(message) ~= "string" then return end
         -- A peer explicitly asks for our version -> whisper it straight back.
         if message:match("^VER_REQ") then
-            local target = Ambiguate and Ambiguate(sender, "short") or sender
+            local target = replyTarget(sender)
             if target and target ~= "" then
                 sendVersion("WHISPER", RESPONSE_COOLDOWN, target)
             end

@@ -1,5 +1,11 @@
 # Mount Route Planner
 
+## [v2.6.1](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.6.1) (2026-11-25)
+[Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.6.1) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
+
+### Fixes
+- WoW Forever: Mount Route Planner no longer answers its own version check.
+
 ## [v2.6.0](https://github.com/Deathwing/Mount-Route-Planner/releases/tag/v2.6.0) (2026-11-18)
 [Full Changelog](https://github.com/Deathwing/Mount-Route-Planner/commits/v2.6.0) [Previous Releases](https://github.com/Deathwing/Mount-Route-Planner/releases)
 
